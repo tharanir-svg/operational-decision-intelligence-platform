@@ -1,1 +1,63 @@
-
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://odip.dev/schemas/entity.schema.json",
+  "title": "Operational Entity",
+  "description": "Schema defining entities referenced by operational events.",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "entityType",
+    "importance",
+    "version"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^ENT-[A-Z]{3}-\\d{3}$"
+    },
+    "name": {
+      "type": "string"
+    },
+    "entityType": {
+      "type": "string",
+      "enum": [
+        "Person",
+        "Organization",
+        "Government",
+        "Location",
+        "Infrastructure",
+        "Airport",
+        "Seaport",
+        "Company",
+        "Political Office",
+        "Military",
+        "Critical Infrastructure",
+        "Transportation",
+        "Cyber Asset"
+      ]
+    },
+    "importance": {
+      "type": "string",
+      "enum": [
+        "Low",
+        "Medium",
+        "High",
+        "Critical"
+      ]
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "country": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}
