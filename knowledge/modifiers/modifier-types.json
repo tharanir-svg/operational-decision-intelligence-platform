@@ -1,0 +1,112 @@
+{
+  "version": "1.0.0",
+  "description": "Canonical operational modifier catalogue.",
+
+  "categories": [
+
+    {
+      "name": "Human Impact",
+      "modifiers": [
+        "Fatalities",
+        "Injuries",
+        "Missing Persons",
+        "Hostages",
+        "Displaced Population",
+        "Evacuation"
+      ]
+    },
+
+    {
+      "name": "Operational Impact",
+      "modifiers": [
+        "Road Closure",
+        "Airport Closure",
+        "Rail Disruption",
+        "Port Closure",
+        "Power Outage",
+        "Telecommunications Failure",
+        "Internet Disruption"
+      ]
+    },
+
+    {
+      "name": "Government",
+      "modifiers": [
+        "National Leadership",
+        "Foreign Government",
+        "Diplomatic Mission",
+        "Election",
+        "Martial Law",
+        "Emergency Declaration"
+      ]
+    },
+
+    {
+      "name": "Critical Infrastructure",
+      "modifiers": [
+        "Airport",
+        "Power Grid",
+        "Hospital",
+        "Nuclear Facility",
+        "Water Treatment",
+        "Oil & Gas"
+      ]
+    },
+
+    {
+      "name": "Corporate",
+      "modifiers": [
+        "Fortune 500",
+        "Public Company",
+        "Financial Institution",
+        "Supply Chain",
+        "Manufacturing",
+        "Data Center"
+      ]
+    },
+
+    {
+      "name": "Cyber",
+      "modifiers": [
+        "Ransomware",
+        "Data Breach",
+        "Credential Theft",
+        "Service Outage",
+        "Critical Vulnerability"
+      ]
+    },
+
+    {
+      "name": "Conflict",
+      "modifiers": [
+        "Military Activity",
+        "Cross-border",
+        "Missile Strike",
+        "Drone Activity",
+        "Naval Activity",
+        "Airspace Violation"
+      ]
+    },
+
+    {
+      "name": "Environmental",
+      "modifiers": [
+        "Hazardous Material",
+        "Chemical Release",
+        "Biological Hazard",
+        "Radiological Hazard"
+      ]
+    },
+
+    {
+      "name": "Public Interest",
+      "modifiers": [
+        "Media Attention",
+        "Social Media Trending",
+        "International Coverage",
+        "VIP Involved",
+        "US Citizen"
+      ]
+    }
+  ]
+}
