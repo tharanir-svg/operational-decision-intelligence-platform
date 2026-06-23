@@ -1,0 +1,53 @@
+{
+  "version": "1.0.0",
+  "description": "Canonical operational relationship catalogue.",
+
+  "relationships": [
+
+    {
+      "type": "affects",
+      "description": "An event impacts an entity."
+    },
+
+    {
+      "type": "occursAt",
+      "description": "An event happens at a location or facility."
+    },
+
+    {
+      "type": "targets",
+      "description": "An event intentionally targets an entity."
+    },
+
+    {
+      "type": "involves",
+      "description": "An entity participates in an event."
+    },
+
+    {
+      "type": "causes",
+      "description": "An event causes a modifier."
+    },
+
+    {
+      "type": "requires",
+      "description": "A policy requires a modifier."
+    },
+
+    {
+      "type": "belongsTo",
+      "description": "An entity belongs to a category."
+    },
+
+    {
+      "type": "escalatesTo",
+      "description": "A modifier raises operational severity."
+    },
+
+    {
+      "type": "relatedTo",
+      "description": "Generic semantic relationship."
+    }
+
+  ]
+}
