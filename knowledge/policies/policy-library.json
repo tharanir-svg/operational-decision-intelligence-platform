@@ -1,0 +1,87 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-06-23",
+  "description": "Canonical Operational Policy Library for the Operational Decision Intelligence Platform.",
+  "policies": [
+    {
+      "id": "POL-001",
+      "name": "Signal Baseline",
+      "severity": 1,
+      "category": "Baseline",
+      "description": "Routine monitoring event with no escalation indicators.",
+      "appliesTo": [
+        "All"
+      ]
+    },
+    {
+      "id": "POL-002",
+      "name": "Confirmed Fatality",
+      "severity": 2,
+      "category": "Casualty",
+      "description": "Single confirmed fatality establishes Local Urgent baseline.",
+      "threshold": {
+        "fatalities": 1
+      }
+    },
+    {
+      "id": "POL-003",
+      "name": "Mass Casualty",
+      "severity": 5,
+      "category": "Casualty",
+      "description": "Mass casualty automatically upgrades to Flash.",
+      "threshold": {
+        "fatalities": 3,
+        "injuries": 5
+      }
+    },
+    {
+      "id": "POL-004",
+      "name": "Critical Infrastructure",
+      "severity": 4,
+      "category": "Infrastructure",
+      "description": "Major disruption to critical infrastructure requiring global monitoring."
+    },
+    {
+      "id": "POL-005",
+      "name": "Cyber Critical",
+      "severity": 4,
+      "category": "Cyber",
+      "description": "Confirmed cyber incident affecting critical systems."
+    },
+    {
+      "id": "POL-006",
+      "name": "Political Leadership",
+      "severity": 5,
+      "category": "Politics",
+      "description": "Events involving national leadership or constitutional continuity."
+    },
+    {
+      "id": "POL-007",
+      "name": "Conflict Escalation",
+      "severity": 4,
+      "category": "Conflict",
+      "description": "Military escalation crossing predefined operational thresholds."
+    },
+    {
+      "id": "POL-008",
+      "name": "Natural Disaster",
+      "severity": 4,
+      "category": "Weather",
+      "description": "Major disaster requiring enterprise-wide monitoring."
+    },
+    {
+      "id": "POL-009",
+      "name": "Corporate Crisis",
+      "severity": 3,
+      "category": "Corporate",
+      "description": "Significant corporate disruption with operational impact."
+    },
+    {
+      "id": "POL-010",
+      "name": "Civil Unrest",
+      "severity": 3,
+      "category": "Security",
+      "description": "Large-scale protests or civil disorder requiring operational awareness."
+    }
+  ]
+}
