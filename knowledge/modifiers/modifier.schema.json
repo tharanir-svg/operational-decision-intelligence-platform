@@ -1,1 +1,55 @@
-
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://odip.dev/schemas/modifier.schema.json",
+  "title": "Operational Modifier",
+  "description": "Schema defining contextual modifiers that influence operational decisions.",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "category",
+    "impact",
+    "version"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^MOD-[A-Z]{3}-\\d{3}$"
+    },
+    "name": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Casualty",
+        "Political",
+        "Corporate",
+        "Critical Infrastructure",
+        "Cyber",
+        "Conflict",
+        "Weather",
+        "Geographic",
+        "Population",
+        "Transportation",
+        "Economic",
+        "Public Health"
+      ]
+    },
+    "impact": {
+      "type": "string",
+      "enum": [
+        "Increase",
+        "Decrease",
+        "Neutral"
+      ]
+    },
+    "description": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}
