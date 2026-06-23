@@ -1,0 +1,112 @@
+{
+  "version": "1.0.0",
+  "description": "Canonical operational entity catalogue.",
+
+  "categories": [
+
+    {
+      "id": "ENT-GOV",
+      "name": "Government",
+      "entities": [
+        "President",
+        "Prime Minister",
+        "Governor",
+        "Mayor",
+        "Parliament",
+        "Congress",
+        "Supreme Court",
+        "Embassy",
+        "Consulate"
+      ]
+    },
+
+    {
+      "id": "ENT-INF",
+      "name": "Critical Infrastructure",
+      "entities": [
+        "Airport",
+        "Rail Station",
+        "Metro",
+        "Port",
+        "Power Plant",
+        "Nuclear Facility",
+        "Oil Refinery",
+        "Dam",
+        "Bridge",
+        "Tunnel"
+      ]
+    },
+
+    {
+      "id": "ENT-COR",
+      "name": "Corporate",
+      "entities": [
+        "Corporate Headquarters",
+        "Office Building",
+        "Data Center",
+        "Manufacturing Plant",
+        "Warehouse",
+        "Retail Store"
+      ]
+    },
+
+    {
+      "id": "ENT-HEA",
+      "name": "Healthcare",
+      "entities": [
+        "Hospital",
+        "Clinic",
+        "Medical Center",
+        "Pharmacy"
+      ]
+    },
+
+    {
+      "id": "ENT-EDU",
+      "name": "Education",
+      "entities": [
+        "School",
+        "University",
+        "College",
+        "Research Laboratory"
+      ]
+    },
+
+    {
+      "id": "ENT-MIL",
+      "name": "Military",
+      "entities": [
+        "Military Base",
+        "Naval Base",
+        "Air Base",
+        "Military Convoy",
+        "Warship"
+      ]
+    },
+
+    {
+      "id": "ENT-PUB",
+      "name": "Public Venues",
+      "entities": [
+        "Stadium",
+        "Shopping Mall",
+        "Hotel",
+        "Convention Center",
+        "Religious Site",
+        "Tourist Attraction"
+      ]
+    },
+
+    {
+      "id": "ENT-TRA",
+      "name": "Transportation",
+      "entities": [
+        "Airline",
+        "Train",
+        "Bus",
+        "Cargo Vessel",
+        "Cruise Ship"
+      ]
+    }
+  ]
+}
