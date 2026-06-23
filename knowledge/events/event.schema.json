@@ -1,1 +1,95 @@
-
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://odip.dev/schemas/event.schema.json",
+  "title": "Operational Event",
+  "description": "Schema defining a standardized operational event for the Operational Decision Intelligence Platform.",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "domain",
+    "subcategory",
+    "description",
+    "status",
+    "severityRange",
+    "version"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique event identifier.",
+      "pattern": "^EVT-[A-Z]{3}-\\d{3}$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable event name."
+    },
+    "domain": {
+      "type": "string",
+      "description": "Primary operational domain."
+    },
+    "subcategory": {
+      "type": "string",
+      "description": "Specific event classification."
+    },
+    "description": {
+      "type": "string"
+    },
+    "status": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Possible lifecycle states."
+    },
+    "severityRange": {
+      "type": "object",
+      "required": [
+        "minimum",
+        "maximum"
+      ],
+      "properties": {
+        "minimum": {
+          "type": "string"
+        },
+        "maximum": {
+          "type": "string"
+        }
+      }
+    },
+    "relatedEntities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "relatedModifiers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "relatedPolicies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "synonyms": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "exceptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "version": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}
