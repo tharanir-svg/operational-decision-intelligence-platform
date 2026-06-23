@@ -1,0 +1,55 @@
+{
+  "version": "1.0.0",
+
+  "links": [
+
+    {
+      "event": "Bomb Threat",
+      "relationship": "targets",
+      "entity": "Airport"
+    },
+
+    {
+      "event": "Bomb Threat",
+      "relationship": "targets",
+      "entity": "School"
+    },
+
+    {
+      "event": "Bomb Threat",
+      "relationship": "targets",
+      "entity": "Government Building"
+    },
+
+    {
+      "event": "Explosion",
+      "relationship": "affects",
+      "entity": "Critical Infrastructure"
+    },
+
+    {
+      "event": "Cyber Attack",
+      "relationship": "targets",
+      "entity": "Data Center"
+    },
+
+    {
+      "event": "Cyber Attack",
+      "relationship": "targets",
+      "entity": "Financial Institution"
+    },
+
+    {
+      "event": "Military Strike",
+      "relationship": "affects",
+      "entity": "Military Base"
+    },
+
+    {
+      "event": "Flood",
+      "relationship": "affects",
+      "entity": "Hospital"
+    }
+
+  ]
+}
