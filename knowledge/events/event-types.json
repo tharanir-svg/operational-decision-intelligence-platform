@@ -1,0 +1,84 @@
+{
+  "version": "1.0.0",
+  "description": "Canonical operational event catalogue.",
+  "domains": [
+    {
+      "id": "DOM-TER",
+      "name": "Terrorism",
+      "events": [
+        "Bomb Threat",
+        "Explosion",
+        "Active Shooter",
+        "Hostage Situation",
+        "Vehicle Attack",
+        "Chemical Attack",
+        "Biological Attack",
+        "Radiological Incident",
+        "IED Discovery",
+        "Suspicious Package"
+      ]
+    },
+    {
+      "id": "DOM-CON",
+      "name": "Conflict",
+      "events": [
+        "Military Strike",
+        "Border Clash",
+        "Drone Strike",
+        "Missile Launch",
+        "Naval Incident",
+        "Airspace Violation",
+        "Mobilization",
+        "Ceasefire Violation"
+      ]
+    },
+    {
+      "id": "DOM-CRM",
+      "name": "Crime",
+      "events": [
+        "Robbery",
+        "Kidnapping",
+        "Homicide",
+        "Assault",
+        "Burglary",
+        "Arson"
+      ]
+    },
+    {
+      "id": "DOM-POL",
+      "name": "Politics",
+      "events": [
+        "Election",
+        "Protest",
+        "Demonstration",
+        "Government Resignation",
+        "Parliament Vote",
+        "Executive Order"
+      ]
+    },
+    {
+      "id": "DOM-CYB",
+      "name": "Cyber",
+      "events": [
+        "Data Breach",
+        "Ransomware",
+        "DDoS Attack",
+        "Website Defacement",
+        "Credential Theft"
+      ]
+    },
+    {
+      "id": "DOM-WTH",
+      "name": "Weather",
+      "events": [
+        "Flood",
+        "Earthquake",
+        "Hurricane",
+        "Wildfire",
+        "Tornado",
+        "Heatwave",
+        "Snowstorm"
+      ]
+    }
+  ]
+}
