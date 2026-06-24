@@ -1,0 +1,50 @@
+[
+  {
+    "id": "EVT-CON-001",
+    "name": "Armed Conflict",
+    "domain": "Conflict",
+    "severityRange": "High-Critical"
+  },
+  {
+    "id": "EVT-TER-001",
+    "name": "Terrorist Attack",
+    "domain": "Terrorism",
+    "severityRange": "High-Critical"
+  },
+  {
+    "id": "EVT-CYB-001",
+    "name": "Ransomware Incident",
+    "domain": "Cyber",
+    "severityRange": "Medium-Critical"
+  },
+  {
+    "id": "EVT-WTH-001",
+    "name": "Severe Storm",
+    "domain": "Weather",
+    "severityRange": "Low-Critical"
+  },
+  {
+    "id": "EVT-INF-001",
+    "name": "Power Outage",
+    "domain": "Infrastructure",
+    "severityRange": "Low-Critical"
+  },
+  {
+    "id": "EVT-AVI-001",
+    "name": "Airport Closure",
+    "domain": "Aviation",
+    "severityRange": "Medium-Critical"
+  },
+  {
+    "id": "EVT-POL-001",
+    "name": "Government Sanction",
+    "domain": "Politics",
+    "severityRange": "Medium-Critical"
+  },
+  {
+    "id": "EVT-LOG-001",
+    "name": "Supply Chain Disruption",
+    "domain": "Supply Chain",
+    "severityRange": "Medium-Critical"
+  }
+]
