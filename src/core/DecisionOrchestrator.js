@@ -1,54 +1,61 @@
-import KnowledgeLoader from "../knowledge/KnowledgeLoader.js";
-import PolicyEngine from "../policy/PolicyEngine.js";
-import ThresholdEngine from "../engine/ThresholdEngine.js";
-import RiskScoringEngine from "../engine/RiskScoringEngine.js";
-import ExplanationEngine from "../explanation/ExplanationEngine.js";
+const RiskScoringEngine =
+  require("../engine/RiskScoringEngine");
 
-export default class DecisionOrchestrator {
+const ThresholdEngine =
+  require("../engine/ThresholdEngine");
+
+const PolicyEngine =
+  require("../policy/PolicyEngine");
+
+const ExplanationEngine =
+  require("../explanation/ExplanationEngine");
+
+class DecisionOrchestrator {
+
   constructor() {
-    const loader = new KnowledgeLoader();
 
-    this.kb = loader.loadKnowledgeBase();
+    this.riskEngine =
+      new RiskScoringEngine();
 
-    this.policyEngine = new PolicyEngine(
-      this.kb.policies
-    );
+    this.thresholdEngine =
+      new ThresholdEngine();
 
-    this.thresholdEngine = new ThresholdEngine(
-      this.kb.thresholds
-    );
-
-    this.scoringEngine = new RiskScoringEngine(
-      this.kb.weights,
-      this.kb.regions
-    );
+    this.policyEngine =
+      new PolicyEngine();
 
     this.explanationEngine =
       new ExplanationEngine();
   }
 
-  evaluate(eventContext) {
-    const policies =
-      this.policyEngine.evaluate(eventContext);
-
-    const thresholdDecision =
-      this.thresholdEngine.evaluate(eventContext);
+  evaluate(event) {
 
     const riskScore =
-      this.scoringEngine.calculate(eventContext);
+      this.riskEngine.calculate(event);
 
-    const explanation =
-      this.explanationEngine.generate(
-        eventContext,
-        thresholdDecision,
+    const threshold =
+      this.thresholdEngine.recommend(
         riskScore
       );
 
+    const policy =
+      this.policyEngine.evaluate(event);
+
+    const explanation =
+      this.explanationEngine.generate({
+        event,
+        riskScore,
+        threshold,
+        policy
+      });
+
     return {
-      policies,
-      thresholdDecision,
       riskScore,
+      threshold,
+      policy,
       explanation
     };
   }
 }
+
+module.exports =
+  DecisionOrchestrator;
