@@ -1,0 +1,22 @@
+{
+  "name": "operational-decision-intelligence-platform",
+  "version": "1.0.0",
+  "description": "Enterprise Operational Decision Intelligence Platform",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "decision-intelligence",
+    "risk-scoring",
+    "operational-intelligence",
+    "policy-engine"
+  ],
+  "author": "Tharani Rajamanickam",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
