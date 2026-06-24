@@ -6,82 +6,155 @@
     {
       "id": "POL-001",
       "name": "Signal Baseline",
-      "severity": 1,
       "category": "Baseline",
+      "severity": 1,
       "description": "Routine monitoring event with no escalation indicators.",
-      "appliesTo": [
-        "All"
-      ]
+      "appliesTo": ["All"],
+      "decisionAction": "MONITOR",
+      "recommendation": {
+        "priority": "Low",
+        "escalation": "None",
+        "monitoringWindow": "24h"
+      }
     },
     {
       "id": "POL-002",
       "name": "Confirmed Fatality",
-      "severity": 2,
       "category": "Casualty",
+      "severity": 2,
       "description": "Single confirmed fatality establishes Local Urgent baseline.",
-      "threshold": {
-        "fatalities": 1
+      "appliesTo": ["Conflict", "Crime", "Terrorism", "Infrastructure"],
+      "conditions": {
+        "fatalities": {
+          "gte": 1
+        }
+      },
+      "decisionAction": "LOCAL_URGENT",
+      "recommendation": {
+        "priority": "Medium",
+        "escalation": "Regional",
+        "monitoringWindow": "12h"
       }
     },
     {
       "id": "POL-003",
       "name": "Mass Casualty",
-      "severity": 5,
       "category": "Casualty",
-      "description": "Mass casualty automatically upgrades to Flash.",
-      "threshold": {
-        "fatalities": 3,
-        "injuries": 5
+      "severity": 5,
+      "description": "Mass casualty automatically upgrades to Flash severity.",
+      "appliesTo": ["Conflict", "Crime", "Terrorism", "Infrastructure"],
+      "conditions": {
+        "fatalities": {
+          "gte": 3
+        },
+        "injuries": {
+          "gte": 5
+        }
+      },
+      "decisionAction": "FLASH",
+      "recommendation": {
+        "priority": "Critical",
+        "escalation": "Global",
+        "monitoringWindow": "Immediate"
       }
     },
     {
       "id": "POL-004",
-      "name": "Critical Infrastructure",
-      "severity": 4,
+      "name": "Critical Infrastructure Disruption",
       "category": "Infrastructure",
-      "description": "Major disruption to critical infrastructure requiring global monitoring."
+      "severity": 4,
+      "description": "Major disruption affecting national critical infrastructure.",
+      "appliesTo": ["Infrastructure", "Cyber"],
+      "decisionAction": "ESCALATE",
+      "recommendation": {
+        "priority": "High",
+        "escalation": "Global",
+        "monitoringWindow": "6h"
+      }
     },
     {
       "id": "POL-005",
       "name": "Cyber Critical",
-      "severity": 4,
       "category": "Cyber",
-      "description": "Confirmed cyber incident affecting critical systems."
+      "severity": 4,
+      "description": "Confirmed cyber incident affecting critical operational systems.",
+      "appliesTo": ["Cyber"],
+      "decisionAction": "ESCALATE",
+      "recommendation": {
+        "priority": "High",
+        "escalation": "Global",
+        "monitoringWindow": "6h"
+      }
     },
     {
       "id": "POL-006",
-      "name": "Political Leadership",
-      "severity": 5,
+      "name": "Political Leadership Impact",
       "category": "Politics",
-      "description": "Events involving national leadership or constitutional continuity."
+      "severity": 5,
+      "description": "Events involving heads of state or constitutional continuity.",
+      "appliesTo": ["Politics"],
+      "decisionAction": "FLASH",
+      "recommendation": {
+        "priority": "Critical",
+        "escalation": "Global",
+        "monitoringWindow": "Immediate"
+      }
     },
     {
       "id": "POL-007",
       "name": "Conflict Escalation",
-      "severity": 4,
       "category": "Conflict",
-      "description": "Military escalation crossing predefined operational thresholds."
+      "severity": 4,
+      "description": "Military escalation crossing predefined operational thresholds.",
+      "appliesTo": ["Conflict"],
+      "decisionAction": "ESCALATE",
+      "recommendation": {
+        "priority": "High",
+        "escalation": "Global",
+        "monitoringWindow": "6h"
+      }
     },
     {
       "id": "POL-008",
       "name": "Natural Disaster",
-      "severity": 4,
       "category": "Weather",
-      "description": "Major disaster requiring enterprise-wide monitoring."
+      "severity": 4,
+      "description": "Major natural disaster requiring enterprise-wide monitoring.",
+      "appliesTo": ["Weather"],
+      "decisionAction": "ESCALATE",
+      "recommendation": {
+        "priority": "High",
+        "escalation": "Global",
+        "monitoringWindow": "6h"
+      }
     },
     {
       "id": "POL-009",
       "name": "Corporate Crisis",
-      "severity": 3,
       "category": "Corporate",
-      "description": "Significant corporate disruption with operational impact."
+      "severity": 3,
+      "description": "Corporate event causing significant operational disruption.",
+      "appliesTo": ["Corporate"],
+      "decisionAction": "WATCH",
+      "recommendation": {
+        "priority": "Medium",
+        "escalation": "Regional",
+        "monitoringWindow": "12h"
+      }
     },
     {
       "id": "POL-010",
       "name": "Civil Unrest",
-      "severity": 3,
       "category": "Security",
-      "description": "Large-scale protests or civil disorder requiring operational awareness."
+      "severity": 3,
+      "description": "Large-scale protests or civil disorder requiring operational awareness.",
+      "appliesTo": ["Politics", "Security"],
+      "decisionAction": "WATCH",
+      "recommendation": {
+        "priority": "Medium",
+        "escalation": "Regional",
+        "monitoringWindow": "12h"
+      }
     }
   ]
 }
