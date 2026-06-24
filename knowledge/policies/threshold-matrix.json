@@ -1,0 +1,41 @@
+{
+  "version": "1.0.0",
+  "description": "Operational severity decision matrix.",
+  "rules": [
+    {
+      "ruleId": "THR-001",
+      "eventType": "Terrorist Attack",
+      "conditions": {
+        "fatalities": {
+          "gte": 3
+        }
+      },
+      "recommendedSeverity": 5,
+      "recommendedAction": "FLASH"
+    },
+    {
+      "ruleId": "THR-002",
+      "eventType": "Cyber Attack",
+      "modifier": "Critical Infrastructure",
+      "recommendedSeverity": 4,
+      "recommendedAction": "ESCALATE"
+    },
+    {
+      "ruleId": "THR-003",
+      "eventType": "Political Assassination",
+      "recommendedSeverity": 5,
+      "recommendedAction": "FLASH"
+    },
+    {
+      "ruleId": "THR-004",
+      "eventType": "Earthquake",
+      "conditions": {
+        "fatalities": {
+          "gte": 10
+        }
+      },
+      "recommendedSeverity": 5,
+      "recommendedAction": "FLASH"
+    }
+  ]
+}
