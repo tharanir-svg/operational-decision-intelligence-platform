@@ -1,0 +1,27 @@
+[
+  {
+    "id": "REG-NA",
+    "name": "North America",
+    "riskLevel": "Low"
+  },
+  {
+    "id": "REG-EU",
+    "name": "Europe",
+    "riskLevel": "Low"
+  },
+  {
+    "id": "REG-ME",
+    "name": "Middle East",
+    "riskLevel": "Medium"
+  },
+  {
+    "id": "REG-AF",
+    "name": "Africa",
+    "riskLevel": "Medium"
+  },
+  {
+    "id": "REG-SA",
+    "name": "South Asia",
+    "riskLevel": "Medium"
+  }
+]
