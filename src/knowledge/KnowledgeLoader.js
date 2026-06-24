@@ -1,7 +1,7 @@
-import fs from "fs";
-import path from "path";
+const fs = require("fs");
+const path = require("path");
 
-export default class KnowledgeLoader {
+class KnowledgeLoader {
   constructor(basePath = "./knowledge") {
     this.basePath = basePath;
   }
@@ -27,3 +27,5 @@ export default class KnowledgeLoader {
     };
   }
 }
+
+module.exports = KnowledgeLoader;

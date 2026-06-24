@@ -1,4 +1,4 @@
-export default class RiskScoringEngine {
+class RiskScoringEngine {
   constructor(weightLibrary, regionProfiles) {
     this.weights = weightLibrary.weights;
     this.regionProfiles = regionProfiles.regions;
@@ -27,3 +27,5 @@ export default class RiskScoringEngine {
     };
   }
 }
+
+module.exports = RiskScoringEngine;

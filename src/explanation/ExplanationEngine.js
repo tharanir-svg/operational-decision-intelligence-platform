@@ -1,4 +1,4 @@
-export default class ExplanationEngine {
+class ExplanationEngine {
   generate(
     eventContext,
     thresholdDecision,
@@ -29,3 +29,5 @@ export default class ExplanationEngine {
     return reasons;
   }
 }
+
+module.exports = ExplanationEngine;

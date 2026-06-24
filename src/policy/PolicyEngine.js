@@ -1,4 +1,4 @@
-export default class PolicyEngine {
+class PolicyEngine {
   constructor(policyLibrary) {
     this.policyLibrary = policyLibrary;
   }
@@ -14,3 +14,5 @@ export default class PolicyEngine {
     });
   }
 }
+
+module.exports = PolicyEngine;

@@ -1,4 +1,4 @@
-export default class ThresholdEngine {
+class ThresholdEngine {
   constructor(thresholdMatrix) {
     this.thresholdMatrix = thresholdMatrix;
   }
@@ -41,3 +41,5 @@ export default class ThresholdEngine {
     };
   }
 }
+
+module.exports = ThresholdEngine;
