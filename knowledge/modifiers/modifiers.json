@@ -1,0 +1,26 @@
+[
+  {
+    "id": "MOD-WEA-001",
+    "name": "Extreme Weather",
+    "category": "Weather",
+    "impact": "Increase Risk"
+  },
+  {
+    "id": "MOD-CON-001",
+    "name": "Active Conflict Zone",
+    "category": "Conflict",
+    "impact": "Increase Risk"
+  },
+  {
+    "id": "MOD-POL-001",
+    "name": "Political Instability",
+    "category": "Political",
+    "impact": "Increase Risk"
+  },
+  {
+    "id": "MOD-CYB-001",
+    "name": "Elevated Cyber Threat",
+    "category": "Cyber",
+    "impact": "Increase Risk"
+  }
+]
