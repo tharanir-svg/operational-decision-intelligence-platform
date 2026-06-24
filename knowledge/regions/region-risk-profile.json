@@ -1,0 +1,20 @@
+{
+  "regions": [
+    {
+      "region": "Middle East",
+      "baselineRisk": 4
+    },
+    {
+      "region": "Europe",
+      "baselineRisk": 2
+    },
+    {
+      "region": "North America",
+      "baselineRisk": 2
+    },
+    {
+      "region": "South Asia",
+      "baselineRisk": 3
+    }
+  ]
+}
