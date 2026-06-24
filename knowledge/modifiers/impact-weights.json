@@ -1,0 +1,12 @@
+{
+  "weights": {
+    "Fatalities": 5,
+    "Injuries": 3,
+    "Critical Infrastructure": 4,
+    "National Leadership": 5,
+    "Cyber": 4,
+    "Airport": 4,
+    "Seaport": 4,
+    "Power Grid": 5
+  }
+}
