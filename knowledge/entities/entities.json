@@ -1,0 +1,72 @@
+[
+  {
+    "id": "ENT-AIR-001",
+    "name": "Commercial Airline",
+    "category": "Transportation",
+    "criticality": "High",
+    "description": "Passenger airline operating scheduled services."
+  },
+  {
+    "id": "ENT-AIR-002",
+    "name": "Airport",
+    "category": "Transportation",
+    "criticality": "Critical",
+    "description": "Airport infrastructure supporting commercial aviation."
+  },
+  {
+    "id": "ENT-GOV-001",
+    "name": "National Government",
+    "category": "Government",
+    "criticality": "Critical",
+    "description": "National governing authority."
+  },
+  {
+    "id": "ENT-GOV-002",
+    "name": "Law Enforcement Agency",
+    "category": "Government",
+    "criticality": "High",
+    "description": "Agency responsible for public safety."
+  },
+  {
+    "id": "ENT-ENE-001",
+    "name": "Power Grid",
+    "category": "Infrastructure",
+    "criticality": "Critical",
+    "description": "Electrical transmission and distribution network."
+  },
+  {
+    "id": "ENT-CYB-001",
+    "name": "Data Center",
+    "category": "Cyber",
+    "criticality": "Critical",
+    "description": "Facility hosting enterprise systems."
+  },
+  {
+    "id": "ENT-COR-001",
+    "name": "Financial Institution",
+    "category": "Corporate",
+    "criticality": "High",
+    "description": "Banking or financial services organization."
+  },
+  {
+    "id": "ENT-HLT-001",
+    "name": "Hospital",
+    "category": "Healthcare",
+    "criticality": "Critical",
+    "description": "Healthcare facility delivering medical services."
+  },
+  {
+    "id": "ENT-LOG-001",
+    "name": "Logistics Hub",
+    "category": "Supply Chain",
+    "criticality": "High",
+    "description": "Transportation and distribution center."
+  },
+  {
+    "id": "ENT-TEL-001",
+    "name": "Telecommunications Provider",
+    "category": "Infrastructure",
+    "criticality": "Critical",
+    "description": "Provider of communication services."
+  }
+]
