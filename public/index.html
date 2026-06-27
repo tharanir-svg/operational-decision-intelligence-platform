@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ODIP — Operational Decision Intelligence Platform</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'><circle cx='14' cy='14' r='13' stroke='%233b82f6' stroke-width='1.5' fill='%230a0e1a'/><path d='M14 5 L14 14 L20 18' stroke='%233b82f6' stroke-width='2' stroke-linecap='round'/><circle cx='14' cy='14' r='2.5' fill='%233b82f6'/></svg>" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-left">
+      <div class="header-logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="13" stroke="#3b82f6" stroke-width="1.5"/>
+          <path d="M14 5 L14 14 L20 18" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="14" cy="14" r="2.5" fill="#3b82f6"/>
+        </svg>
+      </div>
+      <div>
+        <div class="header-title">Operational Decision Intelligence Platform</div>
+        <div class="header-subtitle">Enterprise Risk Assessment &amp; Policy Decision Engine</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="status-dot" id="statusDot"></div>
+      <span class="status-label" id="statusLabel">Connecting…</span>
+    </div>
+  </header>
+
+  <main class="layout">
+
+    <aside class="panel panel-form">
+      <div class="panel-header">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M2 4h12M2 8h8M2 12h5" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Event Input
+      </div>
+
+      <form id="eventForm" autocomplete="off">
+
+        <div class="field-group">
+          <label class="field-label" for="domain">Domain</label>
+          <div class="select-wrap">
+            <select id="domain" name="domain">
+              <option value="">— Select Domain —</option>
+              <option value="Terrorism">Terrorism</option>
+              <option value="Conflict">Conflict</option>
+              <option value="Crime">Crime</option>
+              <option value="Politics">Politics</option>
+              <option value="Cyber">Cyber</option>
+              <option value="Weather">Weather</option>
+            </select>
+            <svg class="select-chevron" width="12" height="12" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="#64748b" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="eventType">Event Type</label>
+          <div class="select-wrap">
+            <select id="eventType" name="eventType" disabled>
+              <option value="">— Select Domain First —</option>
+            </select>
+            <svg class="select-chevron" width="12" height="12" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="#64748b" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="region">Region</label>
+          <div class="select-wrap">
+            <select id="region" name="region">
+              <option value="">— Select Region —</option>
+              <option value="Middle East">Middle East</option>
+              <option value="Europe">Europe</option>
+              <option value="North America">North America</option>
+              <option value="South Asia">South Asia</option>
+            </select>
+            <svg class="select-chevron" width="12" height="12" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="#64748b" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label" for="fatalities">Fatalities</label>
+            <div class="number-wrap">
+              <button type="button" class="num-btn" data-target="fatalities" data-delta="-1">−</button>
+              <input type="number" id="fatalities" name="fatalities" value="0" min="0" max="9999" />
+              <button type="button" class="num-btn" data-target="fatalities" data-delta="1">+</button>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="injuries">Injuries</label>
+            <div class="number-wrap">
+              <button type="button" class="num-btn" data-target="injuries" data-delta="-1">−</button>
+              <input type="number" id="injuries" name="injuries" value="0" min="0" max="9999" />
+              <button type="button" class="num-btn" data-target="injuries" data-delta="1">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Infrastructure Impact</label>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="infrastructure" value="None" checked />
+              <span class="radio-box"></span>
+              <span>None</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="infrastructure" value="Minor" />
+              <span class="radio-box"></span>
+              <span>Minor</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="infrastructure" value="Moderate" />
+              <span class="radio-box"></span>
+              <span>Moderate</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="infrastructure" value="Severe" />
+              <span class="radio-box"></span>
+              <span>Severe</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="formError" class="form-error hidden"></div>
+
+        <button type="submit" class="btn-evaluate" id="evaluateBtn">
+          <span id="btnText">Evaluate Decision</span>
+          <span id="btnSpinner" class="spinner hidden"></span>
+        </button>
+
+      </form>
+
+      <div class="form-footer">
+        <span id="lastEvalTime"></span>
+      </div>
+    </aside>
+
+    <section class="results-area" id="resultsArea">
+
+      <div class="results-placeholder" id="resultsPlaceholder">
+        <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+          <circle cx="28" cy="28" r="27" stroke="#1e2d4a" stroke-width="1.5"/>
+          <path d="M28 14 L28 28 L36 34" stroke="#1e3a5f" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="28" cy="28" r="3" fill="#1e3a5f"/>
+        </svg>
+        <p>Submit an event to generate a risk decision</p>
+      </div>
+
+      <div id="resultsContent" class="hidden">
+
+        <div class="results-top">
+
+          <div class="card card-gauge">
+            <div class="card-label">Risk Score</div>
+            <div class="gauge-wrap">
+              <svg class="gauge-svg" viewBox="0 0 220 140">
+                <circle class="gauge-track" cx="110" cy="115" r="90"
+                  stroke-dasharray="376.99 188.50"
+                  transform="rotate(150 110 115)" />
+                <circle class="gauge-fill" id="gaugeFill" cx="110" cy="115" r="90"
+                  stroke-dasharray="0 565.49"
+                  transform="rotate(150 110 115)" />
+              </svg>
+              <div class="gauge-center">
+                <div class="gauge-score" id="gaugeScore">—</div>
+                <div class="gauge-label-inner" id="gaugeLabel">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card card-threshold">
+            <div class="card-label">Threshold Decision</div>
+            <div id="thresholdContent" class="threshold-body">
+              <div class="threshold-action" id="thresholdAction">—</div>
+              <div class="threshold-meta">
+                <span class="meta-pill" id="thresholdSeverity"></span>
+                <span class="meta-pill meta-source" id="thresholdSource"></span>
+                <span class="meta-pill meta-rule" id="thresholdRule"></span>
+              </div>
+              <div class="threshold-desc" id="thresholdDesc"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="card card-policies">
+          <div class="card-label">
+            Triggered Policies
+            <span class="badge" id="policyCount">0</span>
+          </div>
+          <div id="policiesList" class="policies-list"></div>
+        </div>
+
+        <div class="card card-explanation">
+          <div class="card-label">Decision Explanation</div>
+          <div class="explanation-summary" id="explanationSummary"></div>
+          <div class="explanation-inputs" id="explanationInputs"></div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 
 const DecisionOrchestrator =
   require("./src/core/DecisionOrchestrator");
@@ -9,6 +10,7 @@ const createDecisionAPI =
 const app = express();
 
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
 
 const orchestrator =
   new DecisionOrchestrator();
