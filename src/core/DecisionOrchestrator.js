@@ -52,9 +52,10 @@ class DecisionOrchestrator {
         eventContext
       );
 
-    // Step 2: Determine threshold level
+    // Step 2: Determine threshold level (event-type rules first, score fallback)
     const thresholdDecision =
       this.thresholdEngine.evaluate(
+        eventContext,
         riskScore
       );
 

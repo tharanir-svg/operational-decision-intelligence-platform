@@ -8,7 +8,7 @@ class ExplanationEngine {
 
     return {
       summary:
-        `Risk score ${riskScore} triggered ${thresholdDecision.level}`,
+        `Risk score ${riskScore} triggered ${thresholdDecision.action}`,
       inputs: eventContext
     };
 
