@@ -1,31 +1,81 @@
 class RiskScoringEngine {
-  constructor(weightLibrary, regionProfiles) {
-    this.weights = weightLibrary.weights;
-    this.regionProfiles = regionProfiles.regions;
+
+  constructor(weightLibrary, regionLibrary) {
+
+    this.weights =
+      weightLibrary.weights || {};
+
+    this.regions =
+      regionLibrary.regions || [];
+
   }
 
   calculate(eventContext) {
+
     let score = 0;
 
-    score += (eventContext.fatalities || 0) *
-      (this.weights.Fatalities || 0);
+    // Fatalities
+    score +=
+      (eventContext.fatalities || 0) *
+      (this.weights.Fatalities || 10);
 
-    score += (eventContext.injuries || 0) *
-      (this.weights.Injuries || 0);
+    // Injuries
+    score +=
+      (eventContext.injuries || 0) *
+      (this.weights.Injuries || 5);
 
-    const region = this.regionProfiles.find(
-      r => r.region === eventContext.region
-    );
+    // Critical Infrastructure
+    if (eventContext.infrastructureImpact === true) {
 
-    if (region) {
-      score += region.baselineRisk * 10;
+      score +=
+        this.weights.CriticalInfrastructure || 25;
+
     }
 
-    return {
-      riskScore: Math.min(score, 100),
-      confidence: 90
-    };
+    // Regional Risk Modifier
+    const region =
+      this.regions.find(r =>
+        r.region === eventContext.region
+      );
+
+    if (region) {
+
+      score +=
+        region.baselineRisk * 10;
+
+    }
+
+    // Source Confidence Modifier
+    if (eventContext.sourceConfidence) {
+
+      switch (
+        eventContext.sourceConfidence.toLowerCase()
+      ) {
+
+        case "high":
+          score += 10;
+          break;
+
+        case "medium":
+          score += 5;
+          break;
+
+        case "low":
+          score += 2;
+          break;
+
+      }
+
+    }
+
+    // Cap score at 100
+    score = Math.min(score, 100);
+
+    return score;
+
   }
+
 }
 
-module.exports = RiskScoringEngine;
+module.exports =
+  RiskScoringEngine;

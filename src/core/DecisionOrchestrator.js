@@ -1,41 +1,87 @@
-const path = require("path");
-const KnowledgeLoader = require("../knowledge/KnowledgeLoader");
-const RiskScoringEngine = require("../engine/RiskScoringEngine");
-const ThresholdEngine = require("../engine/ThresholdEngine");
-const PolicyEngine = require("../policy/PolicyEngine");
-const ExplanationEngine = require("../explanation/ExplanationEngine");
+const KnowledgeLoader =
+  require("../knowledge/KnowledgeLoader");
+
+const PolicyEngine =
+  require("../policy/PolicyEngine");
+
+const ThresholdEngine =
+  require("../engine/ThresholdEngine");
+
+const RiskScoringEngine =
+  require("../engine/RiskScoringEngine");
+
+const ExplanationEngine =
+  require("../explanation/ExplanationEngine");
 
 class DecisionOrchestrator {
 
   constructor() {
-    const loader = new KnowledgeLoader(
-      path.join(__dirname, "../../knowledge")
-    );
-    const kb = loader.loadKnowledgeBase();
 
-    this.riskEngine = new RiskScoringEngine(kb.weights, kb.regions);
-    this.thresholdEngine = new ThresholdEngine(kb.thresholds);
-    this.policyEngine = new PolicyEngine(kb.policies);
-    this.explanationEngine = new ExplanationEngine();
+    const loader =
+      new KnowledgeLoader();
+
+    this.kb =
+      loader.loadKnowledgeBase();
+
+    this.policyEngine =
+      new PolicyEngine(
+        this.kb.policies
+      );
+
+    this.thresholdEngine =
+      new ThresholdEngine(
+        this.kb.thresholds
+      );
+
+    this.scoringEngine =
+      new RiskScoringEngine(
+        this.kb.weights,
+        this.kb.regions
+      );
+
+    this.explanationEngine =
+      new ExplanationEngine();
+
   }
 
-  evaluate(event) {
-    const scoreResult = this.riskEngine.calculate(event);
-    const thresholdDecision = this.thresholdEngine.evaluate(event);
-    const applicablePolicies = this.policyEngine.evaluate(event);
-    const explanation = this.explanationEngine.generate(
-      event,
-      thresholdDecision,
-      scoreResult
-    );
+  evaluate(eventContext) {
+
+    // Step 1: Calculate risk score
+    const riskScore =
+      this.scoringEngine.calculate(
+        eventContext
+      );
+
+    // Step 2: Determine threshold level
+    const thresholdDecision =
+      this.thresholdEngine.evaluate(
+        riskScore
+      );
+
+    // Step 3: Evaluate applicable policies
+    const policies =
+      this.policyEngine.evaluate(
+        eventContext
+      );
+
+    // Step 4: Generate explanation
+    const explanation =
+      this.explanationEngine.generate(
+        eventContext,
+        thresholdDecision,
+        riskScore
+      );
 
     return {
-      riskScore: scoreResult,
-      threshold: thresholdDecision,
-      policy: applicablePolicies,
+      riskScore,
+      thresholdDecision,
+      policies,
       explanation
     };
+
   }
+
 }
 
-module.exports = DecisionOrchestrator;
+module.exports =
+  DecisionOrchestrator;

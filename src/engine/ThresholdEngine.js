@@ -1,45 +1,30 @@
 class ThresholdEngine {
+
   constructor(thresholdMatrix) {
-    this.thresholdMatrix = thresholdMatrix;
+
+    this.matrix =
+      thresholdMatrix.thresholds || [];
+
   }
 
-  evaluate(eventContext) {
-    const matchingRule = this.thresholdMatrix.rules.find(rule => {
-      if (rule.eventType !== eventContext.eventType) {
-        return false;
+  evaluate(riskScore) {
+
+    for (const threshold of this.matrix) {
+
+      if (riskScore >= threshold.minimumScore) {
+        return threshold;
       }
 
-      if (
-        rule.conditions?.fatalities?.gte &&
-        eventContext.fatalities <
-          rule.conditions.fatalities.gte
-      ) {
-        return false;
-      }
-
-      if (
-        rule.conditions?.injuries?.gte &&
-        eventContext.injuries <
-          rule.conditions.injuries.gte
-      ) {
-        return false;
-      }
-
-      return true;
-    });
-
-    if (!matchingRule) {
-      return {
-        severity: 1,
-        action: "MONITOR"
-      };
     }
 
     return {
-      severity: matchingRule.recommendedSeverity,
-      action: matchingRule.recommendedAction
+      level: "Monitor",
+      minimumScore: 0
     };
+
   }
+
 }
 
-module.exports = ThresholdEngine;
+module.exports =
+  ThresholdEngine;
