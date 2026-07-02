@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ODIP — Operational Intelligence Workspace</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'><circle cx='14' cy='14' r='13' stroke='%233b82f6' stroke-width='1.5' fill='%230a0e1a'/><path d='M14 5 L14 14 L20 18' stroke='%233b82f6' stroke-width='2' stroke-linecap='round'/><circle cx='14' cy='14' r='2.5' fill='%233b82f6'/></svg>" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-left">
+      <div class="header-logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="13" stroke="#3b82f6" stroke-width="1.5"/>
+          <path d="M14 5 L14 14 L20 18" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="14" cy="14" r="2.5" fill="#3b82f6"/>
+        </svg>
+      </div>
+      <div>
+        <div class="header-title">Operational Intelligence Workspace</div>
+        <div class="header-subtitle">AI-Assisted Risk Assessment &amp; Decision Engine</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="status-dot" id="statusDot"></div>
+      <span class="status-label" id="statusLabel">Connecting…</span>
+    </div>
+  </header>
+
+  <main class="layout">
+
+    <!-- ── Left Panel ─────────────────────────── -->
+    <aside class="panel panel-left">
+
+      <!-- Tab Bar -->
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="evidence">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+            <rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M4 5h6M4 7.5h6M4 10h3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          Evidence
+        </button>
+        <button class="tab-btn" data-tab="manual">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+            <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M7 4v3l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          Manual
+        </button>
+      </div>
+
+      <!-- ── Evidence Intake Tab ──────────────── -->
+      <div class="tab-pane active" id="tab-evidence">
+
+        <div class="pane-section-label">Context</div>
+
+        <div class="field-group">
+          <label class="field-label" for="ev-region">Region</label>
+          <div class="select-wrap">
+            <select id="ev-region">
+              <option value="">— Select Region —</option>
+              <option value="Middle East">Middle East</option>
+              <option value="Europe">Europe</option>
+              <option value="North America">North America</option>
+              <option value="South Asia">South Asia</option>
+            </select>
+            <svg class="select-chevron" width="12" height="12" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="#64748b" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="ev-domain">Domain</label>
+          <div class="select-wrap">
+            <select id="ev-domain">
+              <option value="">— Select Domain —</option>
+              <option value="Terrorism">Terrorism</option>
+              <option value="Conflict">Conflict</option>
+              <option value="Crime">Crime</option>
+              <option value="Politics">Politics</option>
+              <option value="Cyber">Cyber</option>
+              <option value="Weather">Weather</option>
+            </select>
+            <svg class="select-chevron" width="12" height="12" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="#64748b" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="ev-eventType">Event Type</label>
+          <div class="select-wrap">
+            <select id="ev-eventType" disabled>
+              <option value="">— Select Domain First —</option>
+            </select>
+            <svg class="select-chevron" width="12" height="12" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="#64748b" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="pane-section-label">Evidence</div>
+
+        <div class="field-group">
+          <label class="field-label" for="ev-text">
+            Paste article, tweet, report or intelligence
+          </label>
+          <textarea
+            id="ev-text"
+            class="evidence-textarea"
+            placeholder="Paste raw intelligence here — news article, social media post, field report, SIGINT summary, or any open-source text…"
+            rows="7"
+            spellcheck="false"
+          ></textarea>
+          <div class="char-count" id="charCount">0 characters</div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="ev-url">Source URL <span class="field-optional">(optional)</span></label>
+          <div class="url-input-wrap">
+            <svg class="url-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M5.5 8.5L8.5 5.5M6 4.5l1-1a2.828 2.828 0 114 4l-1 1M8 9.5l-1 1a2.828 2.828 0 11-4-4l1-1" stroke="#4b5d7a" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            <input type="url" id="ev-url" placeholder="https://example.com/article" />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            Attach Files
+            <span class="field-optional">(images &amp; video)</span>
+          </div>
+          <div class="dropzone" id="dropzone">
+            <input type="file" id="fileInput" accept="image/*,video/*" multiple hidden />
+            <div class="dropzone-idle" id="dropzoneIdle">
+              <div class="dropzone-icon">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                  <path d="M14 18V10M10 14l4-4 4 4" stroke="#2d4a6e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <rect x="2" y="2" width="24" height="24" rx="5" stroke="#1a2d47" stroke-width="1.3" stroke-dasharray="3 2"/>
+                </svg>
+              </div>
+              <p class="dropzone-text">Drop images or video here</p>
+              <p class="dropzone-sub">or <button type="button" class="dropzone-browse" id="dropzoneBrowse">browse files</button></p>
+            </div>
+            <div class="dropzone-over" id="dropzoneOver">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <path d="M16 22V12M11 17l5-5 5 5" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <p>Release to attach</p>
+            </div>
+          </div>
+          <div class="file-list" id="fileList"></div>
+        </div>
+
+        <div id="evidenceError" class="form-error hidden"></div>
+
+        <button type="button" class="btn-primary btn-analyze" id="analyzeBtn">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <circle cx="7.5" cy="7.5" r="6.5" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M5 7.5l2 2 3.5-3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span id="analyzeBtnText">Analyze Evidence</span>
+          <span id="analyzeSpinner" class="spinner hidden"></span>
+        </button>
+
+        <div class="ai-notice">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <circle cx="6" cy="6" r="5" stroke="#4b5d7a" stroke-width="1.2"/>
+            <path d="M6 5v3M6 3.5v.5" stroke="#4b5d7a" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          AI extraction coming soon — evidence is staged for analysis
+        </div>
+
+      </div><!-- /tab-evidence -->
+
+      <!-- ── Manual Evaluation Tab ────────────── -->
+      <div class="tab-pane" id="tab-manual">
+
+        <div class="pane-section-label">Event Context</div>
+
+        <form id="eventForm" autocomplete="off">
+
+          <div class="field-group">
+            <label class="field-label" for="domain">Domain</label>
+            <div class="select-wrap">
+              <select id="domain">
+                <option value="">— Select Domain —</option>
+                <option value="Terrorism">Terrorism</option>
+                <option value="Conflict">Conflict</option>
+                <option value="Crime">Crime</option>
+                <option value="Politics">Politics</option>
+                <option value="Cyber">Cyber</option>
+                <option value="Weather">Weather</option>
+              </select>
+              <svg class="select-chevron" width="12" height="12" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="#64748b" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="eventType">Event Type</label>
+            <div class="select-wrap">
+              <select id="eventType" disabled>
+                <option value="">— Select Domain First —</option>
+              </select>
+              <svg class="select-chevron" width="12" height="12" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="#64748b" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="region">Region</label>
+            <div class="select-wrap">
+              <select id="region">
+                <option value="">— Select Region —</option>
+                <option value="Middle East">Middle East</option>
+                <option value="Europe">Europe</option>
+                <option value="North America">North America</option>
+                <option value="South Asia">South Asia</option>
+              </select>
+              <svg class="select-chevron" width="12" height="12" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="#64748b" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="pane-section-label">Casualty Data</div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label class="field-label" for="fatalities">Fatalities</label>
+              <div class="number-wrap">
+                <button type="button" class="num-btn" data-target="fatalities" data-delta="-1">−</button>
+                <input type="number" id="fatalities" value="0" min="0" max="9999" />
+                <button type="button" class="num-btn" data-target="fatalities" data-delta="1">+</button>
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="injuries">Injuries</label>
+              <div class="number-wrap">
+                <button type="button" class="num-btn" data-target="injuries" data-delta="-1">−</button>
+                <input type="number" id="injuries" value="0" min="0" max="9999" />
+                <button type="button" class="num-btn" data-target="injuries" data-delta="1">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Infrastructure Impact</label>
+            <div class="radio-group">
+              <label class="radio-item"><input type="radio" name="infrastructure" value="None" checked /><span class="radio-box"></span><span>None</span></label>
+              <label class="radio-item"><input type="radio" name="infrastructure" value="Minor" /><span class="radio-box"></span><span>Minor</span></label>
+              <label class="radio-item"><input type="radio" name="infrastructure" value="Moderate" /><span class="radio-box"></span><span>Moderate</span></label>
+              <label class="radio-item"><input type="radio" name="infrastructure" value="Severe" /><span class="radio-box"></span><span>Severe</span></label>
+            </div>
+          </div>
+
+          <div id="formError" class="form-error hidden"></div>
+
+          <button type="submit" class="btn-primary btn-evaluate" id="evaluateBtn">
+            <span id="btnText">Evaluate Decision</span>
+            <span id="btnSpinner" class="spinner hidden"></span>
+          </button>
+
+        </form>
+
+        <div class="form-footer"><span id="lastEvalTime"></span></div>
+
+      </div><!-- /tab-manual -->
+
+    </aside>
+
+    <!-- ── Results Panel ──────────────────────── -->
+    <section class="results-area" id="resultsArea">
+
+      <div class="results-placeholder" id="resultsPlaceholder">
+        <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+          <circle cx="28" cy="28" r="27" stroke="#1e2d4a" stroke-width="1.5"/>
+          <path d="M28 14 L28 28 L36 34" stroke="#1e3a5f" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="28" cy="28" r="3" fill="#1e3a5f"/>
+        </svg>
+        <p>Submit an event to generate a risk decision</p>
+      </div>
+
+      <div id="resultsContent" class="hidden">
+
+        <div class="results-top">
+
+          <div class="card card-gauge">
+            <div class="card-label">Risk Score</div>
+            <div class="gauge-wrap">
+              <svg class="gauge-svg" viewBox="0 0 220 140">
+                <circle class="gauge-track" cx="110" cy="115" r="90"
+                  stroke-dasharray="376.99 188.50"
+                  transform="rotate(150 110 115)" />
+                <circle class="gauge-fill" id="gaugeFill" cx="110" cy="115" r="90"
+                  stroke-dasharray="0 565.49"
+                  transform="rotate(150 110 115)" />
+              </svg>
+              <div class="gauge-center">
+                <div class="gauge-score" id="gaugeScore">—</div>
+                <div class="gauge-label-inner" id="gaugeLabel">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card card-threshold">
+            <div class="card-label">Threshold Decision</div>
+            <div class="threshold-body">
+              <div class="threshold-action" id="thresholdAction">—</div>
+              <div class="threshold-meta">
+                <span class="meta-pill" id="thresholdSeverity"></span>
+                <span class="meta-pill meta-source" id="thresholdSource"></span>
+                <span class="meta-pill meta-rule" id="thresholdRule"></span>
+              </div>
+              <div class="threshold-desc" id="thresholdDesc"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="card card-policies">
+          <div class="card-label">
+            Triggered Policies
+            <span class="badge" id="policyCount">0</span>
+          </div>
+          <div id="policiesList" class="policies-list"></div>
+        </div>
+
+        <div class="card card-explanation">
+          <div class="card-label">Decision Explanation</div>
+          <div class="explanation-summary" id="explanationSummary"></div>
+          <div class="explanation-inputs" id="explanationInputs"></div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
