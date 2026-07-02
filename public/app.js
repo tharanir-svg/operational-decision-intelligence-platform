@@ -26,27 +26,6 @@ const POLICY_STYLE = {
   MONITOR:      { bg: 'var(--monitor-bg)',  border: 'var(--monitor-border)',  color: 'var(--monitor-text)'  }
 };
 
-/* ── Mock extraction payload ───────────────────────────────── */
-const MOCK_EXTRACTION = {
-  summary:        'Coordinated bomb blast reported near the central market district in Karachi, Pakistan. A vehicle-borne IED detonated during morning rush hour, targeting a densely populated civilian area. Pakistani emergency services confirmed multiple fatalities and dozens of injuries on the scene. Security forces have cordoned the area and a secondary device was reportedly discovered nearby, indicating a multi-phase operation.',
-  eventType:      'Explosion',
-  location:       'Central Market District, Karachi',
-  country:        'Pakistan',
-  region:         'South Asia',
-  domain:         'Terrorism',
-  confidence:     87,
-  fatalities:     12,
-  injuries:       47,
-  infrastructure: 'Moderate',
-  crowdSize:      300,
-  threats:        'Vehicle-borne IED, Coordinated attack, Civilian targeting, Rush hour timing, Secondary device reported',
-  weapons:        'IED, Vehicle bomb, Explosive device',
-  criticalInfra:  'Transport corridor, Central market district, Communication nodes',
-  vips:           'None identified at this time',
-  category:       'Terrorist Attack',
-  threshold:      'FLASH',
-  reasoning:      'The incident exhibits hallmarks of a coordinated terrorist attack: deliberate timing during peak civilian activity, deployment of a vehicle-borne IED, and targeting of a densely populated commercial zone. Confirmed fatality count (12) surpasses the THR-001 mass-casualty threshold. The South Asia regional baseline risk multiplier further elevates the aggregate risk score. Pattern analysis indicates possible affiliation with regional threat actors known to operate in Sindh province. Secondary device discovery suggests operational complexity consistent with a multi-phase attack. Recommendation: immediate FLASH escalation and activation of continuity protocols.'
-};
 
 const GAUGE_ARC  = 376.99;
 const GAUGE_CIRC = 565.49;
@@ -200,34 +179,40 @@ function initThresholdSelect() {
   sel.addEventListener('change', () => updateThresholdColor(sel));
 }
 
-/* ── Populate Intelligence Panel with mock data ───────────── */
-function populateIntelPanel() {
-  const m = MOCK_EXTRACTION;
-  $('ip-summary').value    = m.summary;
-  $('ip-event-type').value = m.eventType;
-  $('ip-location').value   = m.location;
-  $('ip-country').value    = m.country;
-  $('ip-threats').value    = m.threats;
-  $('ip-weapons').value    = m.weapons;
-  $('ip-crit-infra').value = m.criticalInfra;
-  $('ip-vips').value       = m.vips;
-  $('ip-category').value   = m.category;
-  $('ip-reasoning').value  = m.reasoning;
-  $('ip-fatalities').value = m.fatalities;
-  $('ip-injuries').value   = m.injuries;
-  $('ip-crowd').value      = m.crowdSize;
-  $('ip-confidence').value = m.confidence;
+/* ── Map /api/extract response → Intelligence Panel fields ─── */
+function populateIntelPanelFromAPI(d) {
+  // Text fields
+  $('ip-summary').value    = d.incidentSummary        || '';
+  $('ip-event-type').value = d.eventType               || '';
+  $('ip-location').value   = d.location                || '';
+  $('ip-country').value    = d.country                 || '';
+  $('ip-category').value   = d.recommendedCategory     || '';
+  $('ip-reasoning').value  = d.reasoning               || '';
 
-  // Region select
-  setSelectValue('ip-region', m.region);
-  // Domain select
-  setSelectValue('ip-domain', m.domain);
-  // Infrastructure select
-  setSelectValue('ip-infra', m.infrastructure);
-  // Threshold select
-  setSelectValue('ip-threshold', m.threshold);
+  // Number fields
+  $('ip-fatalities').value = d.fatalities  ?? 0;
+  $('ip-injuries').value   = d.injuries    ?? 0;
+  $('ip-crowd').value      = d.crowdSize   ?? 0;
+  $('ip-confidence').value = d.confidence  ?? 0;
 
-  updateConfidenceBar(m.confidence);
+  // Arrays → comma-separated strings for editable textareas
+  $('ip-threats').value    = Array.isArray(d.threatIndicators)      ? d.threatIndicators.join(', ')      : (d.threatIndicators      || '');
+  $('ip-weapons').value    = Array.isArray(d.weapons)               ? d.weapons.join(', ')               : (d.weapons               || '');
+  $('ip-crit-infra').value = Array.isArray(d.criticalInfrastructure)? d.criticalInfrastructure.join(', '): (d.criticalInfrastructure || '');
+
+  // Boolean vipMentioned → human-readable string
+  $('ip-vips').value = d.vipMentioned
+    ? 'VIPs identified — see source material for details'
+    : 'None identified';
+
+  // Selects
+  setSelectValue('ip-region',    d.region              || '');
+  setSelectValue('ip-domain',    d.domain              || '');
+  setSelectValue('ip-infra',     d.infrastructureImpact|| 'None');
+  setSelectValue('ip-threshold', d.suggestedThreshold  || 'MONITOR');
+
+  // Visual updates
+  updateConfidenceBar(d.confidence ?? 0);
   updateThresholdColor($('ip-threshold'));
 }
 
@@ -238,18 +223,17 @@ function setSelectValue(id, value) {
   }
 }
 
-/* ── Analyze Evidence button ───────────────────────────────── */
+/* ── Analyze Evidence → POST /api/extract ──────────────────── */
 function initAnalyzeBtn() {
-  $('analyzeBtn').addEventListener('click', () => {
-    const err  = $('evidenceError');
-    const text = $('ev-text').value.trim();
-    const url  = $('ev-url').value.trim();
-    const region = $('ev-region').value;
-    const domain = $('ev-domain').value;
+  $('analyzeBtn').addEventListener('click', async () => {
+    const err    = $('evidenceError');
+    const text   = $('ev-text').value.trim();
+    const url    = $('ev-url').value.trim();
 
     err.classList.add('hidden');
+    err.style.cssText = '';
 
-    if (!text && !url && !attachedFiles.length && !region && !domain) {
+    if (!text && !url && !attachedFiles.length && !$('ev-region').value && !$('ev-domain').value) {
       err.textContent = 'Provide at least one evidence source or context field before analyzing.';
       err.classList.remove('hidden');
       return;
@@ -258,12 +242,37 @@ function initAnalyzeBtn() {
     const btn = $('analyzeBtn'), txt = $('analyzeBtnText'), spn = $('analyzeSpinner');
     btn.disabled = true; txt.classList.add('hidden'); spn.classList.remove('hidden');
 
-    setTimeout(() => {
-      btn.disabled = false; txt.classList.remove('hidden'); spn.classList.add('hidden');
-      populateIntelPanel();
+    try {
+      const payload = {
+        text,
+        url,
+        images: attachedFiles
+          .filter(f => f.type.startsWith('image/'))
+          .map(f => ({ name: f.name, size: f.size, type: f.type })),
+        videos: attachedFiles
+          .filter(f => f.type.startsWith('video/'))
+          .map(f => ({ name: f.name, size: f.size, type: f.type }))
+      };
+
+      const res  = await fetch('/api/extract', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.success) throw new Error(data.error || 'Extraction failed.');
+
+      populateIntelPanelFromAPI(data.result);
       unlockStep(1);
       goToStep(1);
-    }, 1200);
+
+    } catch (ex) {
+      err.textContent = ex.message || 'Network error — extraction service unavailable.';
+      err.classList.remove('hidden');
+    } finally {
+      btn.disabled = false; txt.classList.remove('hidden'); spn.classList.add('hidden');
+    }
   });
 }
 

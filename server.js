@@ -3,6 +3,7 @@ const path    = require("path");
 
 const DecisionOrchestrator = require("./src/core/DecisionOrchestrator");
 const createDecisionAPI    = require("./src/api/DecisionAPI");
+const createExtractAPI     = require("./src/api/ExtractAPI");
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(express.static(path.join(__dirname, "public")));
 const orchestrator = new DecisionOrchestrator();
 
 app.use("/api", createDecisionAPI(orchestrator));
+app.use("/api", createExtractAPI());
 
 const PORT = process.env.PORT || 5000;
 
