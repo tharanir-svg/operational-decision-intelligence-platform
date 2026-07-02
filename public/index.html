@@ -34,26 +34,26 @@
     <!-- ── Left Panel ─────────────────────────── -->
     <aside class="panel panel-left">
 
-      <!-- Tab Bar -->
-      <div class="tab-bar">
-        <button class="tab-btn active" data-tab="evidence">
-          <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-            <rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/>
-            <path d="M4 5h6M4 7.5h6M4 10h3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-          </svg>
-          Evidence
+      <!-- Pipeline Step Indicator -->
+      <div class="pipeline-steps" id="pipelineSteps">
+        <button class="step-btn active" data-step="0">
+          <div class="step-circle" id="sc-0">1</div>
+          <div class="step-label">Evidence</div>
         </button>
-        <button class="tab-btn" data-tab="manual">
-          <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-            <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.4"/>
-            <path d="M7 4v3l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-          </svg>
-          Manual
+        <div class="step-connector" id="conn-0-1"></div>
+        <button class="step-btn locked" data-step="1">
+          <div class="step-circle" id="sc-1">2</div>
+          <div class="step-label">Intelligence</div>
+        </button>
+        <div class="step-connector" id="conn-1-2"></div>
+        <button class="step-btn locked" data-step="2">
+          <div class="step-circle" id="sc-2">3</div>
+          <div class="step-label">Decision</div>
         </button>
       </div>
 
-      <!-- ── Evidence Intake Tab ──────────────── -->
-      <div class="tab-pane active" id="tab-evidence">
+      <!-- ── Step 0: Evidence Intake ──────────── -->
+      <div class="step-pane active" id="pane-0">
 
         <div class="pane-section-label">Context</div>
 
@@ -101,16 +101,8 @@
         <div class="pane-section-label">Evidence</div>
 
         <div class="field-group">
-          <label class="field-label" for="ev-text">
-            Paste article, tweet, report or intelligence
-          </label>
-          <textarea
-            id="ev-text"
-            class="evidence-textarea"
-            placeholder="Paste raw intelligence here — news article, social media post, field report, SIGINT summary, or any open-source text…"
-            rows="7"
-            spellcheck="false"
-          ></textarea>
+          <label class="field-label" for="ev-text">Paste article, tweet, report or intelligence</label>
+          <textarea id="ev-text" class="evidence-textarea" placeholder="Paste raw intelligence here — news article, social media post, field report, SIGINT summary, or any open-source text…" rows="7" spellcheck="false"></textarea>
           <div class="char-count" id="charCount">0 characters</div>
         </div>
 
@@ -125,10 +117,7 @@
         </div>
 
         <div class="field-group">
-          <div class="field-label">
-            Attach Files
-            <span class="field-optional">(images &amp; video)</span>
-          </div>
+          <div class="field-label">Attach Files <span class="field-optional">(images &amp; video)</span></div>
           <div class="dropzone" id="dropzone">
             <input type="file" id="fileInput" accept="image/*,video/*" multiple hidden />
             <div class="dropzone-idle" id="dropzoneIdle">
@@ -162,18 +151,201 @@
           <span id="analyzeSpinner" class="spinner hidden"></span>
         </button>
 
-        <div class="ai-notice">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <circle cx="6" cy="6" r="5" stroke="#4b5d7a" stroke-width="1.2"/>
-            <path d="M6 5v3M6 3.5v.5" stroke="#4b5d7a" stroke-width="1.2" stroke-linecap="round"/>
-          </svg>
-          AI extraction coming soon — evidence is staged for analysis
+      </div><!-- /pane-0 -->
+
+      <!-- ── Step 1: Extracted Intelligence ────── -->
+      <div class="step-pane" id="pane-1">
+
+        <div class="intel-header">
+          <div class="intel-badge">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <circle cx="6" cy="6" r="5.5" stroke="#6366f1" stroke-width="1"/>
+              <path d="M4 6l1.5 1.5L8 4" stroke="#6366f1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            AI Extraction — Mock Data
+          </div>
+          <button class="back-btn" id="backToEvidence">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M7.5 2L3.5 6l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Back
+          </button>
         </div>
 
-      </div><!-- /tab-evidence -->
+        <!-- Incident Summary -->
+        <div class="ip-section">
+          <div class="ip-section-label">Incident Summary</div>
+          <textarea id="ip-summary" class="ip-textarea ip-summary-textarea" rows="4" spellcheck="false"></textarea>
+        </div>
 
-      <!-- ── Manual Evaluation Tab ────────────── -->
-      <div class="tab-pane" id="tab-manual">
+        <!-- Classification -->
+        <div class="ip-section">
+          <div class="ip-section-label">Classification</div>
+          <div class="ip-grid-2">
+            <div class="field-group">
+              <label class="field-label" for="ip-event-type">Event Type</label>
+              <input type="text" id="ip-event-type" class="ip-input" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ip-domain">Domain</label>
+              <div class="select-wrap">
+                <select id="ip-domain">
+                  <option value="">—</option>
+                  <option value="Terrorism">Terrorism</option>
+                  <option value="Conflict">Conflict</option>
+                  <option value="Crime">Crime</option>
+                  <option value="Politics">Politics</option>
+                  <option value="Cyber">Cyber</option>
+                  <option value="Weather">Weather</option>
+                </select>
+                <svg class="select-chevron" width="12" height="12" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="#64748b" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ip-location">Location</label>
+              <input type="text" id="ip-location" class="ip-input" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ip-country">Country</label>
+              <input type="text" id="ip-country" class="ip-input" />
+            </div>
+          </div>
+          <div class="field-group" style="margin-top:10px">
+            <label class="field-label" for="ip-region">Region</label>
+            <div class="select-wrap">
+              <select id="ip-region">
+                <option value="">—</option>
+                <option value="Middle East">Middle East</option>
+                <option value="Europe">Europe</option>
+                <option value="North America">North America</option>
+                <option value="South Asia">South Asia</option>
+              </select>
+              <svg class="select-chevron" width="12" height="12" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="#64748b" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Confidence Score -->
+        <div class="ip-section">
+          <div class="ip-section-label">Confidence Score</div>
+          <div class="confidence-wrap">
+            <div class="confidence-track">
+              <div class="confidence-fill" id="confidenceFill"></div>
+            </div>
+            <div class="confidence-right">
+              <input type="number" id="ip-confidence" class="confidence-input" min="0" max="100" />
+              <span class="confidence-pct">%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Casualties & Impact -->
+        <div class="ip-section">
+          <div class="ip-section-label">Casualties &amp; Impact</div>
+          <div class="ip-grid-2">
+            <div class="field-group">
+              <label class="field-label" for="ip-fatalities">Fatalities</label>
+              <input type="number" id="ip-fatalities" class="ip-input" min="0" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ip-injuries">Injuries</label>
+              <input type="number" id="ip-injuries" class="ip-input" min="0" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ip-crowd">Crowd Size</label>
+              <input type="number" id="ip-crowd" class="ip-input" min="0" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ip-infra">Infrastructure Impact</label>
+              <div class="select-wrap">
+                <select id="ip-infra">
+                  <option value="None">None</option>
+                  <option value="Minor">Minor</option>
+                  <option value="Moderate">Moderate</option>
+                  <option value="Severe">Severe</option>
+                </select>
+                <svg class="select-chevron" width="12" height="12" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="#64748b" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Intelligence Indicators -->
+        <div class="ip-section">
+          <div class="ip-section-label">Intelligence Indicators</div>
+          <div class="field-group">
+            <label class="field-label" for="ip-threats">Threat Indicators</label>
+            <textarea id="ip-threats" class="ip-textarea" rows="2" spellcheck="false"></textarea>
+          </div>
+          <div class="field-group" style="margin-top:8px">
+            <label class="field-label" for="ip-weapons">Weapons Mentioned</label>
+            <textarea id="ip-weapons" class="ip-textarea" rows="2" spellcheck="false"></textarea>
+          </div>
+          <div class="field-group" style="margin-top:8px">
+            <label class="field-label" for="ip-crit-infra">Critical Infrastructure</label>
+            <textarea id="ip-crit-infra" class="ip-textarea" rows="2" spellcheck="false"></textarea>
+          </div>
+          <div class="field-group" style="margin-top:8px">
+            <label class="field-label" for="ip-vips">VIPs Mentioned</label>
+            <textarea id="ip-vips" class="ip-textarea" rows="2" spellcheck="false"></textarea>
+          </div>
+        </div>
+
+        <!-- Recommendation -->
+        <div class="ip-section">
+          <div class="ip-section-label">Recommendation</div>
+          <div class="ip-grid-2">
+            <div class="field-group">
+              <label class="field-label" for="ip-category">Event Category</label>
+              <input type="text" id="ip-category" class="ip-input" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="ip-threshold">Suggested Threshold</label>
+              <div class="select-wrap">
+                <select id="ip-threshold" class="threshold-select">
+                  <option value="MONITOR">MONITOR</option>
+                  <option value="WATCH">WATCH</option>
+                  <option value="ESCALATE">ESCALATE</option>
+                  <option value="FLASH">FLASH</option>
+                </select>
+                <svg class="select-chevron" width="12" height="12" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="#64748b" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Reasoning -->
+        <div class="ip-section">
+          <div class="ip-section-label">AI Reasoning</div>
+          <div class="ai-reasoning-wrap">
+            <div class="ai-reasoning-badge">
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                <circle cx="5.5" cy="5.5" r="4.5" stroke="#6366f1" stroke-width="1"/>
+                <path d="M5.5 3.5v2.5l1.5 1" stroke="#6366f1" stroke-width="1" stroke-linecap="round"/>
+              </svg>
+              Model Reasoning
+            </div>
+            <textarea id="ip-reasoning" class="ip-textarea ip-reasoning-textarea" rows="5" spellcheck="false"></textarea>
+          </div>
+        </div>
+
+        <button type="button" class="btn-primary btn-approve" id="approveBtn">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <path d="M3 7.5l3 3 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Approve &amp; Continue
+        </button>
+
+      </div><!-- /pane-1 -->
+
+      <!-- ── Step 2: Manual Decision ────────────── -->
+      <div class="step-pane" id="pane-2">
+
+        <div class="intel-header">
+          <div class="step-origin-badge" id="stepOriginBadge"></div>
+          <button class="back-btn" id="backToIntel">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M7.5 2L3.5 6l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Back
+          </button>
+        </div>
 
         <div class="pane-section-label">Event Context</div>
 
@@ -253,7 +425,7 @@
 
           <div id="formError" class="form-error hidden"></div>
 
-          <button type="submit" class="btn-primary btn-evaluate" id="evaluateBtn">
+          <button type="submit" class="btn-primary" id="evaluateBtn">
             <span id="btnText">Evaluate Decision</span>
             <span id="btnSpinner" class="spinner hidden"></span>
           </button>
@@ -262,12 +434,12 @@
 
         <div class="form-footer"><span id="lastEvalTime"></span></div>
 
-      </div><!-- /tab-manual -->
+      </div><!-- /pane-2 -->
 
     </aside>
 
     <!-- ── Results Panel ──────────────────────── -->
-    <section class="results-area" id="resultsArea">
+    <section class="results-area">
 
       <div class="results-placeholder" id="resultsPlaceholder">
         <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
@@ -281,17 +453,12 @@
       <div id="resultsContent" class="hidden">
 
         <div class="results-top">
-
           <div class="card card-gauge">
             <div class="card-label">Risk Score</div>
             <div class="gauge-wrap">
               <svg class="gauge-svg" viewBox="0 0 220 140">
-                <circle class="gauge-track" cx="110" cy="115" r="90"
-                  stroke-dasharray="376.99 188.50"
-                  transform="rotate(150 110 115)" />
-                <circle class="gauge-fill" id="gaugeFill" cx="110" cy="115" r="90"
-                  stroke-dasharray="0 565.49"
-                  transform="rotate(150 110 115)" />
+                <circle class="gauge-track" cx="110" cy="115" r="90" stroke-dasharray="376.99 188.50" transform="rotate(150 110 115)" />
+                <circle class="gauge-fill" id="gaugeFill" cx="110" cy="115" r="90" stroke-dasharray="0 565.49" transform="rotate(150 110 115)" />
               </svg>
               <div class="gauge-center">
                 <div class="gauge-score" id="gaugeScore">—</div>
@@ -299,27 +466,22 @@
               </div>
             </div>
           </div>
-
           <div class="card card-threshold">
             <div class="card-label">Threshold Decision</div>
             <div class="threshold-body">
               <div class="threshold-action" id="thresholdAction">—</div>
               <div class="threshold-meta">
                 <span class="meta-pill" id="thresholdSeverity"></span>
-                <span class="meta-pill meta-source" id="thresholdSource"></span>
-                <span class="meta-pill meta-rule" id="thresholdRule"></span>
+                <span class="meta-pill" id="thresholdSource"></span>
+                <span class="meta-pill hidden" id="thresholdRule"></span>
               </div>
               <div class="threshold-desc" id="thresholdDesc"></div>
             </div>
           </div>
-
         </div>
 
         <div class="card card-policies">
-          <div class="card-label">
-            Triggered Policies
-            <span class="badge" id="policyCount">0</span>
-          </div>
+          <div class="card-label">Triggered Policies <span class="badge" id="policyCount">0</span></div>
           <div id="policiesList" class="policies-list"></div>
         </div>
 
