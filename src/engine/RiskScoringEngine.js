@@ -1,4 +1,4 @@
-export default class RiskScoringEngine {
+class RiskScoringEngine {
   constructor(weightLibrary, regionProfiles) {
     this.weights = weightLibrary.weights;
     this.regionProfiles = regionProfiles.regions;
@@ -21,9 +21,8 @@ export default class RiskScoringEngine {
       score += region.baselineRisk * 10;
     }
 
-    return {
-      riskScore: Math.min(score, 100),
-      confidence: 90
-    };
+    return Math.min(score, 100);
   }
 }
+
+module.exports = RiskScoringEngine;

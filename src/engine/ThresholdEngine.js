@@ -1,43 +1,64 @@
-export default class ThresholdEngine {
+class ThresholdEngine {
+
   constructor(thresholdMatrix) {
-    this.thresholdMatrix = thresholdMatrix;
+    this.rules = thresholdMatrix.rules || [];
+    this.scoreBands = thresholdMatrix.thresholds || [];
   }
 
-  evaluate(eventContext) {
-    const matchingRule = this.thresholdMatrix.rules.find(rule => {
-      if (rule.eventType !== eventContext.eventType) {
-        return false;
-      }
-
-      if (
-        rule.conditions?.fatalities?.gte &&
-        eventContext.fatalities <
-          rule.conditions.fatalities.gte
-      ) {
-        return false;
-      }
-
-      if (
-        rule.conditions?.injuries?.gte &&
-        eventContext.injuries <
-          rule.conditions.injuries.gte
-      ) {
-        return false;
-      }
-
-      return true;
-    });
-
-    if (!matchingRule) {
+  evaluate(eventContext, riskScore) {
+    const eventRule = this._matchEventRule(eventContext);
+    if (eventRule) {
       return {
-        severity: 1,
-        action: "MONITOR"
+        ruleId: eventRule.ruleId,
+        action: eventRule.recommendedAction,
+        severity: eventRule.recommendedSeverity,
+        source: "event-rule"
       };
     }
+    return this._evaluateByScore(riskScore);
+  }
 
-    return {
-      severity: matchingRule.recommendedSeverity,
-      action: matchingRule.recommendedAction
-    };
+  _matchEventRule(eventContext) {
+    return this.rules.find(rule => {
+      if (rule.eventType !== eventContext.eventType) return false;
+
+      const cond = rule.conditions || {};
+
+      if (
+        cond.fatalities?.gte !== undefined &&
+        (eventContext.fatalities || 0) < cond.fatalities.gte
+      ) return false;
+
+      if (
+        cond.injuries?.gte !== undefined &&
+        (eventContext.injuries || 0) < cond.injuries.gte
+      ) return false;
+
+      return true;
+    }) || null;
+  }
+
+  _evaluateByScore(riskScore) {
+    if (this.scoreBands.length) {
+      for (const band of this.scoreBands) {
+        if (riskScore >= band.minimumScore) {
+          return { ...band, source: "score-band" };
+        }
+      }
+    }
+
+    const action =
+      riskScore >= 75 ? "FLASH" :
+      riskScore >= 50 ? "ESCALATE" :
+      riskScore >= 25 ? "WATCH" : "MONITOR";
+
+    const severity =
+      riskScore >= 75 ? 5 :
+      riskScore >= 50 ? 4 :
+      riskScore >= 25 ? 3 : 1;
+
+    return { action, severity, source: "score-band" };
   }
 }
+
+module.exports = ThresholdEngine;

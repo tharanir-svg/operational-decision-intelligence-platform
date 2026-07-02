@@ -1,4 +1,4 @@
-export default class PolicyEngine {
+class PolicyEngine {
   constructor(policyLibrary) {
     this.policyLibrary = policyLibrary;
   }
@@ -6,7 +6,6 @@ export default class PolicyEngine {
   evaluate(eventContext) {
     return this.policyLibrary.policies.filter(policy => {
       if (!policy.appliesTo) return true;
-
       return (
         policy.appliesTo.includes("All") ||
         policy.appliesTo.includes(eventContext.domain)
@@ -14,3 +13,5 @@ export default class PolicyEngine {
     });
   }
 }
+
+module.exports = PolicyEngine;
