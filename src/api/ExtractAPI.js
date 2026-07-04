@@ -128,7 +128,7 @@ module.exports = function createExtractAPI() {
    * Returns the ODIP extraction schema.
    * TODO: replace mock with Gemini API call.
    */
-  router.post("/extract", (req, res) => {
+  router.post("/extract", async (req, res) => {
     try {
       const { text, url, images = [], videos = [] } = req.body;
 
@@ -139,9 +139,11 @@ module.exports = function createExtractAPI() {
         });
       }
 
-      const scenarioKey = detectScenario(text, url);
-      const mock        = SCENARIOS[scenarioKey];
-
+      const intelligence =
+    await service.extractEvidence({
+        evidenceText: text,
+        sourceUrl: url
+    });
       const result = {
         incidentSummary:        mock.incidentSummary,
         eventType:              mock.eventType,
