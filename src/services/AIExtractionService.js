@@ -1,57 +1,54 @@
 const GeminiClient = require("../ai/GeminiClient");
-const ExtractionPrompt = require("../prompts/ExtractionPrompt");
+const buildExtractionPrompt = require("../prompts/ExtractionPrompt");
+const ExtractionValidator = require("../validation/ExtractionValidator");
 
 class AIExtractionService {
 
     constructor() {
 
         this.gemini = new GeminiClient();
+        this.validator = new ExtractionValidator();
 
     }
 
-    async extract(evidence) {
+    async extractEvidence(evidence) {
+
+        const prompt = buildExtractionPrompt(evidence);
+
+        const started = Date.now();
+
+        const result = await this.gemini.generate(prompt);
+
+        if (!result.success) {
+
+            throw new Error(result.error);
+
+        }
+
+        let intelligence;
 
         try {
 
-            const prompt = ExtractionPrompt.build(evidence);
-
-            const result = await this.gemini.generate(prompt);
-
-            if (!result.success) {
-
-                throw new Error(result.error);
-
-            }
-
-            return {
-
-                success: true,
-
-                extraction: result.text,
-
-                metadata: {
-
-                    model: result.model,
-
-                    latency: result.latency
-
-                }
-
-            };
+            intelligence = JSON.parse(result.text);
 
         }
 
         catch (err) {
 
-            return {
-
-                success: false,
-
-                error: err.message
-
-            };
+            throw new Error(
+                "Gemini returned invalid JSON.\n\n" +
+                result.text
+            );
 
         }
+
+        this.validator.validate(intelligence);
+
+        intelligence.model = result.model;
+        intelligence.processingTime = result.latency;
+        intelligence.timestamp = new Date().toISOString();
+
+        return intelligence;
 
     }
 
