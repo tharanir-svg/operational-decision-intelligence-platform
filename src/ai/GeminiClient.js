@@ -4,12 +4,14 @@ class GeminiClient {
 
     constructor() {
 
-        if (!process.env.GEMINI_API_KEY) {
-            throw new Error("Missing GEMINI_API_KEY environment variable.");
+        const apiKey = process.env.GEMINI_API_KEY;
+
+        if (!apiKey) {
+            throw new Error("GEMINI_API_KEY is missing.");
         }
 
-        this.ai = new GoogleGenAI({
-            apiKey: process.env.GEMINI_API_KEY
+        this.client = new GoogleGenAI({
+            apiKey
         });
 
         this.model = "gemini-2.5-flash";
@@ -17,9 +19,11 @@ class GeminiClient {
 
     async generate(prompt) {
 
+        const started = Date.now();
+
         try {
 
-            const response = await this.ai.models.generateContent({
+            const response = await this.client.models.generateContent({
 
                 model: this.model,
 
@@ -27,22 +31,35 @@ class GeminiClient {
 
             });
 
-            if (
-                !response ||
-                !response.text
-            ) {
+            const elapsed = Date.now() - started;
 
-                throw new Error("Gemini returned an empty response.");
+            return {
 
-            }
+                success: true,
 
-            return response.text;
+                text: response.text,
 
-        } catch (err) {
+                model: this.model,
 
-            console.error("Gemini Error:", err.message);
+                latency: elapsed,
 
-            throw err;
+                raw: response
+
+            };
+
+        }
+
+        catch (error) {
+
+            return {
+
+                success: false,
+
+                error: error.message,
+
+                model: this.model
+
+            };
 
         }
 
