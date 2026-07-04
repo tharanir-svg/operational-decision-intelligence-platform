@@ -1,44 +1,27 @@
-class ExtractionPrompt {
+module.exports = function buildExtractionPrompt(evidence) {
+  return `
+You are an Operational Intelligence Analyst.
 
-    static build(evidence) {
+Analyze the following operational evidence.
 
-        return `
-You are an Operational Intelligence analyst.
+Evidence:
+${evidence}
 
-Analyze the evidence below.
-
-Extract ONLY factual information.
-
-Do NOT guess.
-
-Return STRICT JSON.
-
-Schema:
+Return ONLY valid JSON.
 
 {
+  "summary":"",
   "eventType":"",
   "region":"",
   "domain":"",
+  "severity":"",
   "fatalities":0,
   "injuries":0,
   "confidence":0,
-  "summary":"",
+  "keywords":[],
   "entities":[],
-  "locations":[],
-  "threatIndicators":[],
-  "riskFactors":[],
-  "recommendedSeverity":""
+  "recommendedAction":"",
+  "explanation":""
 }
-
-Evidence:
-
-${evidence}
-
-Return JSON only.
 `;
-
-    }
-
-}
-
-module.exports = ExtractionPrompt;
+};
