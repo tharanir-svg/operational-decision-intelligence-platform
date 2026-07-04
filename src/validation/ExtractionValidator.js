@@ -1,45 +1,20 @@
 class ExtractionValidator {
 
-    validate(extraction) {
+    validate(data) {
 
-        const errors = [];
+        if (!data.summary)
+            throw new Error("Summary missing");
 
-        if (!extraction) {
-            errors.push("Extraction is empty.");
-        }
+        if (!data.eventType)
+            throw new Error("Event type missing");
 
-        if (!extraction.eventType) {
-            errors.push("Missing eventType.");
-        }
+        if (!data.region)
+            throw new Error("Region missing");
 
-        if (!extraction.region) {
-            errors.push("Missing region.");
-        }
+        if (!data.domain)
+            throw new Error("Domain missing");
 
-        if (!extraction.domain) {
-            errors.push("Missing domain.");
-        }
-
-        if (typeof extraction.fatalities !== "number") {
-            errors.push("fatalities must be a number.");
-        }
-
-        if (typeof extraction.injuries !== "number") {
-            errors.push("injuries must be a number.");
-        }
-
-        if (
-            extraction.confidence !== undefined &&
-            (extraction.confidence < 0 || extraction.confidence > 1)
-        ) {
-            errors.push("confidence must be between 0 and 1.");
-        }
-
-        return {
-            valid: errors.length === 0,
-            errors
-        };
-
+        return data;
     }
 
 }
