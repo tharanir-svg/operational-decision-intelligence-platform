@@ -1,5 +1,5 @@
 const express = require("express");
-
+const AIExtractionService = require("../services/AIExtractionService");
 /* ── Mock extraction scenarios ─────────────────────────────────
    Keyword matching will be replaced by a Gemini call when the
    AI layer is wired in. Each scenario mirrors the agreed schema.
@@ -115,7 +115,7 @@ function validatePayload(body) {
 /* ── Router ────────────────────────────────────────────────── */
 module.exports = function createExtractAPI() {
   const router = express.Router();
-
+  const service = new AIExtractionService();
   /**
    * POST /api/extract
    *
@@ -139,43 +139,18 @@ module.exports = function createExtractAPI() {
         });
       }
 
-      const intelligence =
-    await service.extractEvidence({
-        evidenceText: text,
-        sourceUrl: url
-    });
-      const result = {
-        incidentSummary:        mock.incidentSummary,
-        eventType:              mock.eventType,
-        location:               mock.location,
-        domain:                 mock.domain,
-        country:                mock.country,
-        region:                 mock.region,
-        confidence:             mock.confidence,
-        fatalities:             mock.fatalities,
-        injuries:               mock.injuries,
-        infrastructureImpact:   mock.infrastructureImpact,
-        crowdSize:              mock.crowdSize,
-        weapons:                mock.weapons,
-        criticalInfrastructure: mock.criticalInfrastructure,
-        vipMentioned:           mock.vipMentioned,
-        threatIndicators:       mock.threatIndicators,
-        recommendedCategory:    mock.recommendedCategory,
-        suggestedThreshold:     mock.suggestedThreshold,
-        reasoning:              mock.reasoning,
-        _meta: {
-          source:    "mock",
-          scenario:  scenarioKey,
-          inputs: {
-            hasText:    typeof text === "string" && text.trim().length > 0,
-            hasUrl:     typeof url  === "string" && url.trim().length  > 0,
-            imageCount: images.length,
-            videoCount: videos.length
-          }
-        }
-      };
+      const intelligence = await service.extractEvidence({
+    text,
+    url,
+    images,
+    videos
+});
 
-      res.json({ success: true, timestamp: new Date().toISOString(), result });
+res.json({
+    success: true,
+    timestamp: new Date().toISOString(),
+    result: intelligence
+});
 
     } catch (err) {
       res.status(500).json({ success: false, error: err.message });
