@@ -3,6 +3,7 @@ const buildExtractionPrompt = require("../prompts/ExtractionPrompt");
 const ExtractionValidator = require("../validation/ExtractionValidator");
 const IntelligenceParser = require("../parsers/IntelligenceParser");
 const EntityExtractor = require("../intelligence/EntityExtractor");
+const ConfidenceEngine = require("../scoring/ConfidenceEngine");
 
 class AIExtractionService {
 
@@ -12,6 +13,7 @@ class AIExtractionService {
         this.validator = new ExtractionValidator();
         this.parser = new IntelligenceParser();
         this.entityExtractor = new EntityExtractor();
+        this.confidenceEngine = new ConfidenceEngine();
 
     }
 
@@ -51,6 +53,9 @@ class AIExtractionService {
 
         intelligence.extractedEntities =
             this.entityExtractor.extract(intelligence);
+
+        intelligence.confidenceAssessment =
+            this.confidenceEngine.calculate(intelligence);
 
         return intelligence;
 
