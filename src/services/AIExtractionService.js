@@ -1,3 +1,5 @@
+const IntelligenceParser =
+require("../parsers/IntelligenceParser");
 const GeminiClient = require("../ai/GeminiClient");
 const buildExtractionPrompt = require("../prompts/ExtractionPrompt");
 const ExtractionValidator = require("../validation/ExtractionValidator");
@@ -12,11 +14,13 @@ class AIExtractionService {
     }
 
     async extractEvidence(evidence) {
-
+        console.log("===== AIExtractionService =====");
+        console.log(evidence);
         const prompt = buildExtractionPrompt(evidence);
 
         const started = Date.now();
-
+        console.log("Calling Gemini...");
+        console.log(result);
         const result = await this.gemini.generate(prompt);
 
         if (!result.success) {
@@ -29,7 +33,9 @@ class AIExtractionService {
 
         try {
 
-            intelligence = JSON.parse(result.text);
+            intelligence = this.parser.parse(result.text);
+
+            intelligence = this.parser.normalize(intelligence);
 
         }
 
