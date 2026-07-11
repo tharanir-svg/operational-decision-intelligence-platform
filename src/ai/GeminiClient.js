@@ -1,5 +1,7 @@
 const { GoogleGenAI } = require("@google/genai");
+
 console.log("✅ GeminiClient loaded");
+
 class GeminiClient {
 
     constructor() {
@@ -14,26 +16,31 @@ class GeminiClient {
             apiKey
         });
 
-        this.model = "gemini-2.5-flash";
+        this.model = "gemini-3.5-flash";
     }
 
     async generate(prompt) {
 
-        const started = Date.now();
+        console.log(">>> ENTERED GeminiClient.generate()");
+        console.log("Model:", this.model);
 
         try {
 
+            // Ignore the supplied prompt temporarily
+            // and use the same prompt that worked in testGemini.js.
+            console.log("=================================");
+            console.log("MODEL USED:", this.model);
+            console.log("=================================");
             const response = await this.client.models.generateContent({
 
-                model: this.model,
+                model: "gemini-3.5-flash",
 
-                contents: prompt
+                contents: "Reply with exactly: Hello from Gemini"
 
             });
-            console.log("===== GEMINI RAW RESPONSE =====");
+
+            console.log("Response:");
             console.dir(response, { depth: null });
-            console.log("===== END RESPONSE =====");
-            const elapsed = Date.now() - started;
 
             return {
 
@@ -41,17 +48,18 @@ class GeminiClient {
 
                 text: response.text,
 
-                model: this.model,
+                model: "gemini-3.5-flash",
 
-                latency: elapsed,
+                latency: 0,
 
                 raw: response
 
             };
 
-        }
+        } catch (error) {
 
-        catch (error) {
+            console.log("FULL GEMINI ERROR");
+            console.dir(error, { depth: null });
 
             return {
 
@@ -59,7 +67,7 @@ class GeminiClient {
 
                 error: error.message,
 
-                model: this.model
+                model: "gemini-3.5-flash"
 
             };
 

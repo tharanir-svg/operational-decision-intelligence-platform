@@ -4,60 +4,82 @@ const ExtractionValidator = require("../validation/ExtractionValidator");
 const IntelligenceParser = require("../parsers/IntelligenceParser");
 const EntityExtractor = require("../intelligence/EntityExtractor");
 const ConfidenceEngine = require("../scoring/ConfidenceEngine");
+const KnowledgeExtractor = require("../intelligence/KnowledgeExtractor");
 
 class AIExtractionService {
 
     constructor() {
 
         this.gemini = new GeminiClient();
+
         this.validator = new ExtractionValidator();
+
         this.parser = new IntelligenceParser();
+
         this.entityExtractor = new EntityExtractor();
+
         this.confidenceEngine = new ConfidenceEngine();
+
+        this.knowledgeExtractor = new KnowledgeExtractor();
 
     }
 
     async extractEvidence(evidence) {
 
-        const prompt = buildExtractionPrompt(evidence);
+        console.log("================================");
+        console.log("AIExtractionService IS EXECUTING");
+        console.log("================================");
 
-        const result = await this.gemini.generate(prompt);
+        console.log("Evidence received:");
+        console.dir(evidence, { depth: null });
 
-        if (!result.success) {
-            throw new Error(result.error);
-        }
+        // TEMPORARY TEST RESPONSE
+        // Gemini is intentionally NOT called.
+        // This allows us to verify whether this exact file is being executed.
 
-        let intelligence;
+        return {
 
-        try {
+            summary: "WORKING",
 
-            intelligence = this.parser.parse(result.text);
-            intelligence = this.parser.normalize(intelligence);
+            eventType: "TEST",
 
-        }
+            region: "TEST",
 
-        catch (err) {
+            domain: "TEST",
 
-            throw new Error(
-                "Gemini returned invalid JSON.\n\n" +
-                result.text
-            );
+            severity: "LOW",
 
-        }
+            fatalities: 0,
 
-        this.validator.validate(intelligence);
+            injuries: 0,
 
-        intelligence.model = result.model;
-        intelligence.processingTime = result.latency;
-        intelligence.timestamp = new Date().toISOString();
+            confidence: 100,
 
-        intelligence.extractedEntities =
-            this.entityExtractor.extract(intelligence);
+            keywords: [],
 
-        intelligence.confidenceAssessment =
-            this.confidenceEngine.calculate(intelligence);
+            entities: [],
 
-        return intelligence;
+            recommendedAction: "NONE",
+
+            explanation: "This response is hardcoded from AIExtractionService.",
+
+            model: "NONE",
+
+            processingTime: 0,
+
+            timestamp: new Date().toISOString(),
+
+            confidenceAssessment: {
+                score: 100,
+                level: "HIGH"
+            },
+
+            knowledge: {
+                entities: [],
+                relationships: []
+            }
+
+        };
 
     }
 
