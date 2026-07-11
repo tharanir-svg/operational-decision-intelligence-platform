@@ -1,5 +1,5 @@
 const { GoogleGenAI } = require("@google/genai");
-
+console.log("✅ GeminiClient loaded");
 class GeminiClient {
 
     constructor() {
@@ -30,7 +30,9 @@ class GeminiClient {
                 contents: prompt
 
             });
-
+            console.log("===== GEMINI RAW RESPONSE =====");
+            console.dir(response, { depth: null });
+            console.log("===== END RESPONSE =====");
             const elapsed = Date.now() - started;
 
             return {
