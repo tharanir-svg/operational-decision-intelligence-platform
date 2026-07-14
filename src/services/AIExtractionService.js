@@ -27,59 +27,64 @@ class AIExtractionService {
     async extractEvidence(evidence) {
 
         console.log("================================");
-        console.log("AIExtractionService IS EXECUTING");
+        console.log("AIExtractionService EXECUTING");
         console.log("================================");
 
-        console.log("Evidence received:");
-        console.dir(evidence, { depth: null });
+        console.log("Evidence:");
+        console.log(evidence);
 
-        // TEMPORARY TEST RESPONSE
-        // Gemini is intentionally NOT called.
-        // This allows us to verify whether this exact file is being executed.
+        // Build prompt
+        const prompt = buildExtractionPrompt(evidence);
 
-        return {
+        console.log("Sending prompt to Gemini...");
 
-            summary: "WORKING",
+        // Call Gemini
+        const response = await this.gemini.generate(prompt);
 
-            eventType: "TEST",
+        if (!response.success) {
+            throw new Error(response.error);
+        }
 
-            region: "TEST",
+        console.log("Gemini Response:");
+        console.log(response.text);
 
-            domain: "TEST",
+        // Parse JSON
+        let parsed = this.parser.parse(response.text);
 
-            severity: "LOW",
+        // Normalize fields
+        parsed = this.parser.normalize(parsed);
 
-            fatalities: 0,
+        // Validate required fields
+        this.validator.validate(parsed);
 
-            injuries: 0,
+        // Extract entities if available
+        if (this.entityExtractor &&
+            typeof this.entityExtractor.extract === "function") {
 
-            confidence: 100,
+            parsed.entities =
+                this.entityExtractor.extract(parsed);
+        }
 
-            keywords: [],
+        // Confidence scoring if available
+        if (this.confidenceEngine &&
+            typeof this.confidenceEngine.score === "function") {
 
-            entities: [],
+            parsed.confidenceAssessment =
+                this.confidenceEngine.score(parsed);
+        }
 
-            recommendedAction: "NONE",
+        // Knowledge extraction if available
+        if (this.knowledgeExtractor &&
+            typeof this.knowledgeExtractor.extract === "function") {
 
-            explanation: "This response is hardcoded from AIExtractionService.",
+            parsed.knowledge =
+                this.knowledgeExtractor.extract(parsed);
+        }
 
-            model: "NONE",
+        parsed.processingTime = 0;
+        parsed.timestamp = new Date().toISOString();
 
-            processingTime: 0,
-
-            timestamp: new Date().toISOString(),
-
-            confidenceAssessment: {
-                score: 100,
-                level: "HIGH"
-            },
-
-            knowledge: {
-                entities: [],
-                relationships: []
-            }
-
-        };
+        return parsed;
 
     }
 
