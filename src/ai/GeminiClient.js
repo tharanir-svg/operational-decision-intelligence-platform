@@ -16,13 +16,18 @@ class GeminiClient {
             apiKey
         });
 
-        this.model = "gemini-2.5-flash";
+        this.model = "gemini-3.1-flash-lite";
+
+        console.log(">>> USING MODEL:", this.model);
     }
 
     async generate(prompt) {
 
-        console.log("Calling Gemini...");
-        console.log("Model:", this.model);
+        console.log("==========================================");
+        console.log("ENTERED GeminiClient.generate()");
+        console.log("MODEL:", this.model);
+        console.log("Prompt length:", prompt.length);
+        console.log("==========================================");
 
         try {
 
@@ -34,28 +39,41 @@ class GeminiClient {
 
             });
 
+            console.log("==========================================");
+            console.log("GEMINI RAW RESPONSE");
+            console.dir(response, { depth: null });
+            console.log("==========================================");
+
+            if (!response) {
+                throw new Error("Gemini returned no response.");
+            }
+
+            if (!response.text) {
+                throw new Error("Gemini returned an empty text response.");
+            }
+
             return {
-
                 success: true,
-
                 text: response.text,
-
                 model: this.model,
-
+                latency: 0,
                 raw: response
-
             };
 
         } catch (error) {
 
+            console.log("==========================================");
+            console.log("GEMINI ERROR");
             console.dir(error, { depth: null });
+            console.log("==========================================");
 
-            throw error;
-
+            return {
+                success: false,
+                error: error.message,
+                model: this.model
+            };
         }
-
     }
-
 }
 
 module.exports = GeminiClient;

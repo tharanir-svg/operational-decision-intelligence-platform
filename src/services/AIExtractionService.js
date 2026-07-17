@@ -9,85 +9,70 @@ const KnowledgeExtractor = require("../intelligence/KnowledgeExtractor");
 class AIExtractionService {
 
     constructor() {
-
         this.gemini = new GeminiClient();
-
         this.validator = new ExtractionValidator();
-
         this.parser = new IntelligenceParser();
-
         this.entityExtractor = new EntityExtractor();
-
         this.confidenceEngine = new ConfidenceEngine();
-
         this.knowledgeExtractor = new KnowledgeExtractor();
-
     }
 
     async extractEvidence(evidence) {
 
-        console.log("================================");
-        console.log("AIExtractionService EXECUTING");
-        console.log("================================");
+        console.log("====================================");
+        console.log("AI EXTRACTION SERVICE");
+        console.log("====================================");
 
-        console.log("Evidence:");
-        console.log(evidence);
+        console.log("========== EVIDENCE RECEIVED ==========");
+        console.dir(evidence, { depth: null });
 
-        // Build prompt
         const prompt = buildExtractionPrompt(evidence);
 
-        console.log("Sending prompt to Gemini...");
+        console.log("========== GENERATED PROMPT ==========");
+        console.log(prompt);
+        console.log("======================================");
 
-        // Call Gemini
-        const response = await this.gemini.generate(prompt);
+        console.log("Prompt created.");
 
-        if (!response.success) {
-            throw new Error(response.error);
+        const started = Date.now();
+
+        const result = await this.gemini.generate(prompt);
+
+        console.log("====================================");
+        console.log("RAW GEMINI RESPONSE");
+        console.log("====================================");
+        console.dir(result, { depth: null });
+
+        console.log("====================================");
+        console.log("RAW GEMINI TEXT");
+        console.log(result.text);
+        console.log("====================================");
+
+        if (!result.success) {
+            throw new Error(result.error);
         }
 
-        console.log("Gemini Response:");
-        console.log(response.text);
+        const intelligence = this.parser.parse(result.text);
 
-        // Parse JSON
-        let parsed = this.parser.parse(response.text);
+        this.validator.validate(intelligence);
 
-        // Normalize fields
-        parsed = this.parser.normalize(parsed);
+        intelligence.entities =
+            this.entityExtractor.extract(intelligence);
 
-        // Validate required fields
-        this.validator.validate(parsed);
+        intelligence.confidenceAssessment =
+            this.confidenceEngine.calculate(intelligence);
 
-        // Extract entities if available
-        if (this.entityExtractor &&
-            typeof this.entityExtractor.extract === "function") {
+        intelligence.knowledge =
+            this.knowledgeExtractor.extract(intelligence);
 
-            parsed.entities =
-                this.entityExtractor.extract(parsed);
-        }
+        intelligence.model = result.model;
+        intelligence.processingTime = Date.now() - started;
+        intelligence.timestamp = new Date().toISOString();
 
-        // Confidence scoring if available
-        if (this.confidenceEngine &&
-            typeof this.confidenceEngine.score === "function") {
+        console.log("Extraction complete.");
 
-            parsed.confidenceAssessment =
-                this.confidenceEngine.score(parsed);
-        }
-
-        // Knowledge extraction if available
-        if (this.knowledgeExtractor &&
-            typeof this.knowledgeExtractor.extract === "function") {
-
-            parsed.knowledge =
-                this.knowledgeExtractor.extract(parsed);
-        }
-
-        parsed.processingTime = 0;
-        parsed.timestamp = new Date().toISOString();
-
-        return parsed;
-
+        return intelligence;
     }
-
 }
 
 module.exports = AIExtractionService;

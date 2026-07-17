@@ -2,20 +2,63 @@ class IntelligenceParser {
 
     parse(aiResponse) {
 
-        if (typeof aiResponse === "string") {
-
-            aiResponse = aiResponse.trim();
-
-            aiResponse = aiResponse
-                .replace(/^```json/, "")
-                .replace(/^```/, "")
-                .replace(/```$/, "")
-                .trim();
-
-            return JSON.parse(aiResponse);
+        if (!aiResponse) {
+            throw new Error("Empty AI response.");
         }
 
-        return aiResponse;
+        // Already parsed object
+        if (typeof aiResponse !== "string") {
+            return this.normalize(aiResponse);
+        }
+
+        let text = aiResponse.trim();
+
+        // Remove markdown fences
+        text = text
+            .replace(/^```json/i, "")
+            .replace(/^```/, "")
+            .replace(/```$/, "")
+            .trim();
+
+        // First attempt
+        try {
+            return this.normalize(JSON.parse(text));
+        }
+        catch (e) {
+
+            console.log("Direct JSON parse failed.");
+
+        }
+
+        // Second attempt
+        const start = text.indexOf("{");
+        const end = text.lastIndexOf("}");
+
+        if (start !== -1 && end !== -1 && end > start) {
+
+            const jsonText = text.substring(start, end + 1);
+
+            try {
+
+                return this.normalize(JSON.parse(jsonText));
+
+            }
+            catch (e) {
+
+                console.log("Embedded JSON parse failed.");
+
+            }
+
+        }
+
+        // Last resort
+        console.log("RAW AI RESPONSE");
+        console.log(text);
+
+        throw new Error(
+            "AI did not return valid JSON."
+        );
+
     }
 
     normalize(data) {
@@ -26,13 +69,13 @@ class IntelligenceParser {
 
             eventType: data.eventType || "Unknown",
 
-            region: data.region || "Unknown",
+            domain: data.domain || "Unknown",
 
             country: data.country || "",
 
-            location: data.location || "",
+            region: data.region || "",
 
-            domain: data.domain || "Unknown",
+            location: data.location || "",
 
             confidence: Number(data.confidence || 0),
 

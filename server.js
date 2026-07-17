@@ -11,7 +11,8 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 const orchestrator = new DecisionOrchestrator();
-
+console.log("Registering Decision API");
+console.log("Registering Extract API");
 app.use("/api", createDecisionAPI(orchestrator));
 app.use("/api", createExtractAPI());
 

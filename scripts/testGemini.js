@@ -1,24 +1,29 @@
 const { GoogleGenAI } = require("@google/genai");
 
-async function main() {
+async function test(model) {
+  try {
+    console.log(`\nTesting: ${model}`);
 
     const client = new GoogleGenAI({
-        apiKey: process.env.GEMINI_API_KEY
+      apiKey: process.env.GEMINI_API_KEY
     });
-
-    console.log("API Key Found:", !!process.env.GEMINI_API_KEY);
 
     const response = await client.models.generateContent({
-        model: "gemini-3.5-flash",
-        contents: "Reply with exactly: Hello from Gemini"
+      model,
+      contents: "Reply with exactly: OK"
     });
 
-    console.log("================================");
-    console.log(response.text);
-    console.log("================================");
+    console.log("SUCCESS:", response.text);
+  } catch (err) {
+    console.log("FAILED:", model);
+    console.log(err.message);
+  }
 }
 
-main().catch(err => {
-    console.error("FULL ERROR:");
-    console.dir(err, { depth: null });
-});
+(async () => {
+  await test("gemini-2.5-pro");
+  await test("gemini-3-flash");
+  await test("gemini-3-pro");
+  await test("gemini-3.1-flash");
+  await test("gemini-3.1-flash-lite");
+})();
