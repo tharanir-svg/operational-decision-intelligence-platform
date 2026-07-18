@@ -1,78 +1,45 @@
-const GeminiClient = require("../ai/GeminiClient");
-const buildExtractionPrompt = require("../prompts/ExtractionPrompt");
-const ExtractionValidator = require("../validation/ExtractionValidator");
-const IntelligenceParser = require("../parsers/IntelligenceParser");
-const EntityExtractor = require("../intelligence/EntityExtractor");
-const ConfidenceEngine = require("../scoring/ConfidenceEngine");
-const KnowledgeExtractor = require("../intelligence/KnowledgeExtractor");
+const express = require("express");
+const AIExtractionService = require("../services/AIExtractionService");
 
-class AIExtractionService {
+module.exports = function () {
 
-    constructor() {
-        this.gemini = new GeminiClient();
-        this.validator = new ExtractionValidator();
-        this.parser = new IntelligenceParser();
-        this.entityExtractor = new EntityExtractor();
-        this.confidenceEngine = new ConfidenceEngine();
-        this.knowledgeExtractor = new KnowledgeExtractor();
-    }
+    const router = express.Router();
 
-    async extractEvidence(evidence) {
+    const extractionService = new AIExtractionService();
 
-        console.log("====================================");
-        console.log("AI EXTRACTION SERVICE");
-        console.log("====================================");
+    router.post("/extract", async (req, res) => {
 
-        console.log("========== EVIDENCE RECEIVED ==========");
-        console.dir(evidence, { depth: null });
+        try {
 
-        const prompt = buildExtractionPrompt(evidence);
+            const result =
+                await extractionService.extractEvidence(req.body);
 
-        console.log("========== GENERATED PROMPT ==========");
-        console.log(prompt);
-        console.log("======================================");
+            res.json({
 
-        console.log("Prompt created.");
+                success: true,
 
-        const started = Date.now();
+                timestamp: new Date().toISOString(),
 
-        const result = await this.gemini.generate(prompt);
+                result
 
-        console.log("====================================");
-        console.log("RAW GEMINI RESPONSE");
-        console.log("====================================");
-        console.dir(result, { depth: null });
+            });
 
-        console.log("====================================");
-        console.log("RAW GEMINI TEXT");
-        console.log(result.text);
-        console.log("====================================");
+        } catch (error) {
 
-        if (!result.success) {
-            throw new Error(result.error);
+            console.error(error);
+
+            res.status(500).json({
+
+                success: false,
+
+                error: error.message
+
+            });
+
         }
 
-        const intelligence = this.parser.parse(result.text);
+    });
 
-        this.validator.validate(intelligence);
+    return router;
 
-        intelligence.entities =
-            this.entityExtractor.extract(intelligence);
-
-        intelligence.confidenceAssessment =
-            this.confidenceEngine.calculate(intelligence);
-
-        intelligence.knowledge =
-            this.knowledgeExtractor.extract(intelligence);
-
-        intelligence.model = result.model;
-        intelligence.processingTime = Date.now() - started;
-        intelligence.timestamp = new Date().toISOString();
-
-        console.log("Extraction complete.");
-
-        return intelligence;
-    }
-}
-
-module.exports = AIExtractionService;
+};
