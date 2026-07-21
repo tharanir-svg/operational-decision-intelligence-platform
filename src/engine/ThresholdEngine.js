@@ -1,64 +1,137 @@
 class ThresholdEngine {
 
-  constructor(thresholdMatrix) {
-    this.rules = thresholdMatrix.rules || [];
-    this.scoreBands = thresholdMatrix.thresholds || [];
-  }
+    constructor(thresholdMatrix) {
 
-  evaluate(eventContext, riskScore) {
-    const eventRule = this._matchEventRule(eventContext);
-    if (eventRule) {
-      return {
-        ruleId: eventRule.ruleId,
-        action: eventRule.recommendedAction,
-        severity: eventRule.recommendedSeverity,
-        source: "event-rule"
-      };
+        console.log(">>> USING ThresholdEngine from:", __filename);
+
+        this.rules = thresholdMatrix.rules || [];
+        this.scoreBands = thresholdMatrix.thresholds || [];
+
     }
-    return this._evaluateByScore(riskScore);
-  }
 
-  _matchEventRule(eventContext) {
-    return this.rules.find(rule => {
-      if (rule.eventType !== eventContext.eventType) return false;
+    evaluate(eventContext, riskScore) {
 
-      const cond = rule.conditions || {};
+        console.log("\n========== THRESHOLD ENGINE ==========");
+        console.log("Incoming Event:", eventContext);
+        console.log("Risk Score:", riskScore);
 
-      if (
-        cond.fatalities?.gte !== undefined &&
-        (eventContext.fatalities || 0) < cond.fatalities.gte
-      ) return false;
+        const eventRule = this._matchEventRule(eventContext);
 
-      if (
-        cond.injuries?.gte !== undefined &&
-        (eventContext.injuries || 0) < cond.injuries.gte
-      ) return false;
+        if (eventRule) {
 
-      return true;
-    }) || null;
-  }
+            console.log("Matched Event Rule:", eventRule);
 
-  _evaluateByScore(riskScore) {
-    if (this.scoreBands.length) {
-      for (const band of this.scoreBands) {
-        if (riskScore >= band.minimumScore) {
-          return { ...band, source: "score-band" };
+            return {
+
+                ruleId: eventRule.ruleId,
+
+                level: eventRule.recommendedAction,
+
+                action: eventRule.recommendedAction,
+
+                severity: eventRule.recommendedSeverity,
+
+                recommendedAction: eventRule.recommendedAction,
+
+                description: "Matched operational rule",
+
+                source: "event-rule"
+
+            };
+
         }
-      }
+
+        console.log("No event rule matched. Evaluating score bands...");
+
+        return this._evaluateByScore(riskScore);
+
     }
 
-    const action =
-      riskScore >= 75 ? "FLASH" :
-      riskScore >= 50 ? "ESCALATE" :
-      riskScore >= 25 ? "WATCH" : "MONITOR";
+    _matchEventRule(eventContext) {
 
-    const severity =
-      riskScore >= 75 ? 5 :
-      riskScore >= 50 ? 4 :
-      riskScore >= 25 ? 3 : 1;
+        return this.rules.find(rule => {
 
-    return { action, severity, source: "score-band" };
-  }
+            if (rule.eventType !== eventContext.eventType)
+                return false;
+
+            const cond = rule.conditions || {};
+
+            if (
+                cond.fatalities?.gte !== undefined &&
+                (eventContext.fatalities || 0) < cond.fatalities.gte
+            )
+                return false;
+
+            if (
+                cond.injuries?.gte !== undefined &&
+                (eventContext.injuries || 0) < cond.injuries.gte
+            )
+                return false;
+
+            return true;
+
+        }) || null;
+
+    }
+
+    _evaluateByScore(riskScore) {
+
+        for (const band of this.scoreBands) {
+
+            if (riskScore >= band.minimumScore) {
+
+                console.log("Matched Score Band:", band);
+
+                const result = {
+
+                    minimumScore: band.minimumScore,
+
+                    level: band.level,
+
+                    action: band.level,
+
+                    severity: band.severity,
+
+                    recommendedAction: band.recommendedAction,
+
+                    description: band.description,
+
+                    source: "score-band"
+
+                };
+
+                console.log("Returning Threshold Decision:", result);
+                console.log("=====================================\n");
+
+                return result;
+
+            }
+
+        }
+
+        const defaultResult = {
+
+            level: "SIGNAL",
+
+            action: "SIGNAL",
+
+            severity: 1,
+
+            recommendedAction: "Routine Monitoring",
+
+            description: "Default operational threshold",
+
+            source: "default"
+
+        };
+
+        console.log("Returning Default Threshold:", defaultResult);
+        console.log("=====================================\n");
+
+        return defaultResult;
+
+    }
+
 }
 
 module.exports = ThresholdEngine;

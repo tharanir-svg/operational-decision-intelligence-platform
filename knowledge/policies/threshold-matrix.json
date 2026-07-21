@@ -1,6 +1,7 @@
 {
-  "version": "1.0.0",
-  "description": "Operational severity decision matrix.",
+  "version": "2.0.0",
+  "description": "Operational Decision Intelligence Platform Threshold Matrix",
+
   "rules": [
     {
       "ruleId": "THR-001",
@@ -37,5 +38,49 @@
       "recommendedSeverity": 5,
       "recommendedAction": "FLASH"
     }
+  ],
+
+  "thresholds": [
+
+    {
+      "minimumScore": 90,
+      "level": "FLASH",
+      "severity": 5,
+      "recommendedAction": "Immediate Executive Notification",
+      "description": "Critical operational situation requiring immediate command activation."
+    },
+
+    {
+      "minimumScore": 75,
+      "level": "GLOBAL_URGENT",
+      "severity": 4,
+      "recommendedAction": "Activate Crisis Management Team",
+      "description": "Major incident with significant operational impact."
+    },
+
+    {
+      "minimumScore": 50,
+      "level": "NATIONAL_URGENT",
+      "severity": 3,
+      "recommendedAction": "Escalate to National Operations Centre",
+      "description": "National-level monitoring and coordination required."
+    },
+
+    {
+      "minimumScore": 25,
+      "level": "LOCAL_URGENT",
+      "severity": 2,
+      "recommendedAction": "Notify Regional Operations",
+      "description": "Regional response and monitoring required."
+    },
+
+    {
+      "minimumScore": 0,
+      "level": "SIGNAL",
+      "severity": 1,
+      "recommendedAction": "Routine Monitoring",
+      "description": "Routine monitoring with no escalation indicators."
+    }
+
   ]
 }

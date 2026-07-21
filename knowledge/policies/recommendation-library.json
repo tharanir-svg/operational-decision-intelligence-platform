@@ -1,0 +1,98 @@
+{
+  "version": "1.0.0",
+  "description": "Operational Recommendation Library",
+
+  "recommendations": [
+
+    {
+      "level": "FLASH",
+      "actions": [
+        {
+          "priority": 1,
+          "owner": "Duty Manager",
+          "action": "Notify Global Operations Centre"
+        },
+        {
+          "priority": 2,
+          "owner": "Operations Lead",
+          "action": "Activate Crisis Management Team"
+        },
+        {
+          "priority": 3,
+          "owner": "Executive Team",
+          "action": "Issue Executive Situation Report"
+        },
+        {
+          "priority": 4,
+          "owner": "Intelligence Analyst",
+          "action": "Increase monitoring frequency to every 15 minutes"
+        }
+      ]
+    },
+
+    {
+      "level": "GLOBAL_URGENT",
+      "actions": [
+        {
+          "priority": 1,
+          "owner": "Operations Lead",
+          "action": "Escalate to Global Operations"
+        },
+        {
+          "priority": 2,
+          "owner": "Regional Intelligence",
+          "action": "Validate incoming intelligence"
+        },
+        {
+          "priority": 3,
+          "owner": "Duty Manager",
+          "action": "Prepare executive notification"
+        }
+      ]
+    },
+
+    {
+      "level": "NATIONAL_URGENT",
+      "actions": [
+        {
+          "priority": 1,
+          "owner": "National Operations",
+          "action": "Coordinate with regional teams"
+        },
+        {
+          "priority": 2,
+          "owner": "Analyst",
+          "action": "Monitor for escalation indicators"
+        }
+      ]
+    },
+
+    {
+      "level": "LOCAL_URGENT",
+      "actions": [
+        {
+          "priority": 1,
+          "owner": "Regional Operations",
+          "action": "Continue local monitoring"
+        },
+        {
+          "priority": 2,
+          "owner": "Analyst",
+          "action": "Collect additional intelligence"
+        }
+      ]
+    },
+
+    {
+      "level": "SIGNAL",
+      "actions": [
+        {
+          "priority": 1,
+          "owner": "Analyst",
+          "action": "Routine monitoring"
+        }
+      ]
+    }
+
+  ]
+}
