@@ -5,6 +5,7 @@ const RiskScoringEngine = require("../engine/RiskScoringEngine");
 const ThresholdEngine = require("../engine/ThresholdEngine");
 const PolicyEngine = require("../policy/PolicyEngine");
 const RecommendationEngine = require("../engine/RecommendationEngine");
+const DecisionTraceEngine = require("../engine/DecisionTraceEngine");
 const ExplanationEngine = require("../explanation/ExplanationEngine");
 
 class DecisionOrchestrator {
@@ -34,34 +35,45 @@ class DecisionOrchestrator {
             kb.recommendations
         );
 
+        this.traceEngine = new DecisionTraceEngine();
+
         this.explanationEngine = new ExplanationEngine();
 
     }
 
     evaluate(eventContext) {
 
-        // Step 1 - Calculate operational risk
+        // STEP 1
         const riskResult =
             this.riskEngine.calculate(eventContext);
 
-        // Step 2 - Determine operational threshold
+        // STEP 2
         const thresholdDecision =
             this.thresholdEngine.evaluate(
                 eventContext,
                 riskResult.score
             );
 
-        // Step 3 - Evaluate applicable policies
+        // STEP 3
         const policies =
             this.policyEngine.evaluate(eventContext);
 
-        // Step 4 - Generate operational recommendations
+        // STEP 4
         const recommendations =
             this.recommendationEngine.generate(
                 thresholdDecision
             );
 
-        // Step 5 - Generate explanation
+        // STEP 5
+        const decisionTrace =
+            this.traceEngine.generate(
+                riskResult,
+                thresholdDecision,
+                policies,
+                recommendations
+            );
+
+        // STEP 6
         const explanation =
             this.explanationEngine.generate(
                 eventContext,
@@ -70,7 +82,6 @@ class DecisionOrchestrator {
                 recommendations
             );
 
-        // Step 6 - Return complete operational assessment
         return {
 
             riskScore: riskResult,
@@ -80,6 +91,8 @@ class DecisionOrchestrator {
             policies,
 
             recommendedActions: recommendations,
+
+            decisionTrace,
 
             explanation
 
