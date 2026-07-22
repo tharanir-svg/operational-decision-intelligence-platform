@@ -31,17 +31,21 @@ const GAUGE_ARC  = 376.99;
 const GAUGE_CIRC = 565.49;
 
 /* ── Helpers ───────────────────────────────────────────────── */
-const $  = id => document.getElementById(id);
-const qs = sel => document.querySelector(sel);
-
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function fmtBytes(n) {
-  return n < 1024 ? `${n} B` : n < 1048576 ? `${(n/1024).toFixed(1)} KB` : `${(n/1048576).toFixed(1)} MB`;
-}
-function scoreGaugeClass(s) { return s >= 75 ? 'gauge-flash' : s >= 50 ? 'gauge-escalate' : s >= 25 ? 'gauge-watch' : 'gauge-monitor'; }
-function scoreLabel(s)      { return s >= 75 ? 'Critical' : s >= 50 ? 'High' : s >= 25 ? 'Moderate' : 'Low'; }
+/*
+ * Shared helper functions are provided by helpers.js.
+ *
+ * Available globally:
+ *   $
+ *   qs
+ *   qsa
+ *   esc
+ *   fmtBytes
+ *   scoreGaugeClass
+ *   scoreLabel
+ *   formatNumber
+ *   formatPercent
+ *   joinArray
+ */
 
 /* ── Pipeline state ────────────────────────────────────────── */
 let currentStep   = 0;
@@ -363,13 +367,139 @@ function renderResults(result, payload) {
   void c.offsetWidth;
 
   // Gauge
-  const fill = $('gaugeFill');
-  const score = result.riskScore;
-  fill.setAttribute('stroke-dasharray', `${(score/100)*GAUGE_ARC} ${GAUGE_CIRC}`);
-  fill.className.baseVal = 'gauge-fill ' + scoreGaugeClass(score);
-  $('gaugeScore').textContent = score;
-  $('gaugeLabel').textContent = scoreLabel(score);
+const fill = $('gaugeFill');
 
+const risk =
+    result.riskScore || {};
+
+const score =
+    typeof risk === "object"
+        ? Number(risk.score || 0)
+        : Number(risk || 0);
+
+fill.setAttribute(
+    "stroke-dasharray",
+    `${(score / 100) * GAUGE_ARC} ${GAUGE_CIRC}`
+);
+
+fill.className.baseVal =
+    "gauge-fill " +
+    scoreGaugeClass(score);
+
+$('gaugeScore').textContent =
+    score;
+
+$('gaugeLabel').textContent =
+    scoreLabel(score);
+// --------------------------------------------------
+// Risk Factors
+// --------------------------------------------------
+
+const factors =
+    result.riskScore?.factors || [];
+
+const rf =
+    $('riskFactors');
+
+if (!factors.length) {
+
+    rf.innerHTML =
+        '<span class="muted">No scoring factors returned.</span>';
+
+} else {
+
+    rf.innerHTML =
+        factors.map(f => `
+            <div class="factor-item">
+                <div class="factor-title">${esc(f.name || f.factor || "Factor")}</div>
+                <div class="factor-score">
+                    +${f.score ?? f.weight ?? 0}
+                </div>
+            </div>
+        `).join('');
+
+}
+// --------------------------------------------------
+// Decision Trace
+// --------------------------------------------------
+
+const trace = result.decisionTrace || [];
+const traceDiv = $('decisionTrace');
+
+if (!trace.length) {
+
+    traceDiv.innerHTML =
+        '<div class="empty-state">No decision trace available.</div>';
+
+} else {
+
+    traceDiv.innerHTML = trace.map((step, index) => {
+
+        const engine =
+            step.engine || "Decision Engine";
+
+        const message =
+            step.decision ||
+            step.message ||
+            step.description ||
+            "";
+
+        return `
+
+        <div class="trace-card">
+
+            <div class="trace-number">
+                ${index + 1}
+            </div>
+
+            <div class="trace-content">
+
+                <div class="trace-engine">
+                    ${esc(engine)}
+                </div>
+
+                <div class="trace-message">
+                    ${esc(message)}
+                </div>
+
+            </div>
+
+        </div>
+
+        `;
+
+    }).join("");
+
+}
+// --------------------------------------------------
+// Recommended Actions
+// --------------------------------------------------
+
+const actions =
+    result.recommendedActions || [];
+
+const act =
+    $('recommendedActionsList');
+
+if (!actions.length) {
+
+    act.innerHTML =
+        '<span class="muted">No recommendations returned.</span>';
+
+} else {
+
+    act.innerHTML =
+        actions.map(a => `
+            <div class="recommendation-item">
+                ${esc(
+                    a.action ||
+                    a.title ||
+                    String(a)
+                )}
+            </div>
+        `).join('');
+
+}
   // Threshold
   const td     = result.thresholdDecision;
   const action = td.action || 'MONITOR';

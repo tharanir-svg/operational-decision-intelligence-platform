@@ -1,12 +1,17 @@
 const path = require("path");
 
 const KnowledgeLoader = require("../knowledge/KnowledgeLoader");
+
+const NormalizationEngine = require("../engine/NormalizationEngine");
 const RiskScoringEngine = require("../engine/RiskScoringEngine");
 const ThresholdEngine = require("../engine/ThresholdEngine");
 const PolicyEngine = require("../policy/PolicyEngine");
 const RecommendationEngine = require("../engine/RecommendationEngine");
 const DecisionTraceEngine = require("../engine/DecisionTraceEngine");
 const ExplanationEngine = require("../explanation/ExplanationEngine");
+
+// NEW
+const DecisionOverrideEngine = require("./DecisionOverrideEngine");
 
 class DecisionOrchestrator {
 
@@ -18,79 +23,187 @@ class DecisionOrchestrator {
 
         const kb = loader.loadKnowledgeBase();
 
-        this.riskEngine = new RiskScoringEngine(
-            kb.weights,
-            kb.regions
-        );
+        // -----------------------------
+        // Engines
+        // -----------------------------
 
-        this.thresholdEngine = new ThresholdEngine(
-            kb.thresholds
-        );
+        this.normalizationEngine =
+            new NormalizationEngine();
 
-        this.policyEngine = new PolicyEngine(
-            kb.policies
-        );
+        this.riskEngine =
+            new RiskScoringEngine(
+                kb.weights,
+                kb.regions
+            );
 
-        this.recommendationEngine = new RecommendationEngine(
-            kb.recommendations
-        );
+        this.thresholdEngine =
+            new ThresholdEngine(
+                kb.thresholds
+            );
 
-        this.traceEngine = new DecisionTraceEngine();
+        this.policyEngine =
+            new PolicyEngine(
+                kb.policies
+            );
 
-        this.explanationEngine = new ExplanationEngine();
+        // NEW
+        this.overrideEngine =
+            new DecisionOverrideEngine(
+                kb.overrideRules
+            );
+
+        this.recommendationEngine =
+            new RecommendationEngine(
+                kb.recommendations
+            );
+
+        this.traceEngine =
+            new DecisionTraceEngine();
+
+        this.explanationEngine =
+            new ExplanationEngine();
 
     }
 
     evaluate(eventContext) {
 
-        // STEP 1
-        const riskResult =
-            this.riskEngine.calculate(eventContext);
+        // ===========================================
+        // STEP 0
+        // Normalize
+        // ===========================================
 
+        const normalizedEvent =
+            this.normalizationEngine.normalize(
+                eventContext
+            );
+
+        // ===========================================
+        // STEP 1
+        // Risk Score
+        // ===========================================
+
+        const riskResult =
+            this.riskEngine.calculate(
+                normalizedEvent
+            );
+
+        // ===========================================
         // STEP 2
+        // Threshold Decision
+        // ===========================================
+
         const thresholdDecision =
             this.thresholdEngine.evaluate(
-                eventContext,
+                normalizedEvent,
                 riskResult.score
             );
 
+        // ===========================================
         // STEP 3
-        const policies =
-            this.policyEngine.evaluate(eventContext);
+        // Policy Evaluation
+        // ===========================================
 
+        const policies =
+            this.policyEngine.evaluate(
+                normalizedEvent
+            );
+
+        // ===========================================
         // STEP 4
+        // Decision Override
+        // ===========================================
+
+        const overrideDecision =
+            this.overrideEngine.evaluate({
+
+                thresholdDecision,
+
+                triggeredPolicies: policies,
+
+                normalizedInput:
+                    normalizedEvent
+
+            });
+
+        // ===========================================
+        // STEP 5
+        // Recommendation
+        // ===========================================
+
         const recommendations =
             this.recommendationEngine.generate(
-                thresholdDecision
+
+                overrideDecision,
+
+                normalizedEvent,
+
+                policies
+
             );
 
-        // STEP 5
+        // ===========================================
+        // STEP 6
+        // Decision Trace
+        // ===========================================
+
         const decisionTrace =
             this.traceEngine.generate(
+
                 riskResult,
+
                 thresholdDecision,
+
+                overrideDecision,
+
                 policies,
+
                 recommendations
+
             );
 
-        // STEP 6
+        // ===========================================
+        // STEP 7
+        // Explanation
+        // ===========================================
+
         const explanation =
             this.explanationEngine.generate(
-                eventContext,
+
+                normalizedEvent,
+
                 thresholdDecision,
+
+                overrideDecision,
+
                 riskResult,
+
                 recommendations
+
             );
+
+        // ===========================================
+        // Final Response
+        // ===========================================
 
         return {
 
-            riskScore: riskResult,
+            originalInput:
+                eventContext,
+
+            normalizedInput:
+                normalizedEvent,
+
+            riskScore:
+                riskResult,
 
             thresholdDecision,
 
+            overrideDecision,
+
             policies,
 
-            recommendedActions: recommendations,
+            recommendedActions:
+                recommendations,
 
             decisionTrace,
 
@@ -102,4 +215,5 @@ class DecisionOrchestrator {
 
 }
 
-module.exports = DecisionOrchestrator;
+module.exports =
+    DecisionOrchestrator;

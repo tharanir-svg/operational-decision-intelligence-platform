@@ -11,15 +11,31 @@ class KnowledgeLoader {
 
         const fullPath = path.join(this.basePath, relativePath);
 
-        return JSON.parse(
-            fs.readFileSync(fullPath, "utf8")
-        );
+        if (!fs.existsSync(fullPath)) {
+            throw new Error(
+                `Knowledge file not found: ${fullPath}`
+            );
+        }
+
+        try {
+            return JSON.parse(
+                fs.readFileSync(fullPath, "utf8")
+            );
+        } catch (err) {
+            throw new Error(
+                `Failed to parse JSON: ${fullPath}\n${err.message}`
+            );
+        }
 
     }
 
     loadKnowledgeBase() {
 
         return {
+
+            // -----------------------------
+            // Knowledge Base
+            // -----------------------------
 
             entities:
                 this.loadJson("entities/entity-types.json"),
@@ -33,6 +49,10 @@ class KnowledgeLoader {
             relationships:
                 this.loadJson("relationships/relationship-types.json"),
 
+            // -----------------------------
+            // Policy Engine
+            // -----------------------------
+
             policies:
                 this.loadJson("policies/policy-library.json"),
 
@@ -41,6 +61,14 @@ class KnowledgeLoader {
 
             recommendations:
                 this.loadJson("policies/recommendation-library.json"),
+
+            // NEW
+            overrideRules:
+                this.loadJson("policies/override-rules.json"),
+
+            // -----------------------------
+            // Supporting Data
+            // -----------------------------
 
             regions:
                 this.loadJson("regions/region-risk-profile.json"),

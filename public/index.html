@@ -452,48 +452,242 @@
 
       <div id="resultsContent" class="hidden">
 
-        <div class="results-top">
-          <div class="card card-gauge">
-            <div class="card-label">Risk Score</div>
+    <!-- Top Cards -->
+
+    <div class="results-top">
+
+        <div class="card card-gauge">
+
+            <div class="card-label">
+                Risk Score
+            </div>
+
             <div class="gauge-wrap">
-              <svg class="gauge-svg" viewBox="0 0 220 140">
-                <circle class="gauge-track" cx="110" cy="115" r="90" stroke-dasharray="376.99 188.50" transform="rotate(150 110 115)" />
-                <circle class="gauge-fill" id="gaugeFill" cx="110" cy="115" r="90" stroke-dasharray="0 565.49" transform="rotate(150 110 115)" />
-              </svg>
-              <div class="gauge-center">
-                <div class="gauge-score" id="gaugeScore">—</div>
-                <div class="gauge-label-inner" id="gaugeLabel">—</div>
-              </div>
+
+                <svg class="gauge-svg" viewBox="0 0 220 140">
+
+                    <circle
+                        class="gauge-track"
+                        cx="110"
+                        cy="115"
+                        r="90"
+                        stroke-dasharray="376.99 188.50"
+                        transform="rotate(150 110 115)" />
+
+                    <circle
+                        class="gauge-fill"
+                        id="gaugeFill"
+                        cx="110"
+                        cy="115"
+                        r="90"
+                        stroke-dasharray="0 565.49"
+                        transform="rotate(150 110 115)" />
+
+                </svg>
+
+                <div class="gauge-center">
+
+                    <div
+                        class="gauge-score"
+                        id="gaugeScore">
+                        —
+                    </div>
+
+                    <div
+                        class="gauge-label-inner"
+                        id="gaugeLabel">
+                        —
+                    </div>
+
+                </div>
+
             </div>
-          </div>
-          <div class="card card-threshold">
-            <div class="card-label">Threshold Decision</div>
+
+        </div>
+
+        <div class="card card-threshold">
+
+            <div class="card-label">
+
+                Threshold Decision
+
+            </div>
+
             <div class="threshold-body">
-              <div class="threshold-action" id="thresholdAction">—</div>
-              <div class="threshold-meta">
-                <span class="meta-pill" id="thresholdSeverity"></span>
-                <span class="meta-pill" id="thresholdSource"></span>
-                <span class="meta-pill hidden" id="thresholdRule"></span>
-              </div>
-              <div class="threshold-desc" id="thresholdDesc"></div>
+
+                <div
+                    class="threshold-action"
+                    id="thresholdAction">
+                    —
+                </div>
+
+                <div class="threshold-meta">
+
+                    <span
+                        class="meta-pill"
+                        id="thresholdSeverity"></span>
+
+                    <span
+                        class="meta-pill"
+                        id="thresholdSource"></span>
+
+                    <span
+                        class="meta-pill hidden"
+                        id="thresholdRule"></span>
+
+                </div>
+
+                <div
+                    class="threshold-desc"
+                    id="thresholdDesc"></div>
+
             </div>
-          </div>
+
         </div>
 
-        <div class="card card-policies">
-          <div class="card-label">Triggered Policies <span class="badge" id="policyCount">0</span></div>
-          <div id="policiesList" class="policies-list"></div>
+    </div>
+
+    <!-- Risk Factors -->
+
+    <div class="card">
+
+        <div class="card-label">
+
+            Risk Factors
+
         </div>
 
-        <div class="card card-explanation">
-          <div class="card-label">Decision Explanation</div>
-          <div class="explanation-summary" id="explanationSummary"></div>
-          <div class="explanation-inputs" id="explanationInputs"></div>
+        <div
+            id="riskFactors"
+            class="factor-list">
+
+            Waiting for evaluation...
+
         </div>
 
-      </div>
+    </div>
 
-    </section>
+    <!-- Decision Trace -->
+
+    <div class="card">
+
+        <div class="card-label">
+
+            Decision Trace
+
+        </div>
+
+        <div
+            id="decisionTrace"
+            class="trace-list">
+
+            Waiting for evaluation...
+
+        </div>
+
+    </div>
+
+    <!-- Recommended Actions -->
+
+    <div class="card">
+
+        <div class="card-label">
+
+            Recommended Actions
+
+        </div>
+
+        <div
+            id="recommendedActionsList"
+            class="recommendation-list">
+
+            Waiting for evaluation...
+
+        </div>
+
+    </div>
+
+    <!-- Policies -->
+
+    <div class="card card-policies">
+
+        <div class="card-label">
+
+            Triggered Policies
+
+            <span
+                class="badge"
+                id="policyCount">
+                0
+            </span>
+
+        </div>
+
+        <div
+            id="policiesList"
+            class="policies-list"></div>
+
+    </div>
+
+    <!-- Original vs Normalized -->
+
+    <div class="results-top">
+
+        <div class="card">
+
+            <div class="card-label">
+
+                Original Input
+
+            </div>
+
+            <pre id="originalInput">
+
+Waiting...
+
+            </pre>
+
+        </div>
+
+        <div class="card">
+
+            <div class="card-label">
+
+                Normalized Input
+
+            </div>
+
+            <pre id="normalizedInput">
+
+Waiting...
+
+            </pre>
+
+        </div>
+
+    </div>
+
+    <!-- Explanation -->
+
+    <div class="card card-explanation">
+
+        <div class="card-label">
+
+            Operational Explanation
+
+        </div>
+
+        <div
+            class="explanation-summary"
+            id="explanationSummary"></div>
+
+        <div
+            class="explanation-inputs"
+            id="explanationInputs"></div>
+
+    </div>
+
+</div>
 
   </main>
 

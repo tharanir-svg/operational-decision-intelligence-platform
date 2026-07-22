@@ -1,0 +1,53 @@
+{
+  "version": "1.0.0",
+  "description": "Decision Override Rules",
+
+  "priorityOrder": {
+    "MONITOR": 1,
+    "LOCAL_URGENT": 2,
+    "NATIONAL_URGENT": 3,
+    "GLOBAL": 4,
+    "FLASH": 5
+  },
+
+  "rules": [
+    {
+      "id": "OVR-001",
+      "name": "Mass Casualty Override",
+      "priority": 100,
+
+      "conditions": {
+        "policyId": "POL-003"
+      },
+
+      "overrideDecision": "FLASH"
+    },
+
+    {
+      "id": "OVR-002",
+      "name": "Critical Infrastructure Terrorism",
+      "priority": 90,
+
+      "conditions": {
+        "domain": "Terrorism",
+        "infrastructureImpact": "Severe"
+      },
+
+      "overrideDecision": "GLOBAL"
+    },
+
+    {
+      "id": "OVR-003",
+      "name": "Extreme Fatality Override",
+      "priority": 80,
+
+      "conditions": {
+        "fatalities": {
+          "gte": 10
+        }
+      },
+
+      "overrideDecision": "GLOBAL"
+    }
+  ]
+}
