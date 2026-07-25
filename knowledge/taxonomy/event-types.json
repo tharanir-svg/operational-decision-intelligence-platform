@@ -1,0 +1,29 @@
+{
+  "Crime": [
+    "Kidnapping",
+    "Armed Robbery",
+    "Homicide",
+    "Human Trafficking",
+    "Drug Trafficking",
+    "Smuggling",
+    "Extortion",
+    "Vehicle Theft",
+    "Prison Break"
+  ],
+  "Cyber Security": [
+    "Ransomware",
+    "Data Breach",
+    "DDoS",
+    "Credential Theft",
+    "Malware",
+    "Zero-Day Exploit"
+  ],
+  "Weather": [
+    "Flood",
+    "Hurricane",
+    "Cyclone",
+    "Earthquake",
+    "Wildfire",
+    "Heatwave"
+  ]
+}
