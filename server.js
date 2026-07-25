@@ -8,13 +8,7 @@ const createExtractAPI = require("./src/api/ExtractAPI");
 const app = express();
 
 app.use(express.json());
-app.get("/", (req, res) => {
-    res.send("ODIP ROOT WORKING");
-});
 
-app.get("/hello", (req, res) => {
-    res.send("ODIP HELLO WORKING");
-});
 app.use(express.static(path.join(__dirname, "public")));
 
 const orchestrator = new DecisionOrchestrator();
