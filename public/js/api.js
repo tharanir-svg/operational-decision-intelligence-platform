@@ -1,11 +1,13 @@
 /*
 ==========================================================
 ODIP API Module
-Sprint 2C
+Sprint 5A
 ==========================================================
 */
 
 const API = {
+
+    taxonomy: null,
 
     async extract(payload) {
 
@@ -23,11 +25,8 @@ const API = {
 
         const data = await response.json();
 
-        if (!response.ok) {
-
+        if (!response.ok)
             throw new Error(data.error || "Extraction failed.");
-
-        }
 
         return data;
 
@@ -49,19 +48,39 @@ const API = {
 
         const data = await response.json();
 
-        if (!response.ok) {
-
+        if (!response.ok)
             throw new Error(data.error || "Decision evaluation failed.");
-
-        }
 
         return data;
 
     },
 
+    async getTaxonomy(forceRefresh = false) {
+
+        if (this.taxonomy && !forceRefresh)
+            return this.taxonomy;
+
+        const response =
+            await fetch("/api/taxonomy");
+
+        const data =
+            await response.json();
+
+        if (!response.ok)
+            throw new Error(
+                data.error || "Unable to load taxonomy."
+            );
+
+        this.taxonomy = data.taxonomy;
+
+        return this.taxonomy;
+
+    },
+
     async health() {
 
-        const response = await fetch("/");
+        const response =
+            await fetch("/");
 
         return response.ok;
 

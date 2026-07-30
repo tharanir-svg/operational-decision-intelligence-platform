@@ -1,14 +1,175 @@
 'use strict';
+const TaxonomyManager = {
+
+    taxonomy: null,
+
+    async load() {
+
+        if (this.taxonomy)
+            return this.taxonomy;
+
+        this.taxonomy =
+            await API.getTaxonomy();
+
+        return this.taxonomy;
+
+    },
+
+    getRegions() {
+
+        return this.taxonomy?.regions || [];
+
+    },
+
+    getDomains() {
+
+        return this.taxonomy?.domains || [];
+
+    },
+
+    getCountries(region) {
+
+        return (
+            this.taxonomy?.countries?.[region]
+            || []
+        );
+
+    },
+
+    getEventTypes(domain) {
+
+        return (
+            this.taxonomy?.eventTypes?.[domain]
+            || []
+        );
+
+    }
+
+};
+const DropdownManager = {
+
+    populate(selectId, items, placeholder) {
+
+        const select =
+            document.getElementById(selectId);
+
+        if (!select) return;
+
+        select.innerHTML = "";
+
+        select.add(
+            new Option(
+                placeholder,
+                ""
+            )
+        );
+
+        items.forEach(item => {
+
+            const value =
+                item.name || item;
+
+            select.add(
+                new Option(
+                    value,
+                    value
+                )
+            );
+
+        });
+
+        select.disabled =
+            items.length === 0;
+
+    },
+
+    populateRegions() {
+
+        const regions =
+            TaxonomyManager.getRegions();
+
+        [
+
+            "ev-region",
+
+            "ip-region",
+
+            "region"
+
+        ].forEach(id => {
+
+            this.populate(
+                id,
+                regions,
+                "— Select Region —"
+            );
+
+        });
+
+    },
+
+    populateDomains() {
+
+        const domains =
+            TaxonomyManager.getDomains();
+
+        [
+
+            "ev-domain",
+
+            "ip-domain",
+
+            "domain"
+
+        ].forEach(id => {
+
+            this.populate(
+                id,
+                domains,
+                "— Select Domain —"
+            );
+
+        });
+
+    },
+
+    populateCountries(region) {
+
+        const countries =
+            TaxonomyManager.getCountries(region);
+
+        this.populate(
+
+            "ev-country",
+
+            countries,
+
+            "— Select Country —"
+
+        );
+
+    },
+
+    populateEventTypes(domain, target) {
+
+        const events =
+            TaxonomyManager.getEventTypes(domain);
+
+        this.populate(
+
+            target,
+
+            events,
+
+            "— Select Event Type —"
+
+        );
+
+    }
+
+};
 
 /* ── Static data ───────────────────────────────────────────── */
-const EVENT_MAP = {
-  Terrorism: ['Bomb Threat','Explosion','Active Shooter','Hostage Situation','Vehicle Attack','Chemical Attack','Biological Attack','Radiological Incident','IED Discovery','Suspicious Package'],
-  Conflict:  ['Military Strike','Border Clash','Drone Strike','Missile Launch','Naval Incident','Airspace Violation','Mobilization','Ceasefire Violation'],
-  Crime:     ['Robbery','Kidnapping','Homicide','Assault','Burglary','Arson'],
-  Politics:  ['Election','Protest','Demonstration','Government Resignation','Parliament Vote','Executive Order'],
-  Cyber:     ['Data Breach','Ransomware','DDoS Attack','Website Defacement','Credential Theft'],
-  Weather:   ['Flood','Earthquake','Hurricane','Wildfire','Tornado','Heatwave','Snowstorm']
-};
 
 const ACTION_INFO = {
   FLASH:        { label: 'FLASH — Immediate Global Escalation',  cls: 'action-flash',    sev: 'severity-flash',    gauge: 'gauge-flash'    },
@@ -98,20 +259,86 @@ function initStepNav() {
 }
 
 /* ── Domain → Event Type cascade ──────────────────────────── */
-function buildEventOptions(domain, selectEl, currentValue) {
-  const events = EVENT_MAP[domain] || [];
-  selectEl.innerHTML = events.length
-    ? '<option value="">— Select Event Type —</option>' + events.map(e => `<option value="${esc(e)}"${e===currentValue?' selected':''}>${esc(e)}</option>`).join('')
-    : '<option value="">— Select Domain First —</option>';
-  selectEl.disabled = !events.length;
-}
+function buildEventOptions(
 
-function bindDomainCascade(domainId, eventTypeId) {
-  $(domainId).addEventListener('change', () => {
-    buildEventOptions($(domainId).value, $(eventTypeId), '');
-  });
-}
+    domain,
 
+    selectEl,
+
+    currentValue = ""
+
+) {
+
+    const events =
+        TaxonomyManager.getEventTypes(domain);
+
+    selectEl.innerHTML = "";
+
+    selectEl.add(
+
+        new Option(
+
+            "— Select Event Type —",
+
+            ""
+
+        )
+
+    );
+
+    events.forEach(event => {
+
+        const value =
+            event.name || event;
+
+        const option =
+            new Option(
+
+                value,
+
+                value
+
+            );
+
+        if (value === currentValue)
+
+            option.selected = true;
+
+        selectEl.add(option);
+
+    });
+
+    selectEl.disabled =
+        events.length === 0;
+
+}
+function bindDomainCascade(
+
+    domainId,
+
+    eventTypeId
+
+) {
+
+    $(domainId).addEventListener(
+
+        "change",
+
+        () => {
+
+            buildEventOptions(
+
+                $(domainId).value,
+
+                $(eventTypeId)
+
+            );
+
+        }
+
+    );
+
+}
 /* ── Character count ───────────────────────────────────────── */
 function initCharCount() {
   $('ev-text').addEventListener('input', () => {
@@ -574,18 +801,56 @@ async function checkHealth() {
 }
 
 /* ── Init ──────────────────────────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
-  initStepNav();
-  bindDomainCascade('ev-domain', 'ev-eventType');
-  bindDomainCascade('domain', 'eventType');
-  initCharCount();
-  initDropzone();
-  initAnalyzeBtn();
-  initApproveBtn();
-  initConfidenceInput();
-  initThresholdSelect();
-  initNumButtons();
-  $('eventForm').addEventListener('submit', handleEvaluate);
-  checkHealth();
-  setInterval(checkHealth, 30000);
+document.addEventListener("DOMContentLoaded", async () => {
+
+    await TaxonomyManager.load();
+
+    DropdownManager.populateRegions();
+
+    DropdownManager.populateDomains();
+
+    initStepNav();
+
+    bindDomainCascade(
+        "ev-domain",
+        "ev-eventType"
+    );
+
+    bindDomainCascade(
+        "domain",
+        "eventType"
+    );
+
+    $("ev-region").addEventListener(
+        "change",
+        e => {
+            DropdownManager.populateCountries(
+                e.target.value
+            );
+        }
+    );
+
+    initCharCount();
+
+    initDropzone();
+
+    initAnalyzeBtn();
+
+    initApproveBtn();
+
+    initConfidenceInput();
+
+    initThresholdSelect();
+
+    initNumButtons();
+
+    $("eventForm").addEventListener(
+        "submit",
+        handleEvaluate
+    );
+
+    checkHealth();
+
+    setInterval(checkHealth, 30000);
+
 });

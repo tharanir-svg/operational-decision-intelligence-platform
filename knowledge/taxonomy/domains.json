@@ -1,0 +1,24 @@
+{
+  "domains": [
+    "Armed Conflict",
+    "Terrorism",
+    "Crime",
+    "Organized Crime",
+    "Cyber Security",
+    "Civil Unrest",
+    "Political",
+    "Infrastructure",
+    "Transportation",
+    "Aviation",
+    "Maritime",
+    "Energy",
+    "Public Health",
+    "Industrial",
+    "Weather",
+    "Environmental",
+    "Supply Chain",
+    "Financial",
+    "Border Security",
+    "Intelligence"
+  ]
+}

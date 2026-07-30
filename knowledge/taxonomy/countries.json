@@ -1,0 +1,28 @@
+{
+  "North America": [
+    "United States",
+    "Canada",
+    "Mexico"
+  ],
+  "Western Europe": [
+    "United Kingdom",
+    "France",
+    "Germany",
+    "Belgium",
+    "Netherlands"
+  ],
+  "South Asia": [
+    "India",
+    "Pakistan",
+    "Bangladesh",
+    "Sri Lanka",
+    "Nepal"
+  ],
+  "Middle East": [
+    "Saudi Arabia",
+    "United Arab Emirates",
+    "Qatar",
+    "Israel",
+    "Jordan"
+  ]
+}
