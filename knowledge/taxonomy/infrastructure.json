@@ -1,3 +1,79 @@
 {
-  "infrastructure": []
+  "infrastructure": {
+    "Maritime": {
+      "default": [
+        "Commercial Port",
+        "Cargo Vessel",
+        "Shipping Lane"
+      ]
+    },
+    "Cyber Security": {
+      "default": [
+        "Data Center",
+        "Cloud Platform",
+        "Corporate Network"
+      ]
+    },
+    "Transportation": {
+      "default": [
+        "Railway",
+        "Bridge",
+        "Highway"
+      ]
+    },
+    "Aviation": {
+      "default": [
+        "Airport",
+        "Runway",
+        "Aircraft"
+      ]
+    },
+    "Energy": {
+      "default": [
+        "Power Plant",
+        "Pipeline",
+        "Substation"
+      ]
+    },
+    "Infrastructure": {
+      "default": [
+        "Government Building",
+        "Utility Network"
+      ]
+    },
+    "Public Health": {
+      "default": [
+        "Hospital",
+        "Laboratory"
+      ]
+    },
+    "Industrial": {
+      "default": [
+        "Factory",
+        "Warehouse"
+      ]
+    },
+    "Supply Chain": {
+      "default": [
+        "Distribution Center"
+      ]
+    },
+    "Financial": {
+      "default": [
+        "Bank",
+        "Payment Network"
+      ]
+    },
+    "Border Security": {
+      "default": [
+        "Border Crossing"
+      ]
+    },
+    "Armed Conflict": {
+      "default": [
+        "Military Base",
+        "Command Center"
+      ]
+    }
+  }
 }

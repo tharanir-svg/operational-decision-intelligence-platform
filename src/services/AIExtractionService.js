@@ -2,19 +2,34 @@ const GeminiClient = require("../ai/GeminiClient");
 const buildExtractionPrompt = require("../prompts/ExtractionPrompt");
 const ExtractionValidator = require("../validation/ExtractionValidator");
 const IntelligenceParser = require("../parsers/IntelligenceParser");
+
 const EntityExtractor = require("../intelligence/EntityExtractor");
-const ConfidenceEngine = require("../scoring/ConfidenceEngine");
+const TaxonomyMatcher = require("../intelligence/TaxonomyMatcher");
+const KnowledgeEnricher = require("../intelligence/KnowledgeEnricher");
 const KnowledgeExtractor = require("../intelligence/KnowledgeExtractor");
+
+const ConfidenceEngine = require("../scoring/ConfidenceEngine");
 
 class AIExtractionService {
 
     constructor() {
+
         this.gemini = new GeminiClient();
+
         this.validator = new ExtractionValidator();
+
         this.parser = new IntelligenceParser();
+
         this.entityExtractor = new EntityExtractor();
+
+        this.taxonomyMatcher = new TaxonomyMatcher();
+
+        this.knowledgeEnricher = new KnowledgeEnricher();
+
         this.confidenceEngine = new ConfidenceEngine();
+
         this.knowledgeExtractor = new KnowledgeExtractor();
+
     }
 
     async extractEvidence(evidence) {
@@ -26,15 +41,21 @@ class AIExtractionService {
         console.log("========== EVIDENCE RECEIVED ==========");
         console.dir(evidence, { depth: null });
 
+        //------------------------------------------
+        // Build Prompt
+        //------------------------------------------
+
         const prompt = buildExtractionPrompt(evidence);
 
         console.log("========== GENERATED PROMPT ==========");
         console.log(prompt);
         console.log("======================================");
 
-        console.log("Prompt created.");
-
         const started = Date.now();
+
+        //------------------------------------------
+        // Gemini
+        //------------------------------------------
 
         const result = await this.gemini.generate(prompt);
 
@@ -43,36 +64,128 @@ class AIExtractionService {
         console.log("====================================");
         console.dir(result, { depth: null });
 
-        console.log("====================================");
-        console.log("RAW GEMINI TEXT");
-        console.log(result.text);
-        console.log("====================================");
-
         if (!result.success) {
+
             throw new Error(result.error);
+
         }
 
-        const intelligence = this.parser.parse(result.text);
+        console.log("====================================");
+        console.log("RAW GEMINI TEXT");
+        console.log("====================================");
+        console.log(result.text);
+
+        //------------------------------------------
+        // Parse
+        //------------------------------------------
+
+        let intelligence = this.parser.parse(result.text);
+
+        console.log("====================================");
+        console.log("PARSED INTELLIGENCE");
+        console.log("====================================");
+        console.dir(intelligence, { depth: null });
+
+        //------------------------------------------
+        // Validate
+        //------------------------------------------
 
         this.validator.validate(intelligence);
+
+        //------------------------------------------
+        // Normalize against Enterprise Taxonomy
+        //------------------------------------------
+
+        intelligence =
+            this.taxonomyMatcher.match(intelligence);
+
+        console.log("====================================");
+        console.log("NORMALIZED INTELLIGENCE");
+        console.log("====================================");
+        console.dir(intelligence, { depth: null });
+
+        //------------------------------------------
+        // Knowledge Enrichment
+        //------------------------------------------
+
+        intelligence =
+            this.knowledgeEnricher.enrich(intelligence);
+
+        console.log("====================================");
+        console.log("KNOWLEDGE ENRICHMENT");
+        console.log("====================================");
+        console.dir(intelligence.enrichment, { depth: null });
+
+        //------------------------------------------
+        // Entity Extraction
+        //------------------------------------------
 
         intelligence.entities =
             this.entityExtractor.extract(intelligence);
 
+        console.log("====================================");
+        console.log("ENTITY EXTRACTION");
+        console.log("====================================");
+        console.dir(intelligence.entities, { depth: null });
+
+        //------------------------------------------
+        // Confidence Assessment
+        //------------------------------------------
+
         intelligence.confidenceAssessment =
             this.confidenceEngine.calculate(intelligence);
+
+        console.log("====================================");
+        console.log("CONFIDENCE");
+        console.log("====================================");
+        console.dir(intelligence.confidenceAssessment, {
+            depth: null
+        });
+
+        //------------------------------------------
+        // Knowledge Extraction
+        //------------------------------------------
 
         intelligence.knowledge =
             this.knowledgeExtractor.extract(intelligence);
 
-        intelligence.model = result.model;
-        intelligence.processingTime = Date.now() - started;
-        intelligence.timestamp = new Date().toISOString();
+        console.log("====================================");
+        console.log("KNOWLEDGE");
+        console.log("====================================");
+        console.dir(intelligence.knowledge, {
+            depth: null
+        });
 
-        console.log("Extraction complete.");
+        //------------------------------------------
+        // Metadata
+        //------------------------------------------
+
+        intelligence.model = result.model;
+
+        intelligence.processingTime =
+            Date.now() - started;
+
+        intelligence.timestamp =
+            new Date().toISOString();
+
+        //------------------------------------------
+        // Completed
+        //------------------------------------------
+
+        console.log("====================================");
+        console.log("FINAL INTELLIGENCE");
+        console.log("====================================");
+
+        console.dir(intelligence, {
+            depth: null
+        });
+
+        console.log("Extraction completed successfully.");
 
         return intelligence;
+
     }
+
 }
 
 module.exports = AIExtractionService;
