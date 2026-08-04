@@ -8,19 +8,19 @@ class AliasRepository {
         this.basePath = path.join(
             process.cwd(),
             "knowledge",
-            "normalization"
+            "taxonomy"
         );
 
         this.cache = {};
-
         this.loaded = false;
 
     }
 
     load() {
 
-        if (this.loaded)
+        if (this.loaded) {
             return;
+        }
 
         if (!fs.existsSync(this.basePath)) {
 
@@ -29,48 +29,47 @@ class AliasRepository {
                 this.basePath
             );
 
-            this.loaded = true;
-
             return;
-
         }
 
         const files = fs.readdirSync(this.basePath);
 
         for (const file of files) {
 
-            if (!file.endsWith(".json"))
+            if (!file.endsWith(".json")) {
                 continue;
+            }
 
-            const fullPath = path.join(
-                this.basePath,
-                file
-            );
+            const datasetName =
+                path.basename(file, ".json");
+
+            const fullPath =
+                path.join(this.basePath, file);
 
             try {
 
-                const json =
+                const raw =
                     JSON.parse(
-                        fs.readFileSync(
-                            fullPath,
-                            "utf8"
-                        )
+                        fs.readFileSync(fullPath, "utf8")
                     );
 
-                const key =
-                    file.replace(".json", "");
-
-                this.cache[key] = json;
+                this.cache[datasetName] =
+                    this.transformDataset(raw);
 
                 console.log(
-                    `Loaded normalization dataset: ${key}`
+                    `Loaded normalization dataset: ${datasetName}`
                 );
 
-            } catch (err) {
+            }
+
+            catch (err) {
 
                 console.error(
+
                     `Failed loading ${file}`,
-                    err
+
+                    err.message
+
                 );
 
             }
@@ -83,25 +82,118 @@ class AliasRepository {
 
     get(dataset) {
 
-        this.load();
+        if (!this.loaded) {
+
+            this.load();
+
+        }
 
         return this.cache[dataset] || {};
 
     }
 
-    has(dataset) {
+    //-------------------------------------------------------
+    // Convert every taxonomy format into one lookup format
+    //-------------------------------------------------------
 
-        this.load();
+    transformDataset(raw) {
 
-        return dataset in this.cache;
+        const output = {};
 
-    }
+        //---------------------------------------------------
+        // CASE 1
+        //
+        // {
+        //   "domains":[
+        //      "Crime",
+        //      "Cyber Security"
+        //   ]
+        // }
+        //---------------------------------------------------
 
-    list() {
+        if (
 
-        this.load();
+            raw.domains &&
+            Array.isArray(raw.domains)
 
-        return Object.keys(this.cache);
+        ) {
+
+            for (const item of raw.domains) {
+
+                output[item] = {
+
+                    aliases: [],
+
+                    abbreviations: [],
+
+                    misspellings: []
+
+                };
+
+            }
+
+            return output;
+
+        }
+
+        //---------------------------------------------------
+        // CASE 2
+        //
+        // {
+        //   "North America":[
+        //      "United States",
+        //      "Canada"
+        //   ]
+        // }
+        //---------------------------------------------------
+
+        let grouped = true;
+
+        for (const key of Object.keys(raw)) {
+
+            if (!Array.isArray(raw[key])) {
+
+                grouped = false;
+
+                break;
+
+            }
+
+        }
+
+        if (grouped) {
+
+            for (const region of Object.keys(raw)) {
+
+                for (const country of raw[region]) {
+
+                    output[country] = {
+
+                        region,
+
+                        aliases: [],
+
+                        abbreviations: [],
+
+                        misspellings: []
+
+                    };
+
+                }
+
+            }
+
+            return output;
+
+        }
+
+        //---------------------------------------------------
+        // CASE 3
+        //
+        // Already canonical
+        //---------------------------------------------------
+
+        return raw;
 
     }
 

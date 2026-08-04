@@ -96,8 +96,16 @@ class AIExtractionService {
         // Normalize against Enterprise Taxonomy
         //------------------------------------------
 
-        intelligence =
+        console.log("\n========== BEFORE TAXONOMY MATCH ==========");
+        console.dir(intelligence, { depth: null });
+
+        const matched =
             this.taxonomyMatcher.match(intelligence);
+
+        console.log("\n========== AFTER TAXONOMY MATCH ==========");
+        console.dir(matched, { depth: null });
+
+        intelligence = matched;
 
         console.log("====================================");
         console.log("NORMALIZED INTELLIGENCE");
@@ -108,14 +116,30 @@ class AIExtractionService {
         // Knowledge Enrichment
         //------------------------------------------
 
-        intelligence =
-            this.knowledgeEnricher.enrich(intelligence);
+        const enrichment =
+            this.knowledgeEnricher.enrich(
+                intelligence
+    );
 
-        console.log("====================================");
-        console.log("KNOWLEDGE ENRICHMENT");
-        console.log("====================================");
-        console.dir(intelligence.enrichment, { depth: null });
+        intelligence.enrichment =
+            enrichment;
 
+        console.log(
+            "===================================="
+);
+
+        console.log(
+            "KNOWLEDGE ENRICHMENT"
+);
+
+        console.log(
+            "===================================="
+);
+
+        console.dir(
+            enrichment,
+            { depth: null }
+);
         //------------------------------------------
         // Entity Extraction
         //------------------------------------------

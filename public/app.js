@@ -213,30 +213,71 @@ let currentStep   = 0;
 let unlockedUntil = 0; // highest step ever reached
 
 function goToStep(step) {
-  if (step > unlockedUntil) return;
 
-  currentStep = step;
+    console.log("GO TO STEP:", step);
+
+    if (step > unlockedUntil) {
+        console.log("Blocked by unlockedUntil");
+        return;
+    }
+
+    currentStep = step;
+
+    const panes = document.querySelectorAll(".step-pane");
+
+    console.log("Found panes:", panes.length);
+
+    panes.forEach((pane, index) => {
+
+        console.log(
+            "Pane",
+            index,
+            pane.id,
+            "before:",
+            pane.className
+        );
+
+        pane.classList.remove("active");
+
+        if (index === step) {
+            pane.classList.add("active");
+        }
+
+        console.log(
+            "Pane",
+            index,
+            "after:",
+            pane.className
+        );
+    });
+
+    document.querySelectorAll(".step-btn").forEach((btn, index) => {
+
+        btn.classList.remove("active", "done", "locked");
+
+        if (index === step)
+            btn.classList.add("active");
+        else if (index < step)
+            btn.classList.add("done");
+        else if (index > unlockedUntil)
+            btn.classList.add("locked");
+
+    });
+
+    document.querySelectorAll(".step-connector").forEach((conn, index) => {
+
+        conn.classList.remove("active", "done");
+
+        if (index < step)
+            conn.classList.add("done");
+        else if (index === step - 1)
+            conn.classList.add("active");
+
+    });
+
+}
 
   // Panes
-  document.querySelectorAll('.step-pane').forEach((p, i) => {
-    p.classList.toggle('active', i === step);
-  });
-
-  // Step buttons
-  document.querySelectorAll('.step-btn').forEach((btn, i) => {
-    btn.classList.remove('active','locked','done');
-    if (i === step)          btn.classList.add('active');
-    else if (i < step)       btn.classList.add('done');
-    else if (i > unlockedUntil) btn.classList.add('locked');
-  });
-
-  // Connectors
-  document.querySelectorAll('.step-connector').forEach((conn, i) => {
-    conn.classList.remove('active','done');
-    if (i < step)         conn.classList.add('done');
-    else if (i === step - 1) conn.classList.add('active');
-  });
-}
 
 function unlockStep(step) {
   if (step > unlockedUntil) {
@@ -412,39 +453,142 @@ function initThresholdSelect() {
 
 /* ── Map /api/extract response → Intelligence Panel fields ─── */
 function populateIntelPanelFromAPI(d) {
-  // Text fields
-  $('ip-summary').value    = d.incidentSummary        || '';
-  $('ip-event-type').value = d.eventType               || '';
-  $('ip-location').value   = d.location                || '';
-  $('ip-country').value    = d.country                 || '';
-  $('ip-category').value   = d.recommendedCategory     || '';
-  $('ip-reasoning').value  = d.reasoning               || '';
 
-  // Number fields
-  $('ip-fatalities').value = d.fatalities  ?? 0;
-  $('ip-injuries').value   = d.injuries    ?? 0;
-  $('ip-crowd').value      = d.crowdSize   ?? 0;
-  $('ip-confidence').value = d.confidence  ?? 0;
+    console.log("Rendering Intelligence Panel");
 
-  // Arrays → comma-separated strings for editable textareas
-  $('ip-threats').value    = Array.isArray(d.threatIndicators)      ? d.threatIndicators.join(', ')      : (d.threatIndicators      || '');
-  $('ip-weapons').value    = Array.isArray(d.weapons)               ? d.weapons.join(', ')               : (d.weapons               || '');
-  $('ip-crit-infra').value = Array.isArray(d.criticalInfrastructure)? d.criticalInfrastructure.join(', '): (d.criticalInfrastructure || '');
+    console.dir(d);
 
-  // Boolean vipMentioned → human-readable string
-  $('ip-vips').value = d.vipMentioned
-    ? 'VIPs identified — see source material for details'
-    : 'None identified';
+    // Helper function to extract readable value
+    const valueOf = (field) => {
 
-  // Selects
-  setSelectValue('ip-region',    d.region              || '');
-  setSelectValue('ip-domain',    d.domain              || '');
-  setSelectValue('ip-infra',     d.infrastructureImpact|| 'None');
-  setSelectValue('ip-threshold', d.suggestedThreshold  || 'MONITOR');
+        if (!field) return "";
 
-  // Visual updates
-  updateConfidenceBar(d.confidence ?? 0);
-  updateThresholdColor($('ip-threshold'));
+        if (typeof field === "string")
+            return field;
+
+        if (field.canonical)
+            return field.canonical;
+
+        if (field.value)
+            return field.value;
+
+        if (field.input)
+            return field.input;
+
+        return "";
+    };
+
+    // -----------------------------
+    // Text Fields
+    // -----------------------------
+
+    $('ip-summary').value =
+        d.incidentSummary ||
+        d.summary ||
+        "";
+
+    $('ip-event-type').value =
+        valueOf(d.eventType);
+
+    $('ip-location').value =
+        d.location ||
+        "";
+
+    $('ip-country').value =
+        valueOf(d.country);
+
+    $('ip-category').value =
+        d.recommendedCategory ||
+        "";
+
+    $('ip-reasoning').value =
+        d.reasoning ||
+        "";
+
+    // -----------------------------
+    // Numbers
+    // -----------------------------
+
+    $('ip-fatalities').value =
+        d.fatalities ?? 0;
+
+    $('ip-injuries').value =
+        d.injuries ?? 0;
+
+    $('ip-crowd').value =
+        d.crowdSize ?? 0;
+
+    $('ip-confidence').value =
+        d.confidence ?? 0;
+
+    // -----------------------------
+    // Arrays
+    // -----------------------------
+
+    $('ip-threats').value =
+        Array.isArray(d.threatIndicators)
+            ? d.threatIndicators.join(", ")
+            : "";
+
+    $('ip-weapons').value =
+        Array.isArray(d.weapons)
+            ? d.weapons.join(", ")
+            : "";
+
+    $('ip-crit-infra').value =
+        Array.isArray(d.criticalInfrastructure)
+            ? d.criticalInfrastructure.join(", ")
+            : "";
+
+    // -----------------------------
+    // VIP
+    // -----------------------------
+
+    $('ip-vips').value =
+        d.vipMentioned
+            ? "VIP identified"
+            : "None";
+
+    // -----------------------------
+    // Dropdowns
+    // -----------------------------
+
+    setSelectValue(
+        "ip-region",
+        valueOf(d.region)
+    );
+
+    setSelectValue(
+        "ip-domain",
+        valueOf(d.domain)
+    );
+
+    setSelectValue(
+        "ip-threshold",
+        d.suggestedThreshold ||
+        "MONITOR"
+    );
+
+    setSelectValue(
+        "ip-infra",
+        d.infrastructureImpact ||
+        "None"
+    );
+
+    // -----------------------------
+    // Visuals
+    // -----------------------------
+
+    updateConfidenceBar(
+        d.confidence ?? 0
+    );
+
+    updateThresholdColor(
+        $("ip-threshold")
+    );
+
+    console.log("Intelligence Panel Updated");
+
 }
 
 function setSelectValue(id, value) {
@@ -456,55 +600,187 @@ function setSelectValue(id, value) {
 
 /* ── Analyze Evidence → POST /api/extract ──────────────────── */
 function initAnalyzeBtn() {
-  $('analyzeBtn').addEventListener('click', async () => {
-    const err    = $('evidenceError');
-    const text   = $('ev-text').value.trim();
-    const url    = $('ev-url').value.trim();
 
-    err.classList.add('hidden');
-    err.style.cssText = '';
+    const analyzeBtn = document.getElementById("analyzeBtn");
 
-    if (!text && !url && !attachedFiles.length && !$('ev-region').value && !$('ev-domain').value) {
-      err.textContent = 'Provide at least one evidence source or context field before analyzing.';
-      err.classList.remove('hidden');
-      return;
+    if (!analyzeBtn) {
+        console.error("Analyze button not found.");
+        return;
     }
 
-    const btn = $('analyzeBtn'), txt = $('analyzeBtnText'), spn = $('analyzeSpinner');
-    btn.disabled = true; txt.classList.add('hidden'); spn.classList.remove('hidden');
+    analyzeBtn.addEventListener("click", async () => {
 
-    try {
-      const payload = {
-        text,
-        url,
-        images: attachedFiles
-          .filter(f => f.type.startsWith('image/'))
-          .map(f => ({ name: f.name, size: f.size, type: f.type })),
-        videos: attachedFiles
-          .filter(f => f.type.startsWith('video/'))
-          .map(f => ({ name: f.name, size: f.size, type: f.type }))
-      };
+        console.log("Analyze button clicked");
 
-      const res  = await fetch('/api/extract', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(payload)
-      });
-      const data = await res.json();
+        const err = document.getElementById("evidenceError");
 
-      if (!res.ok || !data.success) throw new Error(data.error || 'Extraction failed.');
+        const region =
+            document.getElementById("ev-region")?.value || "";
 
-      populateIntelPanelFromAPI(data.result);
-      unlockStep(1);
-      goToStep(1);
+        const country =
+            document.getElementById("ev-country")?.value || "";
 
-    } catch (ex) {
-      err.textContent = ex.message || 'Network error — extraction service unavailable.';
-      err.classList.remove('hidden');
-    } finally {
-      btn.disabled = false; txt.classList.remove('hidden'); spn.classList.add('hidden');
-    }
-  });
+        const domain =
+            document.getElementById("ev-domain")?.value || "";
+
+        const eventType =
+            document.getElementById("ev-eventType")?.value || "";
+
+        const text =
+            document.getElementById("ev-text")?.value.trim() || "";
+
+        const url =
+            document.getElementById("ev-url")?.value.trim() || "";
+
+        if (err) {
+
+            err.classList.add("hidden");
+            err.textContent = "";
+
+        }
+
+        if (
+            !text &&
+            !url &&
+            !region &&
+            !domain
+        ) {
+
+            if (err) {
+
+                err.textContent =
+                    "Please enter evidence or choose a context.";
+
+                err.classList.remove("hidden");
+
+            }
+
+            return;
+
+        }
+
+        analyzeBtn.disabled = true;
+
+        analyzeBtn.innerHTML =
+            "Analyzing...";
+
+        try {
+
+            const payload = {
+
+                region,
+
+                country,
+
+                domain,
+
+                eventType,
+
+                text,
+
+                url
+
+            };
+
+            console.log("Sending payload");
+
+            console.dir(payload);
+
+            const response =
+                await fetch("/api/extract", {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body: JSON.stringify(payload)
+
+                });
+
+            console.log(
+                "Response received"
+            );
+
+            const result =
+                await response.json();
+
+            console.dir(result);
+
+            if (!response.ok) {
+
+                throw new Error(
+
+                    result.error ||
+
+                    "Extraction failed"
+
+                );
+
+            }
+
+            if (!result.success) {
+
+                throw new Error(
+
+                    result.message ||
+
+                    "Extraction unsuccessful"
+
+                );
+
+            }
+
+            console.log(
+                "Populating Intelligence..."
+            );
+
+            populateIntelPanelFromAPI(
+                result.result ||
+                result.data ||
+                result.intelligence ||
+                result
+);
+
+// Unlock Intelligence
+            unlockStep(1);
+
+// Show Intelligence page
+            goToStep(1);
+
+        }
+
+        catch (e) {
+
+            console.error(e);
+
+            if (err) {
+
+                err.textContent =
+
+                    e.message;
+
+                err.classList.remove("hidden");
+
+            }
+
+        }
+
+        finally {
+
+            analyzeBtn.disabled = false;
+
+            analyzeBtn.innerHTML =
+                "Analyze Evidence";
+
+        }
+
+    });
+
 }
 
 /* ── Approve & Continue ────────────────────────────────────── */
@@ -803,54 +1079,64 @@ async function checkHealth() {
 /* ── Init ──────────────────────────────────────────────────── */
 document.addEventListener("DOMContentLoaded", async () => {
 
+    console.log("1. DOM Loaded");
+
     await TaxonomyManager.load();
+    console.log("2. Taxonomy Loaded");
 
     DropdownManager.populateRegions();
+    console.log("3. Regions");
 
     DropdownManager.populateDomains();
+    console.log("4. Domains");
 
     initStepNav();
+    console.log("5. Step Nav");
 
-    bindDomainCascade(
-        "ev-domain",
-        "ev-eventType"
-    );
+    bindDomainCascade("ev-domain", "ev-eventType");
+    console.log("6. Cascade 1");
 
-    bindDomainCascade(
-        "domain",
-        "eventType"
-    );
+    bindDomainCascade("domain", "eventType");
+    console.log("7. Cascade 2");
 
-    $("ev-region").addEventListener(
+    document.getElementById("ev-region")?.addEventListener(
         "change",
-        e => {
-            DropdownManager.populateCountries(
-                e.target.value
-            );
-        }
+        e => DropdownManager.populateCountries(e.target.value)
     );
+    console.log("8. Region Change");
 
     initCharCount();
+    console.log("9. Char Count");
 
     initDropzone();
+    console.log("10. Dropzone");
 
     initAnalyzeBtn();
+    console.log("11. Analyze Button");
 
     initApproveBtn();
+    console.log("12. Approve");
 
     initConfidenceInput();
+    console.log("13. Confidence");
 
     initThresholdSelect();
+    console.log("14. Threshold");
 
     initNumButtons();
+    console.log("15. Numbers");
 
-    $("eventForm").addEventListener(
+    document.getElementById("eventForm")?.addEventListener(
         "submit",
         handleEvaluate
     );
+    console.log("16. Event Form");
 
     checkHealth();
+    console.log("17. Health");
 
     setInterval(checkHealth, 30000);
+
+    console.log("INITIALIZATION COMPLETE");
 
 });
