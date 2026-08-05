@@ -96,22 +96,49 @@ class AIExtractionService {
         // Normalize against Enterprise Taxonomy
         //------------------------------------------
 
+        //------------------------------------------
+// Normalize against Enterprise Taxonomy
+//------------------------------------------
+
         console.log("\n========== BEFORE TAXONOMY MATCH ==========");
         console.dir(intelligence, { depth: null });
 
-        const matched =
+        const taxonomy =
             this.taxonomyMatcher.match(intelligence);
 
         console.log("\n========== AFTER TAXONOMY MATCH ==========");
-        console.dir(matched, { depth: null });
+        console.dir(taxonomy, { depth: null });
 
-        intelligence = matched;
+/*
+ * IMPORTANT:
+ * Keep all AI extracted fields.
+ * Attach taxonomy matches instead of replacing them.
+ */
+intelligence = {
+
+    ...intelligence,
+
+    taxonomy,
+
+    // Replace only classification fields with normalized versions
+    region: taxonomy.region,
+    country: taxonomy.country,
+    domain: taxonomy.domain,
+    eventType: taxonomy.eventType,
+
+    threatActor: taxonomy.threatActor,
+    criticalSector: taxonomy.criticalSector,
+    infrastructure: taxonomy.infrastructure,
+    organization: taxonomy.organization,
+
+    taxonomySummary: taxonomy.summary
+
+};
 
         console.log("====================================");
-        console.log("NORMALIZED INTELLIGENCE");
+        console.log("MERGED INTELLIGENCE");
         console.log("====================================");
         console.dir(intelligence, { depth: null });
-
         //------------------------------------------
         // Knowledge Enrichment
         //------------------------------------------

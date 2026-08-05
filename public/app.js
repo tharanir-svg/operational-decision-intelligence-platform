@@ -709,6 +709,18 @@ function initAnalyzeBtn() {
             const result =
                 await response.json();
 
+            console.log("========== FULL RESULT ==========");
+            console.dir(result);
+
+            console.log("========== RESULT.DATA ==========");
+            console.dir(result.data);
+
+            console.log("========== RESULT.RESULT ==========");
+            console.dir(result.result);
+
+            console.log("========== RESULT.INTELLIGENCE ==========");
+            console.dir(result.intelligence);
+
             console.dir(result);
 
             if (!response.ok) {
@@ -738,7 +750,18 @@ function initAnalyzeBtn() {
             console.log(
                 "Populating Intelligence..."
             );
+            const extracted =
+                result.result ||
+                result.data ||
+                result.intelligence ||
+                result;
 
+            window.currentExtraction = extracted;
+
+            console.log("Stored extraction");
+            console.dir(window.currentExtraction);
+
+            populateIntelPanelFromAPI(extracted);
             populateIntelPanelFromAPI(
                 result.result ||
                 result.data ||
