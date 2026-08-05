@@ -454,140 +454,118 @@ function initThresholdSelect() {
 /* ── Map /api/extract response → Intelligence Panel fields ─── */
 function populateIntelPanelFromAPI(d) {
 
-    console.log("Rendering Intelligence Panel");
+    console.log("================================");
+    console.log("AUTO POPULATION ENGINE");
+    console.log("================================");
 
     console.dir(d);
 
-    // Helper function to extract readable value
-    const valueOf = (field) => {
+    window.currentExtraction = d;
 
-        if (!field) return "";
+    const auto = new AutoPopulationEngine(d);
 
-        if (typeof field === "string")
-            return field;
+    //------------------------------------------------
+    // Summary
+    //------------------------------------------------
 
-        if (field.canonical)
-            return field.canonical;
+    $("ip-summary").value =
+        auto.value("summary") ||
+        auto.value("incidentSummary");
 
-        if (field.value)
-            return field.value;
+    //------------------------------------------------
+    // Classification
+    //------------------------------------------------
 
-        if (field.input)
-            return field.input;
+    $("ip-event-type").value =
+        auto.value("eventType");
 
-        return "";
-    };
+    $("ip-location").value =
+        auto.value("city") ||
+        auto.value("location");
 
-    // -----------------------------
-    // Text Fields
-    // -----------------------------
+    $("ip-country").value =
+        auto.value("country");
 
-    $('ip-summary').value =
-        d.incidentSummary ||
-        d.summary ||
-        "";
+    $("ip-category").value =
+        auto.value("suggestedCategory") ||
+        auto.value("recommendedCategory");
 
-    $('ip-event-type').value =
-        valueOf(d.eventType);
+    $("ip-reasoning").value =
+        auto.value("reasoning");
 
-    $('ip-location').value =
-        d.location ||
-        "";
-
-    $('ip-country').value =
-        valueOf(d.country);
-
-    $('ip-category').value =
-        d.recommendedCategory ||
-        "";
-
-    $('ip-reasoning').value =
-        d.reasoning ||
-        "";
-
-    // -----------------------------
+    //------------------------------------------------
     // Numbers
-    // -----------------------------
+    //------------------------------------------------
 
-    $('ip-fatalities').value =
-        d.fatalities ?? 0;
+    $("ip-fatalities").value =
+        auto.fatalities();
 
-    $('ip-injuries').value =
-        d.injuries ?? 0;
+    $("ip-injuries").value =
+        auto.injuries();
 
-    $('ip-crowd').value =
-        d.crowdSize ?? 0;
+    $("ip-crowd").value =
+        auto.value("crowdSize") || 0;
 
-    $('ip-confidence').value =
-        d.confidence ?? 0;
+    $("ip-confidence").value =
+        auto.confidence();
 
-    // -----------------------------
+    //------------------------------------------------
     // Arrays
-    // -----------------------------
+    //------------------------------------------------
 
-    $('ip-threats').value =
-        Array.isArray(d.threatIndicators)
-            ? d.threatIndicators.join(", ")
-            : "";
+    $("ip-threats").value =
+        auto.list("threatIndicators").join(", ");
 
-    $('ip-weapons').value =
-        Array.isArray(d.weapons)
-            ? d.weapons.join(", ")
-            : "";
+    $("ip-weapons").value =
+        auto.list("weapons").join(", ");
 
-    $('ip-crit-infra').value =
-        Array.isArray(d.criticalInfrastructure)
-            ? d.criticalInfrastructure.join(", ")
-            : "";
+    $("ip-crit-infra").value =
+        auto.list("criticalInfrastructure").join(", ");
 
-    // -----------------------------
+    //------------------------------------------------
     // VIP
-    // -----------------------------
+    //------------------------------------------------
 
-    $('ip-vips').value =
-        d.vipMentioned
-            ? "VIP identified"
-            : "None";
+    $("ip-vips").value =
+        auto.list("persons").join(", ");
 
-    // -----------------------------
+    //------------------------------------------------
     // Dropdowns
-    // -----------------------------
+    //------------------------------------------------
 
     setSelectValue(
         "ip-region",
-        valueOf(d.region)
+        auto.value("region")
     );
 
     setSelectValue(
         "ip-domain",
-        valueOf(d.domain)
+        auto.value("domain")
     );
 
     setSelectValue(
         "ip-threshold",
-        d.suggestedThreshold ||
-        "MONITOR"
+        auto.value("suggestedThreshold") || "MONITOR"
     );
 
     setSelectValue(
         "ip-infra",
-        d.infrastructureImpact ||
-        "None"
+        auto.infrastructureImpact()
     );
 
-    // -----------------------------
+    //------------------------------------------------
     // Visuals
-    // -----------------------------
+    //------------------------------------------------
 
     updateConfidenceBar(
-        d.confidence ?? 0
+        auto.confidence()
     );
 
     updateThresholdColor(
         $("ip-threshold")
     );
 
-    console.log("Intelligence Panel Updated");
+    console.log("AUTO POPULATION COMPLETE");
 
 }
 
@@ -664,118 +642,91 @@ function initAnalyzeBtn() {
         analyzeBtn.innerHTML =
             "Analyzing...";
 
-        try {
+try {
 
-            const payload = {
+    const payload = {
 
-                region,
+        evidence: text,
 
-                country,
+        region,
 
-                domain,
+        country,
 
-                eventType,
+        domain,
 
-                text,
+        eventType,
 
-                url
+        url
 
-            };
+    };
 
-            console.log("Sending payload");
+    console.log("Sending payload to V2");
+    console.dir(payload);
 
-            console.dir(payload);
+    const response = await fetch("/api/extract-v2", {
 
-            const response =
-                await fetch("/api/extract", {
+        method: "POST",
 
-                    method: "POST",
+        headers: {
 
-                    headers: {
+            "Content-Type": "application/json"
 
-                        "Content-Type":
-                            "application/json"
+        },
 
-                    },
+        body: JSON.stringify(payload)
 
-                    body: JSON.stringify(payload)
+    });
 
-                });
+    const result = await response.json();
 
-            console.log(
-                "Response received"
-            );
+    console.log("========== V2 RESPONSE ==========");
+    console.dir(result);
 
-            const result =
-                await response.json();
+    if (!response.ok) {
 
-            console.log("========== FULL RESULT ==========");
-            console.dir(result);
+        throw new Error(
+            result.error || "Extraction failed."
+        );
 
-            console.log("========== RESULT.DATA ==========");
-            console.dir(result.data);
+    }
 
-            console.log("========== RESULT.RESULT ==========");
-            console.dir(result.result);
+    if (!result.success) {
 
-            console.log("========== RESULT.INTELLIGENCE ==========");
-            console.dir(result.intelligence);
+        throw new Error(
+            result.error || "Extraction unsuccessful."
+        );
 
-            console.dir(result);
+    }
 
-            if (!response.ok) {
+    //------------------------------------------
+    // Store Enterprise Object
+    //------------------------------------------
 
-                throw new Error(
+    window.currentExtraction =
+        result.intelligence;
 
-                    result.error ||
+    console.log("Enterprise Intelligence");
+    console.dir(window.currentExtraction);
 
-                    "Extraction failed"
+    //------------------------------------------
+    // Populate Pane 2
+    //------------------------------------------
 
-                );
+    window.IntelligenceMapperV2.set(
+        window.currentExtraction
+    );
 
-            }
+    window.IntelligenceMapperV2.populatePane2();
 
-            if (!result.success) {
+    //------------------------------------------
+    // Unlock Step 2
+    //------------------------------------------
 
-                throw new Error(
+    unlockStep(1);
 
-                    result.message ||
+    goToStep(1);
 
-                    "Extraction unsuccessful"
-
-                );
-
-            }
-
-            console.log(
-                "Populating Intelligence..."
-            );
-            const extracted =
-                result.result ||
-                result.data ||
-                result.intelligence ||
-                result;
-
-            window.currentExtraction = extracted;
-
-            console.log("Stored extraction");
-            console.dir(window.currentExtraction);
-
-            populateIntelPanelFromAPI(extracted);
-            populateIntelPanelFromAPI(
-                result.result ||
-                result.data ||
-                result.intelligence ||
-                result
-);
-
-// Unlock Intelligence
-            unlockStep(1);
-
-// Show Intelligence page
-            goToStep(1);
-
-        }
+}
 
         catch (e) {
 

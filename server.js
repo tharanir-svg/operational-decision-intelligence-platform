@@ -1,3 +1,6 @@
+const createExtractAPIV2 =
+    require("./src/api/ExtractAPIV2");
+
 const express = require("express");
 const path = require("path");
 
@@ -31,6 +34,10 @@ app.use("/api", createExtractAPI());
 
 console.log("Registering Taxonomy API");
 app.use("/api", createTaxonomyAPI());
+
+console.log("Registering Extract API V2");
+
+app.use("/api", createExtractAPIV2());
 
 // ==========================================================
 // Health Check
