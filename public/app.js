@@ -760,12 +760,27 @@ try {
 /* ── Approve & Continue ────────────────────────────────────── */
 function initApproveBtn() {
   $('approveBtn').addEventListener('click', () => {
-    const domain    = $('ip-domain').value;
-    const eventType = $('ip-event-type').value;
+    const mapped =
+    window.IntelligenceMapperV2.get();
+
+    const domain =
+        mapped.domain;
+
+    const eventType =
+        mapped.eventType;
+
+    const region =
+        mapped.region;
+
+    const fatalities =
+        mapped.casualties?.fatalities ?? 0;
+
+    const injuries =
+        mapped.casualties?.injuries ?? 0;
+
+    const infra =
+        mapped.infrastructureImpact || "None";
     const region    = $('ip-region').value;
-    const fatalities = parseInt($('ip-fatalities').value, 10) || 0;
-    const injuries   = parseInt($('ip-injuries').value, 10)  || 0;
-    const infra      = $('ip-infra').value || 'None';
 
     // Populate Manual tab
     setSelectValue('domain', domain);

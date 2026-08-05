@@ -1,17 +1,171 @@
-class IntelligenceMapperV2 {
+constructor() {
 
-    constructor() {
+    this.current = null;
+
+    //------------------------------------------------
+    // Enterprise Domain Mapping
+    //------------------------------------------------
+
+    this.DOMAIN_MAP = {
+
+        "Security": "Terrorism",
+
+        "Crime": "Crime",
+
+        "Cyber": "Cyber",
+
+        "Natural Disaster": "Natural Disaster",
+
+        "Health": "Public Health",
+
+        "Political": "Political",
+
+        "Infrastructure": "Infrastructure"
+
+    };
+
+    //------------------------------------------------
+    // Enterprise Event Mapping
+    //------------------------------------------------
+
+    this.EVENT_MAP = {
+
+        // Terrorism
+        "Terrorist Attack": "Suicide Bombing",
+        "Bomb Attack": "Bombing",
+        "Explosion": "Bombing",
+        "IED": "Vehicle-Borne IED",
+        "VBIED": "Vehicle-Borne IED",
+        "Hostage": "Hostage Situation",
+        "Kidnapping": "Hostage Situation",
+
+        // Civil Disorder
+        "Protest": "Demonstration",
+        "Riot": "Violent Protest",
+
+        // Disaster
+        "Earthquake": "Earthquake",
+        "Flood": "Flood",
+        "Wildfire": "Wildfire",
+        "Cyclone": "Cyclone",
+
+        // Default
+        "Unknown": ""
+
+    };
+
+    //------------------------------------------------
+    // Threshold Mapping
+    //------------------------------------------------
+
+    this.THRESHOLD_MAP = {
+
+        "Low": "MONITOR",
+
+        "Medium": "LOCAL",
+
+        "High": "NATIONAL",
+
+        "Critical": "FLASH"
+
+    };
+
+}
+
+set(intelligence) {
+
+    if (!intelligence) {
 
         this.current = null;
+        return;
 
     }
 
-    set(intelligence) {
+    const mapped = {
 
-        this.current = intelligence;
+        ...intelligence
 
-    }
+    };
 
+    //----------------------------------------
+    // Domain
+    //----------------------------------------
+
+    mapped.domain =
+
+        this.DOMAIN_MAP[mapped.domain]
+
+        || mapped.domain
+
+        || "";
+
+    //----------------------------------------
+    // Event Type
+    //----------------------------------------
+
+    mapped.eventType =
+
+        this.EVENT_MAP[mapped.eventType]
+
+        || mapped.eventType
+
+        || "";
+
+    //----------------------------------------
+    // Threshold
+    //----------------------------------------
+
+    mapped.suggestedThreshold =
+
+        this.THRESHOLD_MAP[mapped.suggestedThreshold]
+
+        || mapped.suggestedThreshold
+
+        || "MONITOR";
+
+    //----------------------------------------
+    // Defaults
+    //----------------------------------------
+
+    mapped.casualties ||= {
+
+        fatalities: mapped.fatalities || 0,
+
+        injuries: mapped.injuries || 0
+
+    };
+
+    mapped.infrastructureImpact ||= "None";
+
+    mapped.crowdSize ??= 0;
+
+    mapped.summary ||= "";
+
+    mapped.country ||= "";
+
+    mapped.region ||= "";
+
+    mapped.city ||= "";
+
+    mapped.reasoning ||= "";
+
+    mapped.confidence ??= 0;
+
+    mapped.threatIndicators ||= [];
+
+    mapped.weapons ||= [];
+
+    mapped.criticalInfrastructure ||= [];
+
+    mapped.persons ||= [];
+
+    mapped.organizations ||= [];
+
+    mapped.recommendedActions ||= [];
+
+    this.current = mapped;
+
+}
     get() {
 
         return this.current;
