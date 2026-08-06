@@ -758,37 +758,37 @@ try {
 }
 
 /* ── Approve & Continue ────────────────────────────────────── */
+/* ── Approve & Continue ────────────────────────────────────── */
 function initApproveBtn() {
-  $('approveBtn').addEventListener('click', () => {
-    const domain    = $('ip-domain').value;
-    const eventType = $('ip-event-type').value;
-    const region    = $('ip-region').value;
-    const fatalities = parseInt($('ip-fatalities').value, 10) || 0;
-    const injuries   = parseInt($('ip-injuries').value, 10)  || 0;
-    const infra      = $('ip-infra').value || 'None';
 
-    // Populate Manual tab
-    setSelectValue('domain', domain);
-    buildEventOptions(domain, $('eventType'), eventType);
+    $("approveBtn").addEventListener("click", () => {
 
-    setSelectValue('region', region);
-    $('fatalities').value = fatalities;
-    $('injuries').value   = injuries;
+        if (!window.IntelligenceMapperV2.hasData()) {
 
-    document.querySelectorAll('input[name="infrastructure"]').forEach(r => {
-      r.checked = r.value === infra;
+            alert("No AI extraction available.");
+
+            return;
+
+        }
+
+        //----------------------------------------------------
+        // Populate Decision Workspace
+        //----------------------------------------------------
+
+        window.IntelligenceMapperV2.populatePane3();
+
+        //----------------------------------------------------
+        // Unlock Decision Step
+        //----------------------------------------------------
+
+        $("formError").classList.add("hidden");
+
+        unlockStep(2);
+
+        goToStep(2);
+
     });
 
-    // Show origin badge
-    const badge = $('stepOriginBadge');
-    badge.textContent = 'Pre-filled from AI extraction';
-    badge.className   = 'step-origin-badge from-intel';
-
-    $('formError').classList.add('hidden');
-
-    unlockStep(2);
-    goToStep(2);
-  });
 }
 
 /* ── Manual evaluation ─────────────────────────────────────── */
