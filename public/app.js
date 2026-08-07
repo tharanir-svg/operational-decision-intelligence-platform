@@ -713,8 +713,14 @@ try {
     //------------------------------------------
 
     window.IntelligenceMapperV2.set(
-        window.currentExtraction
-    );
+    window.currentExtraction
+);
+
+    console.log("Current Extraction");
+    console.dir(window.currentExtraction);
+
+    console.log("Mapper After Set");
+    console.dir(window.IntelligenceMapperV2.get());
 
     window.IntelligenceMapperV2.populatePane2();
 

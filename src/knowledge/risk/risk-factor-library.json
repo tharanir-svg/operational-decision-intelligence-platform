@@ -1,0 +1,86 @@
+{
+  "version": "1.0.0",
+  "description": "Operational Risk Factor Library",
+
+  "riskFactors": [
+
+    {
+      "id": "RF-001",
+      "name": "Fatalities",
+
+      "rule": {
+        "field": "intelligence.casualties.fatalities",
+        "operator": "greaterThanOrEqual",
+        "value": 20
+      },
+
+      "points": 40,
+
+      "reason": "Mass casualty event"
+    },
+
+    {
+      "id": "RF-002",
+
+      "name": "Mass Casualty",
+
+      "rule": {
+        "field": "intelligence.casualties.fatalities",
+        "operator": "greaterThanOrEqual",
+        "value": 10
+      },
+
+      "points": 15,
+
+      "reason": "High fatality incident"
+    },
+
+    {
+      "id": "RF-003",
+
+      "name": "Government Facility",
+
+      "rule": {
+        "field": "intelligence.infrastructure",
+        "operator": "contains",
+        "value": "White House"
+      },
+
+      "points": 25,
+
+      "reason": "Government facility targeted"
+    },
+
+    {
+      "id": "RF-004",
+
+      "name": "Terrorism",
+
+      "rule": {
+        "field": "intelligence.domain",
+        "operator": "equals",
+        "value": "Terrorism"
+      },
+
+      "points": 20,
+
+      "reason": "Terrorism baseline"
+    },
+
+    {
+      "id": "RF-005",
+
+      "name": "Critical Infrastructure",
+
+      "rule": {
+        "field": "intelligence.infrastructure",
+        "operator": "exists"
+      },
+
+      "points": 10,
+
+      "reason": "Critical infrastructure involved"
+    }
+
+  ]
+}

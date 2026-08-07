@@ -10,36 +10,40 @@ class IntelligenceMapperV2 {
 
         this.DOMAIN_MAP = {
 
-            "Security": "Terrorism",
-            "Terrorism": "Terrorism",
+    // Enterprise Security
+    "Security": "Terrorism",
+    "Physical Security": "Terrorism",
+    "Terrorism": "Terrorism",
 
-            "Crime": "Crime",
-            "Cyber": "Cyber Security",
-            "Cyber Security": "Cyber Security",
+    // Crime
+    "Crime": "Crime",
+    "Organized Crime": "Organized Crime",
 
-            "Political": "Political",
-            "Civil Unrest": "Civil Unrest",
+    // Cyber
+    "Cyber": "Cyber Security",
+    "Cyber Security": "Cyber Security",
 
-            "Infrastructure": "Infrastructure",
+    // Public Health
+    "Health": "Public Health",
+    "Public Health": "Public Health",
 
-            "Transportation": "Transportation",
+    // Infrastructure
+    "Infrastructure": "Infrastructure",
 
-            "Maritime": "Maritime",
+    // Political
+    "Political": "Political",
 
-            "Aviation": "Aviation",
+    // Transport
+    "Transportation": "Transportation",
+    "Transport": "Transportation",
 
-            "Energy": "Energy",
+    // Environment
+    "Environmental": "Environmental",
 
-            "Financial": "Financial",
+    // Intelligence
+    "Intelligence": "Intelligence"
 
-            "Health": "Public Health",
-            "Public Health": "Public Health",
-
-            "Natural Disaster": "Natural Disaster",
-
-            "Environmental": "Environmental"
-
-        };
+};
 
         //==========================================
         // Event Type Mapping
@@ -112,7 +116,9 @@ class IntelligenceMapperV2 {
 
         }
 
-        const mapped = structuredClone(intelligence);
+        const mapped = JSON.parse(
+    JSON.stringify(intelligence)
+);
 
         mapped.domain =
             this.mapDomain(mapped.domain);
@@ -222,12 +228,14 @@ class IntelligenceMapperV2 {
 
     mapDomain(domain) {
 
-        if (!domain)
-            return "";
+    if (!domain)
+        return "";
 
-        return this.DOMAIN_MAP[domain] || domain;
+    const cleaned = String(domain).trim();
 
-    }
+    return this.DOMAIN_MAP[cleaned] || cleaned;
+
+}
 
     mapEvent(eventType) {
 
