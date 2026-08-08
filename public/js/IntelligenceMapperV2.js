@@ -346,10 +346,49 @@ class IntelligenceMapperV2 {
         // Infrastructure
         //------------------------------------------
 
-        setSelectValue(
-            "ip-infra",
-            i.infrastructureImpact
-        );
+        const infrastructureAssets =
+    Array.isArray(i.criticalInfrastructure)
+        ? i.criticalInfrastructure
+        : [];
+
+const infrastructureText =
+    infrastructureAssets
+        .join(" ")
+        .toLowerCase();
+
+let infrastructureImpact =
+    i.infrastructureImpact || "None";
+
+if (
+    infrastructureText.includes("white house") ||
+    infrastructureText.includes("power grid") ||
+    infrastructureText.includes("airport")
+) {
+
+    infrastructureImpact = "Severe";
+
+}
+else if (
+    infrastructureText.includes("stadium") ||
+    infrastructureText.includes("hospital") ||
+    infrastructureText.includes("port")
+) {
+
+    infrastructureImpact = "Moderate";
+
+}
+else if (
+    infrastructureAssets.length > 0
+) {
+
+    infrastructureImpact = "Minor";
+
+}
+
+setSelectValue(
+    "ip-infra",
+    infrastructureImpact
+);
 
         //------------------------------------------
         // Threat Indicators
@@ -461,17 +500,69 @@ class IntelligenceMapperV2 {
         // Infrastructure
         //------------------------------------------
 
-        document
-            .querySelectorAll(
-                'input[name="infrastructure"]'
-            )
-            .forEach(r => {
+        //------------------------------------------
+// Infrastructure Impact
+//------------------------------------------
 
-                r.checked =
-                    r.value ===
-                    i.infrastructureImpact;
+const infrastructureAssets =
+    Array.isArray(i.criticalInfrastructure)
+        ? i.criticalInfrastructure
+        : [];
 
-            });
+const infrastructureText =
+    infrastructureAssets
+        .join(" ")
+        .toLowerCase();
+
+let infrastructureImpact =
+    i.infrastructureImpact || "None";
+
+// High-priority government / critical assets
+if (
+    infrastructureText.includes("white house") ||
+    infrastructureText.includes("power grid") ||
+    infrastructureText.includes("airport")
+) {
+
+    infrastructureImpact = "Severe";
+
+}
+
+// Major public infrastructure
+else if (
+    infrastructureText.includes("stadium") ||
+    infrastructureText.includes("hospital") ||
+    infrastructureText.includes("port")
+) {
+
+    infrastructureImpact = "Moderate";
+
+}
+
+// Any other explicitly identified infrastructure
+else if (
+    infrastructureAssets.length > 0
+) {
+
+    infrastructureImpact = "Minor";
+
+}
+
+//------------------------------------------
+// Apply to Page 3
+//------------------------------------------
+
+document
+    .querySelectorAll(
+        'input[name="infrastructure"]'
+    )
+    .forEach(r => {
+
+        r.checked =
+            r.value ===
+            infrastructureImpact;
+
+    });
 
         //------------------------------------------
         // Badge
