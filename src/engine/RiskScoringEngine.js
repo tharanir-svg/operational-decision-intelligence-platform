@@ -1,110 +1,262 @@
 class RiskScoringEngine {
 
   constructor(weightLibrary, regionProfiles) {
-    this.weights = weightLibrary.weights || {};
-    this.regionProfiles = regionProfiles.regions || [];
+
+    this.weights =
+      weightLibrary?.weights || {};
+
+    this.regionProfiles =
+      regionProfiles?.regions || [];
+
   }
 
   calculate(eventContext) {
 
     const factors = [];
+
     let score = 0;
 
-    // -----------------------------
-    // Fatalities
-    // -----------------------------
-    const fatalities = eventContext.fatalities || 0;
+    // ==================================================
+    // NEW RISK FACTOR ENGINE OUTPUT
+    // ==================================================
 
-    if (fatalities > 0) {
-      const points = fatalities * (this.weights.Fatalities || 0);
+    const riskFactors =
+      Array.isArray(eventContext.riskFactors)
+        ? eventContext.riskFactors
+        : [];
 
-      score += points;
+    /*
+     * If RiskFactorEngine has already evaluated the event,
+     * use those factors as the authoritative scoring basis.
+     *
+     * This prevents double-counting fatalities, terrorism,
+     * infrastructure, etc.
+     */
 
-      factors.push({
-        factor: "Fatalities",
-        value: fatalities,
-        points
+    if (riskFactors.length > 0) {
+
+      riskFactors.forEach(riskFactor => {
+
+        const points =
+          Number(riskFactor.points) || 0;
+
+        score += points;
+
+        factors.push({
+
+          factor:
+            riskFactor.name ||
+            riskFactor.factor ||
+            riskFactor.id ||
+            "Risk Factor",
+
+          value:
+            riskFactor.value ??
+            null,
+
+          points,
+
+          reason:
+            riskFactor.reason ||
+            "",
+
+          source:
+            riskFactor.source ||
+            "risk-factor-engine"
+
+        });
+
       });
+
     }
 
-    // -----------------------------
-    // Injuries
-    // -----------------------------
-    const injuries = eventContext.injuries || 0;
+    // ==================================================
+    // LEGACY FALLBACK
+    // ==================================================
+    /*
+     * If no RiskFactorEngine output exists, retain the
+     * existing scoring behaviour.
+     *
+     * This keeps older event flows functional.
+     */
 
-    if (injuries > 0) {
-      const points = injuries * (this.weights.Injuries || 0);
+    else {
 
-      score += points;
+      // -----------------------------
+      // Fatalities
+      // -----------------------------
 
-      factors.push({
-        factor: "Injuries",
-        value: injuries,
-        points
-      });
+      const fatalities =
+        eventContext.fatalities || 0;
+
+      if (fatalities > 0) {
+
+        const points =
+          fatalities *
+          (this.weights.Fatalities || 0);
+
+        score += points;
+
+        factors.push({
+
+          factor: "Fatalities",
+
+          value: fatalities,
+
+          points
+
+        });
+
+      }
+
+      // -----------------------------
+      // Injuries
+      // -----------------------------
+
+      const injuries =
+        eventContext.injuries || 0;
+
+      if (injuries > 0) {
+
+        const points =
+          injuries *
+          (this.weights.Injuries || 0);
+
+        score += points;
+
+        factors.push({
+
+          factor: "Injuries",
+
+          value: injuries,
+
+          points
+
+        });
+
+      }
+
+      // -----------------------------
+      // Region Baseline
+      // -----------------------------
+
+      const region =
+        this.regionProfiles.find(
+          r =>
+            r.region ===
+            eventContext.region
+        );
+
+      if (region) {
+
+        const points =
+          region.baselineRisk * 10;
+
+        score += points;
+
+        factors.push({
+
+          factor:
+            "Regional Baseline",
+
+          value:
+            region.region,
+
+          points
+
+        });
+
+      }
+
+      // -----------------------------
+      // Event Type Bonus
+      // -----------------------------
+
+      const criticalEvents = [
+
+        "Terrorist Attack",
+
+        "Political Assassination",
+
+        "Cyber Attack"
+
+      ];
+
+      if (
+        criticalEvents.includes(
+          eventContext.eventType
+        )
+      ) {
+
+        score += 10;
+
+        factors.push({
+
+          factor:
+            "Critical Event Type",
+
+          value:
+            eventContext.eventType,
+
+          points: 10
+
+        });
+
+      }
+
+      // -----------------------------
+      // Confidence Bonus
+      // -----------------------------
+
+      const confidence =
+        eventContext
+          .confidenceAssessment
+          ?.score || 0;
+
+      if (confidence >= 80) {
+
+        score += 5;
+
+        factors.push({
+
+          factor:
+            "High Confidence",
+
+          value:
+            confidence,
+
+          points: 5
+
+        });
+
+      }
+
     }
 
-    // -----------------------------
-    // Region Baseline
-    // -----------------------------
-    const region = this.regionProfiles.find(
-      r => r.region === eventContext.region
-    );
+    // ==================================================
+    // FINAL SCORE
+    // ==================================================
 
-    if (region) {
+    score =
+      Math.min(
+        Math.max(score, 0),
+        100
+      );
 
-      const points = region.baselineRisk * 10;
+    // ==================================================
+    // SUMMARY
+    // ==================================================
 
-      score += points;
+    const fatalities =
+      eventContext.fatalities || 0;
 
-      factors.push({
-        factor: "Regional Baseline",
-        value: region.region,
-        points
-      });
-    }
+    const injuries =
+      eventContext.injuries || 0;
 
-    // -----------------------------
-    // Event Type Bonus
-    // -----------------------------
-    const criticalEvents = [
-      "Terrorist Attack",
-      "Political Assassination",
-      "Cyber Attack"
-    ];
-
-    if (criticalEvents.includes(eventContext.eventType)) {
-
-      score += 10;
-
-      factors.push({
-        factor: "Critical Event Type",
-        value: eventContext.eventType,
-        points: 10
-      });
-    }
-
-    // -----------------------------
-    // Confidence Bonus
-    // -----------------------------
     const confidence =
-      eventContext.confidenceAssessment?.score || 0;
-
-    if (confidence >= 80) {
-
-      score += 5;
-
-      factors.push({
-        factor: "High Confidence",
-        value: confidence,
-        points: 5
-      });
-    }
-
-    // -----------------------------
-    // Final Score
-    // -----------------------------
-    score = Math.min(score, 100);
+      eventContext
+        .confidenceAssessment
+        ?.score || 0;
 
     return {
 
@@ -118,11 +270,15 @@ class RiskScoringEngine {
 
         injuries,
 
-        region: eventContext.region || null,
+        region:
+          eventContext.region ||
+          null,
 
         confidence,
 
-        eventType: eventContext.eventType || null
+        eventType:
+          eventContext.eventType ||
+          null
 
       }
 
@@ -132,4 +288,5 @@ class RiskScoringEngine {
 
 }
 
-module.exports = RiskScoringEngine;
+module.exports =
+  RiskScoringEngine;

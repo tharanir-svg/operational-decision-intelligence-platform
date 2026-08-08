@@ -1,14 +1,37 @@
 const path = require("path");
 
-const KnowledgeLoader = require("../knowledge/KnowledgeLoader");
+const KnowledgeLoader =
+    require("../knowledge/KnowledgeLoader");
 
-const NormalizationEngine = require("../engine/NormalizationEngine");
-const RiskScoringEngine = require("../engine/RiskScoringEngine");
-const ThresholdEngine = require("../engine/ThresholdEngine");
-const PolicyEngine = require("../policy/PolicyEngine");
-const RecommendationEngine = require("../engine/RecommendationEngine");
-const DecisionTraceEngine = require("../engine/DecisionTraceEngine");
-const ExplanationEngine = require("../explanation/ExplanationEngine");
+const KnowledgeManager =
+    require("../orchestration/KnowledgeManager");
+
+const DecisionContext =
+    require("../orchestration/DecisionContext");
+
+const RiskFactorEngine =
+    require("../intelligence/RiskFactorEngine");
+
+const NormalizationEngine =
+    require("../engine/NormalizationEngine");
+
+const RiskScoringEngine =
+    require("../engine/RiskScoringEngine");
+
+const ThresholdEngine =
+    require("../engine/ThresholdEngine");
+
+const PolicyEngine =
+    require("../policy/PolicyEngine");
+
+const RecommendationEngine =
+    require("../engine/RecommendationEngine");
+
+const DecisionTraceEngine =
+    require("../engine/DecisionTraceEngine");
+
+const ExplanationEngine =
+    require("../explanation/ExplanationEngine");
 
 // NEW
 const DecisionOverrideEngine = require("./DecisionOverrideEngine");
@@ -29,6 +52,25 @@ class DecisionOrchestrator {
 
         this.normalizationEngine =
             new NormalizationEngine();
+
+        // ---------------------------------------------
+// Risk Factor Knowledge + Engine
+// ---------------------------------------------
+
+this.riskFactorKnowledge =
+  new KnowledgeManager(
+    path.join(__dirname, "../..")
+  );
+
+this.riskFactorKnowledge.load(
+  "riskFactors",
+  "src/knowledge/risk/risk-factor-library.json"
+);
+
+this.riskFactorEngine =
+  new RiskFactorEngine(
+    this.riskFactorKnowledge
+  );
 
         this.riskEngine =
             new RiskScoringEngine(
@@ -72,20 +114,40 @@ class DecisionOrchestrator {
         // Normalize
         // ===========================================
 
-        const normalizedEvent =
-            this.normalizationEngine.normalize(
-                eventContext
-            );
+        // STEP 0 - Normalize incoming event
+const normalizedEvent =
+  this.normalizationEngine.normalize(eventContext);
 
-        // ===========================================
-        // STEP 1
-        // Risk Score
-        // ===========================================
 
-        const riskResult =
-            this.riskEngine.calculate(
-                normalizedEvent
-            );
+// =============================================
+// STEP 0.5 - Risk Factor Evaluation
+// =============================================
+
+const riskContext =
+  new DecisionContext(
+    normalizedEvent
+  );
+
+this.riskFactorEngine.process(
+  riskContext
+);
+
+// Pass validated risk factors into the
+// scoring layer without changing the
+// existing normalized event structure.
+
+normalizedEvent.riskFactors =
+  riskContext.riskFactors;
+
+
+// =============================================
+// STEP 1 - Risk Score
+// =============================================
+
+const riskResult =
+  this.riskEngine.calculate(
+    normalizedEvent
+  );
 
         // ===========================================
         // STEP 2
