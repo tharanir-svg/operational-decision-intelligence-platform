@@ -172,21 +172,204 @@ const DropdownManager = {
 /* ── Static data ───────────────────────────────────────────── */
 
 const ACTION_INFO = {
-  FLASH:        { label: 'FLASH — Immediate Global Escalation',  cls: 'action-flash',    sev: 'severity-flash',    gauge: 'gauge-flash'    },
-  ESCALATE:     { label: 'ESCALATE — High Priority Response',    cls: 'action-escalate', sev: 'severity-escalate', gauge: 'gauge-escalate' },
-  WATCH:        { label: 'WATCH — Active Monitoring Required',   cls: 'action-watch',    sev: 'severity-watch',    gauge: 'gauge-watch'    },
-  LOCAL_URGENT: { label: 'LOCAL URGENT — Regional Alert',        cls: 'action-local',    sev: 'severity-local',    gauge: 'gauge-local'    },
-  MONITOR:      { label: 'MONITOR — Routine Surveillance',       cls: 'action-monitor',  sev: 'severity-monitor',  gauge: 'gauge-monitor'  }
+
+    FLASH: {
+        label:
+            "FLASH — Immediate highest-priority escalation",
+        cls:
+            "action-flash",
+        sev:
+            "severity-flash",
+        gauge:
+            "gauge-flash"
+    },
+
+    GLOBAL: {
+        label:
+            "GLOBAL — Global operational escalation",
+        cls:
+            "action-flash",
+        sev:
+            "severity-flash",
+        gauge:
+            "gauge-flash"
+    },
+
+    GLOBAL_URGENT: {
+        label:
+            "GLOBAL URGENT — Global coordination required",
+        cls:
+            "action-escalate",
+        sev:
+            "severity-escalate",
+        gauge:
+            "gauge-escalate"
+    },
+
+    NATIONAL_URGENT: {
+        label:
+            "NATIONAL URGENT — National coordination required",
+        cls:
+            "action-watch",
+        sev:
+            "severity-watch",
+        gauge:
+            "gauge-watch"
+    },
+
+    LOCAL_URGENT: {
+        label:
+            "LOCAL URGENT — Local escalation required",
+        cls:
+            "action-local",
+        sev:
+            "severity-local",
+        gauge:
+            "gauge-local"
+    },
+
+    SIGNAL: {
+        label:
+            "SIGNAL — Monitor and validate",
+        cls:
+            "action-monitor",
+        sev:
+            "severity-monitor",
+        gauge:
+            "gauge-monitor"
+    },
+
+    MONITOR: {
+        label:
+            "MONITOR — Routine surveillance",
+        cls:
+            "action-monitor",
+        sev:
+            "severity-monitor",
+        gauge:
+            "gauge-monitor"
+    },
+
+    ESCALATE: {
+        label:
+            "ESCALATE — High priority response",
+        cls:
+            "action-escalate",
+        sev:
+            "severity-escalate",
+        gauge:
+            "gauge-escalate"
+    },
+
+    WATCH: {
+        label:
+            "WATCH — Active monitoring required",
+        cls:
+            "action-watch",
+        sev:
+            "severity-watch",
+        gauge:
+            "gauge-watch"
+    }
+
 };
+//==================================================
+// Policy Display Styling
+//==================================================
 
 const POLICY_STYLE = {
-  FLASH:        { bg: 'var(--flash-bg)',    border: 'var(--flash-border)',    color: 'var(--flash-text)'    },
-  ESCALATE:     { bg: 'var(--escalate-bg)', border: 'var(--escalate-border)', color: 'var(--escalate-text)' },
-  WATCH:        { bg: 'var(--watch-bg)',    border: 'var(--watch-border)',    color: 'var(--watch-text)'    },
-  LOCAL_URGENT: { bg: 'var(--local-bg)',    border: 'var(--local-border)',    color: 'var(--local-text)'    },
-  MONITOR:      { bg: 'var(--monitor-bg)',  border: 'var(--monitor-border)',  color: 'var(--monitor-text)'  }
-};
 
+    FLASH: {
+        bg:
+            "var(--flash-bg, rgba(239, 68, 68, 0.12))",
+        border:
+            "var(--flash-border, #ef4444)",
+        color:
+            "var(--flash-text, #fca5a5)"
+    },
+
+    GLOBAL: {
+        bg:
+            "var(--flash-bg, rgba(239, 68, 68, 0.12))",
+        border:
+            "var(--flash-border, #ef4444)",
+        color:
+            "var(--flash-text, #fca5a5)"
+    },
+
+    GLOBAL_URGENT: {
+        bg:
+            "var(--escalate-bg, rgba(249, 115, 22, 0.12))",
+        border:
+            "var(--escalate-border, #f97316)",
+        color:
+            "var(--escalate-text, #fdba74)"
+    },
+
+    NATIONAL_URGENT: {
+        bg:
+            "var(--watch-bg, rgba(234, 179, 8, 0.12))",
+        border:
+            "var(--watch-border, #eab308)",
+        color:
+            "var(--watch-text, #fde047)"
+    },
+
+    LOCAL_URGENT: {
+        bg:
+            "var(--local-bg, rgba(59, 130, 246, 0.12))",
+        border:
+            "var(--local-border, #3b82f6)",
+        color:
+            "var(--local-text, #93c5fd)"
+    },
+
+    SIGNAL: {
+        bg:
+            "var(--monitor-bg, rgba(100, 116, 139, 0.12))",
+        border:
+            "var(--monitor-border, #64748b)",
+        color:
+            "var(--monitor-text, #cbd5e1)"
+    },
+
+    MONITOR: {
+        bg:
+            "var(--monitor-bg, rgba(100, 116, 139, 0.12))",
+        border:
+            "var(--monitor-border, #64748b)",
+        color:
+            "var(--monitor-text, #cbd5e1)"
+    },
+
+    ESCALATE: {
+        bg:
+            "var(--escalate-bg, rgba(249, 115, 22, 0.12))",
+        border:
+            "var(--escalate-border, #f97316)",
+        color:
+            "var(--escalate-text, #fdba74)"
+    },
+
+    WATCH: {
+        bg:
+            "var(--watch-bg, rgba(234, 179, 8, 0.12))",
+        border:
+            "var(--watch-border, #eab308)",
+        color:
+            "var(--watch-text, #fde047)"
+    },
+
+    MATCHED: {
+        bg:
+            "rgba(34, 197, 94, 0.10)",
+        border:
+            "#22c55e",
+        color:
+            "#86efac"
+    }
+
+};
 
 const GAUGE_ARC  = 376.99;
 const GAUGE_CIRC = 565.49;
@@ -762,38 +945,308 @@ try {
     });
 
 }
+//==================================================
+// Convert editable comma-separated intelligence
+// fields back into arrays
+//==================================================
+
+function textToArray(value) {
+
+    if (!value) {
+        return [];
+    }
+
+    return String(value)
+        .split(",")
+        .map(item => item.trim())
+        .filter(Boolean);
+
+}
+
+
+//==================================================
+// Capture analyst-approved intelligence from Page 2
+//==================================================
+
+function syncApprovedIntelligenceFromPane2() {
+
+    const current =
+        window.IntelligenceMapperV2?.get?.();
+
+    if (!current) {
+
+        console.error(
+            "No intelligence available to approve."
+        );
+
+        return null;
+
+    }
+
+
+    const approved = {
+
+        ...current,
+
+
+        //==========================================
+        // Narrative
+        //==========================================
+
+        summary:
+            $("ip-summary")?.value?.trim() ||
+            current.summary ||
+            "",
+
+
+        //==========================================
+        // Classification
+        //==========================================
+
+        eventType:
+            $("ip-event-type")?.value?.trim() ||
+            current.eventType ||
+            "",
+
+        domain:
+            $("ip-domain")?.value ||
+            current.domain ||
+            "",
+
+        region:
+            $("ip-region")?.value ||
+            current.region ||
+            "",
+
+        country:
+            $("ip-country")?.value?.trim() ||
+            current.country ||
+            "",
+
+        city:
+            $("ip-location")?.value?.trim() ||
+            current.city ||
+            "",
+
+
+        //==========================================
+        // Confidence
+        //==========================================
+
+        confidence:
+            Number(
+                $("ip-confidence")?.value ??
+                current.confidence ??
+                0
+            ),
+
+
+        //==========================================
+        // Casualties
+        //==========================================
+
+        casualties: {
+
+            fatalities:
+                Number(
+                    $("ip-fatalities")?.value ??
+                    current.casualties?.fatalities ??
+                    0
+                ),
+
+            injuries:
+                Number(
+                    $("ip-injuries")?.value ??
+                    current.casualties?.injuries ??
+                    0
+                )
+
+        },
+
+
+        //==========================================
+        // Crowd
+        //==========================================
+
+        crowdSize:
+            Number(
+                $("ip-crowd")?.value ??
+                current.crowdSize ??
+                0
+            ),
+
+
+        //==========================================
+        // Infrastructure
+        //==========================================
+
+        infrastructureImpact:
+            $("ip-infra")?.value ||
+            current.infrastructureImpact ||
+            "None",
+
+        criticalInfrastructure:
+            textToArray(
+                $("ip-crit-infra")?.value
+            ),
+
+
+        //==========================================
+        // Intelligence Indicators
+        //==========================================
+
+        threatIndicators:
+            textToArray(
+                $("ip-threats")?.value
+            ),
+
+        weapons:
+            textToArray(
+                $("ip-weapons")?.value
+            ),
+
+        persons:
+            textToArray(
+                $("ip-vips")?.value
+            ),
+
+
+        //==========================================
+        // AI Recommendation
+        //==========================================
+
+        suggestedCategory:
+            $("ip-category")?.value?.trim() ||
+            current.suggestedCategory ||
+            "",
+
+        suggestedThreshold:
+            $("ip-threshold")?.value ||
+            current.suggestedThreshold ||
+            "MONITOR",
+
+        reasoning:
+            $("ip-reasoning")?.value?.trim() ||
+            current.reasoning ||
+            ""
+
+    };
+
+
+    //------------------------------------------
+    // Re-store analyst-approved intelligence
+    //------------------------------------------
+
+    window.IntelligenceMapperV2.set(
+        approved
+    );
+
+
+    window.currentExtraction =
+        window.IntelligenceMapperV2.get();
+
+
+    console.log(
+        "===== APPROVED INTELLIGENCE ====="
+    );
+
+    console.dir(
+        window.currentExtraction
+    );
+
+
+    return window.currentExtraction;
+
+}
 
 /* ── Approve & Continue ────────────────────────────────────── */
-/* ── Approve & Continue ────────────────────────────────────── */
+
 function initApproveBtn() {
 
-    $("approveBtn").addEventListener("click", () => {
+    const approveBtn =
+        $("approveBtn");
 
-        if (!window.IntelligenceMapperV2.hasData()) {
 
-            alert("No AI extraction available.");
+    if (!approveBtn) {
 
-            return;
+        console.error(
+            "Approve button not found."
+        );
+
+        return;
+
+    }
+
+
+    approveBtn.addEventListener(
+        "click",
+        () => {
+
+
+            //--------------------------------------
+            // Ensure extraction exists
+            //--------------------------------------
+
+            if (
+                !window.IntelligenceMapperV2
+                    ?.hasData?.()
+            ) {
+
+                alert(
+                    "No AI extraction available."
+                );
+
+                return;
+
+            }
+
+
+            //--------------------------------------
+            // Capture analyst-approved Page 2
+            //--------------------------------------
+
+            const approved =
+                syncApprovedIntelligenceFromPane2();
+
+
+            if (!approved) {
+
+                alert(
+                    "Unable to prepare approved intelligence."
+                );
+
+                return;
+
+            }
+
+
+            //--------------------------------------
+            // Populate Page 3 from SAME object
+            //--------------------------------------
+
+            window.IntelligenceMapperV2
+                .populatePane3();
+
+
+            //--------------------------------------
+            // Clear previous form errors
+            //--------------------------------------
+
+            $("formError")
+                ?.classList
+                .add("hidden");
+
+
+            //--------------------------------------
+            // Unlock Page 3
+            //--------------------------------------
+
+            unlockStep(2);
+
+            goToStep(2);
 
         }
-
-        //----------------------------------------------------
-        // Populate Decision Workspace
-        //----------------------------------------------------
-
-        window.IntelligenceMapperV2.populatePane3();
-
-        //----------------------------------------------------
-        // Unlock Decision Step
-        //----------------------------------------------------
-
-        $("formError").classList.add("hidden");
-
-        unlockStep(2);
-
-        goToStep(2);
-
-    });
+    );
 
 }
 
@@ -812,224 +1265,1056 @@ function showFormError(msg) {
 }
 
 async function handleEvaluate(e) {
-  e.preventDefault();
-  $('formError').classList.add('hidden');
 
-  const domain     = $('domain').value;
-  const eventType  = $('eventType').value;
-  const region     = $('region').value;
-  const fatalities = parseInt($('fatalities').value, 10) || 0;
-  const injuries   = parseInt($('injuries').value, 10)   || 0;
-  const infra      = qs('input[name="infrastructure"]:checked')?.value || 'None';
+    e.preventDefault();
 
-  if (!domain)    return showFormError('Please select a domain.');
-  if (!eventType) return showFormError('Please select an event type.');
-  if (!region)    return showFormError('Please select a region.');
 
-  const payload = { eventType, region, domain, fatalities, injuries, infrastructureImpact: infra };
-  setLoading(true);
+    $("formError")
+        ?.classList
+        .add("hidden");
 
-  try {
-    const res  = await fetch('/api/decision', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-    const data = await res.json();
-    if (!res.ok || !data.success) throw new Error(data.error || 'Evaluation failed.');
-    renderResults(data.result, payload);
-    $('lastEvalTime').textContent = 'Last evaluated: ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  } catch (err) {
-    showFormError(err.message || 'Network error.');
-  } finally {
-    setLoading(false);
-  }
+
+    //==============================================
+    // Read Page 3 editable fields
+    //==============================================
+
+    const domain =
+        $("domain")?.value || "";
+
+    const eventType =
+        $("eventType")?.value || "";
+
+    const region =
+        $("region")?.value || "";
+
+    const fatalities =
+        parseInt(
+            $("fatalities")?.value,
+            10
+        ) || 0;
+
+    const injuries =
+        parseInt(
+            $("injuries")?.value,
+            10
+        ) || 0;
+
+    const infrastructureImpact =
+        qs(
+            'input[name="infrastructure"]:checked'
+        )?.value || "None";
+
+
+    //==============================================
+    // Required fields
+    //==============================================
+
+    if (!domain) {
+
+        return showFormError(
+            "Please select a domain."
+        );
+
+    }
+
+
+    if (!eventType) {
+
+        return showFormError(
+            "Please select an event type."
+        );
+
+    }
+
+
+    if (!region) {
+
+        return showFormError(
+            "Please select a region."
+        );
+
+    }
+
+
+    //==============================================
+    // Export COMPLETE approved intelligence
+    //==============================================
+
+    const approvedIntelligence =
+        window.IntelligenceMapperV2
+            ?.toDecisionInput?.() || {};
+
+
+    //==============================================
+    // Page 3 values override approved values
+    // because Page 3 remains analyst-editable
+    //==============================================
+
+    const payload = {
+
+        ...approvedIntelligence,
+
+        domain,
+
+        eventType,
+
+        region,
+
+        fatalities,
+
+        injuries,
+
+        infrastructureImpact,
+
+
+        //------------------------------------------
+        // Preserve infrastructure evidence
+        //------------------------------------------
+
+        criticalInfrastructure:
+            Array.isArray(
+                approvedIntelligence
+                    .criticalInfrastructure
+            )
+                ? approvedIntelligence
+                    .criticalInfrastructure
+                : []
+
+    };
+
+
+    console.log(
+        "===== DECISION PAYLOAD ====="
+    );
+
+    console.dir(
+        payload
+    );
+
+
+    setLoading(true);
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                "/api/decision",
+                {
+
+                    method:
+                        "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify(
+                            payload
+                        )
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !data.success
+        ) {
+
+            throw new Error(
+                data.error ||
+                "Evaluation failed."
+            );
+
+        }
+
+
+        console.log(
+            "===== DECISION RESULT ====="
+        );
+
+        console.dir(
+            data.result
+        );
+
+
+        //------------------------------------------
+        // Render result
+        //------------------------------------------
+
+        renderResults(
+            data.result,
+            payload
+        );
+
+
+        //------------------------------------------
+        // Evaluation timestamp
+        //------------------------------------------
+
+        $("lastEvalTime").textContent =
+            "Last evaluated: " +
+            new Date()
+                .toLocaleTimeString(
+                    [],
+                    {
+                        hour:
+                            "2-digit",
+
+                        minute:
+                            "2-digit",
+
+                        second:
+                            "2-digit"
+                    }
+                );
+
+    }
+
+    catch (error) {
+
+
+        console.error(
+            "Decision evaluation failed:",
+            error
+        );
+
+
+        showFormError(
+            error.message ||
+            "Network error."
+        );
+
+    }
+
+    finally {
+
+        setLoading(false);
+
+    }
+
 }
 
 /* ── Results rendering ─────────────────────────────────────── */
 function renderResults(result, payload) {
-  $('resultsPlaceholder').classList.add('hidden');
-  const c = $('resultsContent');
-  c.classList.remove('hidden');
-  void c.offsetWidth;
 
-  // Gauge
-const fill = $('gaugeFill');
+    //------------------------------------------
+    // Show Results Area
+    //------------------------------------------
 
-const risk =
-    result.riskScore || {};
+    $("resultsPlaceholder")
+        .classList
+        .add("hidden");
 
-const score =
-    typeof risk === "object"
-        ? Number(risk.score || 0)
-        : Number(risk || 0);
+    const content =
+        $("resultsContent");
 
-fill.setAttribute(
-    "stroke-dasharray",
-    `${(score / 100) * GAUGE_ARC} ${GAUGE_CIRC}`
-);
+    content
+        .classList
+        .remove("hidden");
 
-fill.className.baseVal =
-    "gauge-fill " +
-    scoreGaugeClass(score);
+    void content.offsetWidth;
 
-$('gaugeScore').textContent =
-    score;
 
-$('gaugeLabel').textContent =
-    scoreLabel(score);
-// --------------------------------------------------
-// Risk Factors
-// --------------------------------------------------
+    //==================================================
+    // Risk Score
+    //==================================================
 
-const factors =
-    result.riskScore?.factors || [];
+    const risk =
+        result.riskScore || {};
 
-const rf =
-    $('riskFactors');
+    const score =
+        typeof risk === "object"
+            ? Number(
+                risk.score ?? 0
+            )
+            : Number(
+                risk || 0
+            );
 
-if (!factors.length) {
 
-    rf.innerHTML =
-        '<span class="muted">No scoring factors returned.</span>';
+    //------------------------------------------
+    // Gauge may visually represent only 0–100,
+    // while actual operational score may exceed 100.
+    //------------------------------------------
 
-} else {
+    const normalizedGaugeScore =
+        typeof risk === "object"
+            ? Number(
+                risk.normalizedScore ??
+                Math.min(
+                    score,
+                    100
+                )
+            )
+            : Math.min(
+                score,
+                100
+            );
 
-    rf.innerHTML =
-        factors.map(f => `
-            <div class="factor-item">
-                <div class="factor-title">${esc(f.name || f.factor || "Factor")}</div>
-                <div class="factor-score">
-                    +${f.score ?? f.weight ?? 0}
-                </div>
-            </div>
-        `).join('');
 
-}
-// --------------------------------------------------
-// Decision Trace
-// --------------------------------------------------
+    const gaugeScore =
+        Math.max(
+            0,
+            Math.min(
+                normalizedGaugeScore,
+                100
+            )
+        );
 
-const trace = result.decisionTrace || [];
-const traceDiv = $('decisionTrace');
 
-if (!trace.length) {
+    const fill =
+        $("gaugeFill");
 
-    traceDiv.innerHTML =
-        '<div class="empty-state">No decision trace available.</div>';
 
-} else {
+    fill.setAttribute(
+        "stroke-dasharray",
+        `${
+            (gaugeScore / 100) *
+            GAUGE_ARC
+        } ${GAUGE_CIRC}`
+    );
 
-    traceDiv.innerHTML = trace.map((step, index) => {
 
-        const engine =
-            step.engine || "Decision Engine";
+    fill.className.baseVal =
+        "gauge-fill " +
+        scoreGaugeClass(
+            score
+        );
 
-        const message =
-            step.decision ||
-            step.message ||
-            step.description ||
-            "";
 
-        return `
+    //------------------------------------------
+    // Display RAW operational score
+    //------------------------------------------
 
-        <div class="trace-card">
+    $("gaugeScore").textContent =
+        score;
 
-            <div class="trace-number">
-                ${index + 1}
-            </div>
 
-            <div class="trace-content">
+    $("gaugeLabel").textContent =
+        scoreLabel(
+            score
+        );
 
-                <div class="trace-engine">
-                    ${esc(engine)}
-                </div>
 
-                <div class="trace-message">
-                    ${esc(message)}
-                </div>
+    //==================================================
+    // Risk Factors
+    //==================================================
 
-            </div>
+    const factors =
+        Array.isArray(
+            result.riskScore?.factors
+        )
+            ? result.riskScore.factors
+            : [];
 
-        </div>
 
-        `;
+    const riskFactorsElement =
+        $("riskFactors");
 
-    }).join("");
 
-}
-// --------------------------------------------------
-// Recommended Actions
-// --------------------------------------------------
+    if (!factors.length) {
 
-const actions =
-    result.recommendedActions || [];
+        riskFactorsElement.innerHTML =
+            '<span class="muted">' +
+            'No scoring factors returned.' +
+            '</span>';
 
-const act =
-    $('recommendedActionsList');
+    }
+    else {
 
-if (!actions.length) {
+        riskFactorsElement.innerHTML =
+            factors
+                .map(factor => {
 
-    act.innerHTML =
-        '<span class="muted">No recommendations returned.</span>';
 
-} else {
+                    const factorName =
+                        factor.name ||
+                        factor.factor ||
+                        "Risk Factor";
 
-    act.innerHTML =
-        actions.map(a => `
-            <div class="recommendation-item">
-                ${esc(
-                    a.action ||
-                    a.title ||
-                    String(a)
-                )}
-            </div>
-        `).join('');
 
-}
-  // Threshold
-  const td     = result.thresholdDecision;
-  const action = td.action || 'MONITOR';
-  const info   = ACTION_INFO[action] || ACTION_INFO.MONITOR;
-  const taEl   = $('thresholdAction');
-  taEl.textContent = action.replace('_',' ');
-  taEl.className   = 'threshold-action ' + info.cls;
-  const sevEl  = $('thresholdSeverity');
-  sevEl.textContent = `Severity ${td.severity ?? '—'}`;
-  sevEl.className   = 'meta-pill ' + info.sev;
-  const srcEl  = $('thresholdSource');
-  srcEl.textContent = td.source === 'event-rule' ? 'Event Rule' : 'Score Band';
-  srcEl.className   = 'meta-pill';
-  const ruleEl = $('thresholdRule');
-  if (td.ruleId) { ruleEl.textContent = td.ruleId; ruleEl.className = 'meta-pill'; ruleEl.classList.remove('hidden'); }
-  else ruleEl.classList.add('hidden');
-  $('thresholdDesc').textContent = info.label;
+                    const factorPoints =
+                        factor.points ??
+                        factor.score ??
+                        factor.weight ??
+                        0;
 
-  // Policies
-  const policies = result.policies || [];
-  $('policyCount').textContent = policies.length;
-  const list = $('policiesList');
-  list.innerHTML = '';
-  if (!policies.length) {
-    list.innerHTML = '<p style="color:var(--text-muted);font-size:13px">No policies matched this event.</p>';
-  } else {
-    policies.forEach(p => {
-      const st = POLICY_STYLE[p.decisionAction] || POLICY_STYLE.MONITOR;
-      const item = document.createElement('div');
-      item.className = 'policy-item';
-      item.innerHTML = `<span class="policy-id">${esc(p.id)}</span><div class="policy-body"><div class="policy-name">${esc(p.name)}</div><div class="policy-desc">${esc(p.description||'')}</div></div><span class="policy-action" style="background:${st.bg};border:1px solid ${st.border};color:${st.color}">${esc(p.decisionAction)}</span>`;
-      list.appendChild(item);
-    });
-  }
 
-  // Explanation
-  $('explanationSummary').textContent = result.explanation?.summary || '—';
-  const ec = $('explanationInputs');
-  ec.innerHTML = '';
-  const fields = {'Event Type':payload.eventType,'Region':payload.region,'Domain':payload.domain,'Fatalities':payload.fatalities,'Injuries':payload.injuries,'Infrastructure':payload.infrastructureImpact};
-  Object.entries(fields).forEach(([k,v]) => {
-    if (v===undefined||v===null||v==='') return;
-    const ch = document.createElement('div');
-    ch.className = 'input-chip';
-    ch.innerHTML = `<span class="chip-key">${esc(k)}</span><span class="chip-val">${esc(String(v))}</span>`;
-    ec.appendChild(ch);
-  });
+                    const factorReason =
+                        factor.reason ||
+                        "";
+
+
+                    return `
+
+                        <div class="factor-item">
+
+                            <div>
+
+                                <div class="factor-title">
+                                    ${esc(factorName)}
+                                </div>
+
+                                ${
+                                    factorReason
+                                        ? `
+                                            <div
+                                                class="factor-reason"
+                                                title="${esc(factorReason)}"
+                                            >
+                                                ${esc(factorReason)}
+                                            </div>
+                                          `
+                                        : ""
+                                }
+
+                            </div>
+
+                            <div class="factor-score">
+                                +${esc(factorPoints)}
+                            </div>
+
+                        </div>
+
+                    `;
+
+                })
+                .join("");
+
+    }
+
+
+    //==================================================
+    // Threshold Decision
+    //==================================================
+
+    const threshold =
+        result.thresholdDecision || {};
+
+
+    const thresholdAction =
+        threshold.action ||
+        threshold.level ||
+        "MONITOR";
+
+
+    const thresholdInfo =
+        ACTION_INFO[
+            thresholdAction
+        ] ||
+        ACTION_INFO.MONITOR;
+
+
+    //------------------------------------------
+    // Main Threshold
+    //------------------------------------------
+
+    const thresholdActionElement =
+        $("thresholdAction");
+
+
+    thresholdActionElement.textContent =
+        String(
+            thresholdAction
+        )
+            .replace(
+                /_/g,
+                " "
+            );
+
+
+    thresholdActionElement.className =
+        "threshold-action " +
+        thresholdInfo.cls;
+
+
+    //------------------------------------------
+    // Severity
+    //------------------------------------------
+
+    const severityElement =
+        $("thresholdSeverity");
+
+
+    severityElement.textContent =
+        `Severity ${
+            threshold.severity ??
+            "—"
+        }`;
+
+
+    severityElement.className =
+        "meta-pill " +
+        thresholdInfo.sev;
+
+
+    //------------------------------------------
+    // Threshold Source
+    //------------------------------------------
+
+    const sourceElement =
+        $("thresholdSource");
+
+
+    if (
+        threshold.source ===
+        "event-rule"
+    ) {
+
+        sourceElement.textContent =
+            "Event Rule";
+
+    }
+    else if (
+        threshold.source ===
+        "score-band"
+    ) {
+
+        sourceElement.textContent =
+            "Score Band";
+
+    }
+    else {
+
+        sourceElement.textContent =
+            threshold.source ||
+            "Decision Engine";
+
+    }
+
+
+    sourceElement.className =
+        "meta-pill";
+
+
+    //------------------------------------------
+    // Rule ID
+    //------------------------------------------
+
+    const ruleElement =
+        $("thresholdRule");
+
+
+    if (
+        threshold.ruleId
+    ) {
+
+        ruleElement.textContent =
+            threshold.ruleId;
+
+        ruleElement.classList
+            .remove(
+                "hidden"
+            );
+
+    }
+    else {
+
+        ruleElement.classList
+            .add(
+                "hidden"
+            );
+
+    }
+
+
+    //==================================================
+    // Override / Final Operational Decision
+    //==================================================
+
+    const override =
+        result.overrideDecision || {};
+
+
+    let thresholdDescription =
+        threshold.description ||
+        thresholdInfo.label;
+
+
+    if (
+        override.overridden &&
+        override.finalDecision
+    ) {
+
+        thresholdDescription +=
+            " Final operational decision: " +
+            String(
+                override.finalDecision
+            )
+                .replace(
+                    /_/g,
+                    " "
+                );
+
+
+        if (
+            override.overrideReason
+        ) {
+
+            thresholdDescription +=
+                " — " +
+                override.overrideReason;
+
+        }
+
+
+        thresholdDescription +=
+            ".";
+
+    }
+
+
+    $("thresholdDesc").textContent =
+        thresholdDescription;
+
+
+    //==================================================
+    // Decision Trace
+    //==================================================
+
+    const trace =
+        Array.isArray(
+            result.decisionTrace
+        )
+            ? result.decisionTrace
+            : [];
+
+
+    const traceElement =
+        $("decisionTrace");
+
+
+    if (!trace.length) {
+
+        traceElement.innerHTML =
+            '<div class="empty-state">' +
+            'No decision trace available.' +
+            '</div>';
+
+    }
+    else {
+
+        traceElement.innerHTML =
+            trace
+                .map(
+                    (
+                        step,
+                        index
+                    ) => {
+
+
+                        const engine =
+                            step.engine ||
+                            "Decision Engine";
+
+
+                        const message =
+                            step.decision ||
+                            step.message ||
+                            step.description ||
+                            "";
+
+
+                        return `
+
+                            <div class="trace-card">
+
+                                <div class="trace-number">
+                                    ${index + 1}
+                                </div>
+
+                                <div class="trace-content">
+
+                                    <div class="trace-engine">
+                                        ${esc(engine)}
+                                    </div>
+
+                                    <div class="trace-message">
+                                        ${esc(message)}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        `;
+
+                    }
+                )
+                .join("");
+
+    }
+
+
+    //==================================================
+    // Recommended Actions
+    //==================================================
+
+    const recommendationResult =
+        result.recommendedActions;
+
+
+    const actions =
+        Array.isArray(
+            recommendationResult
+        )
+            ? recommendationResult
+
+            : Array.isArray(
+                recommendationResult?.actions
+            )
+                ? recommendationResult.actions
+
+                : [];
+
+
+    const recommendationsElement =
+        $("recommendedActionsList");
+
+
+    if (!actions.length) {
+
+        recommendationsElement.innerHTML =
+            '<span class="muted">' +
+            'No recommendations returned.' +
+            '</span>';
+
+    }
+    else {
+
+        recommendationsElement.innerHTML =
+            actions
+                .map(action => {
+
+
+                    const actionText =
+                        typeof action ===
+                        "string"
+
+                            ? action
+
+                            : (
+                                action.action ||
+                                action.title ||
+                                action.description ||
+                                ""
+                            );
+
+
+                    return `
+
+                        <div class="recommendation-item">
+                            ${esc(actionText)}
+                        </div>
+
+                    `;
+
+                })
+                .join("");
+
+    }
+
+
+    //==================================================
+    // Triggered Policies
+    //==================================================
+
+    const policies =
+        Array.isArray(
+            result.policies
+        )
+            ? result.policies
+            : [];
+
+
+    $("policyCount").textContent =
+        policies.length;
+
+
+    const policiesList =
+        $("policiesList");
+
+
+    policiesList.innerHTML =
+        "";
+
+
+    if (!policies.length) {
+
+        policiesList.innerHTML =
+            '<p style="' +
+            'color:var(--text-muted);' +
+            'font-size:13px">' +
+            'No policies matched this event.' +
+            '</p>';
+
+    }
+    else {
+
+        policies.forEach(
+            (
+                policy,
+                index
+            ) => {
+
+
+                const policyId =
+                    policy.id ||
+                    `POL-${index + 1}`;
+
+
+                const policyName =
+                    policy.name ||
+                    `Operational Policy ${
+                        index + 1
+                    }`;
+
+
+                const policyDescription =
+                    policy.description ||
+
+                    (
+                        Array.isArray(
+                            policy.reasons
+                        )
+                            ? policy.reasons
+                                .join(
+                                    " • "
+                                )
+
+                            : ""
+                    ) ||
+
+                    `Severity ${
+                        policy.severity ??
+                        "—"
+                    }`;
+
+
+                const decisionAction =
+                    policy.decisionAction ||
+                    policy.action ||
+                    policy.level ||
+                    (
+                        policy.matched
+                            ? "MATCHED"
+                            : "MONITOR"
+                    );
+
+
+                const style =
+                    POLICY_STYLE[
+                        decisionAction
+                    ] ||
+                    POLICY_STYLE.MONITOR;
+
+
+                const item =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                item.className =
+                    "policy-item";
+
+
+                item.innerHTML = `
+
+                    <span class="policy-id">
+                        ${esc(policyId)}
+                    </span>
+
+                    <div class="policy-body">
+
+                        <div class="policy-name">
+                            ${esc(policyName)}
+                        </div>
+
+                        <div class="policy-desc">
+                            ${esc(policyDescription)}
+                        </div>
+
+                    </div>
+
+                    <span
+                        class="policy-action"
+                        style="
+                            background:${style.bg};
+                            border:1px solid ${style.border};
+                            color:${style.color};
+                        "
+                    >
+                        ${esc(decisionAction)}
+                    </span>
+
+                `;
+
+
+                policiesList
+                    .appendChild(
+                        item
+                    );
+
+            }
+        );
+
+    }
+
+
+    //==================================================
+    // Original Input
+    //==================================================
+
+    $("originalInput").textContent =
+        JSON.stringify(
+            result.originalInput ||
+            payload ||
+            {},
+            null,
+            2
+        );
+
+
+    //==================================================
+    // Normalized Input
+    //==================================================
+
+    $("normalizedInput").textContent =
+        JSON.stringify(
+            result.normalizedInput ||
+            {},
+            null,
+            2
+        );
+
+
+    //==================================================
+    // Operational Explanation
+    //==================================================
+
+    $("explanationSummary").textContent =
+        result.explanation?.summary ||
+        "—";
+
+
+    const explanationInputs =
+        $("explanationInputs");
+
+
+    explanationInputs.innerHTML =
+        "";
+
+
+    const normalized =
+        result.normalizedInput ||
+        payload ||
+        {};
+
+
+    const explanationFields = {
+
+        "Event Type":
+            normalized.eventType,
+
+        "Region":
+            normalized.region,
+
+        "Domain":
+            normalized.domain,
+
+        "Fatalities":
+            normalized.fatalities,
+
+        "Injuries":
+            normalized.injuries,
+
+        "Infrastructure Impact":
+            normalized.infrastructureImpact,
+
+        "Critical Infrastructure":
+            Array.isArray(
+                normalized
+                    .criticalInfrastructure
+            )
+                ? normalized
+                    .criticalInfrastructure
+                    .join(", ")
+
+                : normalized
+                    .criticalInfrastructure
+
+    };
+
+
+    Object.entries(
+        explanationFields
+    )
+        .forEach(
+            (
+                [
+                    key,
+                    value
+                ]
+            ) => {
+
+
+                if (
+                    value ===
+                    undefined ||
+                    value ===
+                    null ||
+                    value ===
+                    ""
+                ) {
+
+                    return;
+
+                }
+
+
+                const chip =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                chip.className =
+                    "input-chip";
+
+
+                chip.innerHTML = `
+
+                    <span class="chip-key">
+                        ${esc(key)}
+                    </span>
+
+                    <span class="chip-val">
+                        ${esc(String(value))}
+                    </span>
+
+                `;
+
+
+                explanationInputs
+                    .appendChild(
+                        chip
+                    );
+
+            }
+        );
+
 }
 
 /* ── Number steppers ───────────────────────────────────────── */

@@ -237,12 +237,17 @@ class RiskScoringEngine {
     // FINAL SCORE
     // ==================================================
 
-    score =
-      Math.min(
-        Math.max(score, 0),
-        100
-      );
+    const rawScore =
+    Math.max(
+        score,
+        0
+    );
 
+const normalizedScore =
+    Math.min(
+        rawScore,
+        100
+    );
     // ==================================================
     // SUMMARY
     // ==================================================

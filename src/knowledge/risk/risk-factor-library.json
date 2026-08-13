@@ -1,9 +1,8 @@
 {
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Operational Risk Factor Library",
 
   "riskFactors": [
-
     {
       "id": "RF-001",
       "name": "Extreme Fatality Count",
@@ -30,14 +29,14 @@
 
     {
       "id": "RF-003",
-      "name": "Government Facility Target",
+      "name": "Severe Infrastructure Impact",
       "rule": {
-        "field": "intelligence.infrastructure",
-        "operator": "contains",
-        "value": "The White House"
+        "field": "intelligence.infrastructureImpact",
+        "operator": "equals",
+        "value": "Severe"
       },
       "points": 25,
-      "reason": "A government facility is identified as a critical target."
+      "reason": "Severe infrastructure impact materially increases operational risk."
     },
 
     {
@@ -56,32 +55,11 @@
       "id": "RF-005",
       "name": "Critical Infrastructure Identified",
       "rule": {
-        "any": [
-          {
-            "field": "intelligence.infrastructure",
-            "operator": "contains",
-            "value": "The White House"
-          },
-          {
-            "field": "intelligence.infrastructure",
-            "operator": "contains",
-            "value": "Power Grid"
-          },
-          {
-            "field": "intelligence.infrastructure",
-            "operator": "contains",
-            "value": "Airport"
-          },
-          {
-            "field": "intelligence.infrastructure",
-            "operator": "contains",
-            "value": "Stadium"
-          }
-        ]
+        "field": "intelligence.infrastructure",
+        "operator": "nonEmpty"
       },
       "points": 10,
-      "reason": "A predefined critical infrastructure asset is identified."
+      "reason": "Identification of critical infrastructure increases operational significance."
     }
-
   ]
 }

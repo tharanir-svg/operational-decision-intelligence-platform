@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
-  "description": "Operational Recommendation Library",
+  "version": "2.0.0",
+  "description": "Operational Alerting and Analyst Workflow Recommendation Library",
 
   "recommendations": [
 
@@ -9,23 +9,19 @@
       "actions": [
         {
           "priority": 1,
-          "owner": "Duty Manager",
-          "action": "Notify Global Operations Centre"
-        },
+          "owner": "Analyst",
+          "action": "Flag client as #HPW — High Priority Workflow"
+        }
+      ]
+    },
+
+    {
+      "level": "GLOBAL",
+      "actions": [
         {
-          "priority": 2,
-          "owner": "Operations Lead",
-          "action": "Activate Crisis Management Team"
-        },
-        {
-          "priority": 3,
-          "owner": "Executive Team",
-          "action": "Issue Executive Situation Report"
-        },
-        {
-          "priority": 4,
-          "owner": "Intelligence Analyst",
-          "action": "Increase monitoring frequency to every 15 minutes"
+          "priority": 1,
+          "owner": "Analyst",
+          "action": "Flag client as #HPW — High Priority Workflow"
         }
       ]
     },
@@ -35,18 +31,8 @@
       "actions": [
         {
           "priority": 1,
-          "owner": "Operations Lead",
-          "action": "Escalate to Global Operations"
-        },
-        {
-          "priority": 2,
-          "owner": "Regional Intelligence",
-          "action": "Validate incoming intelligence"
-        },
-        {
-          "priority": 3,
-          "owner": "Duty Manager",
-          "action": "Prepare executive notification"
+          "owner": "Analyst",
+          "action": "Send Global Urgent alert from the tool"
         }
       ]
     },
@@ -56,13 +42,8 @@
       "actions": [
         {
           "priority": 1,
-          "owner": "National Operations",
-          "action": "Coordinate with regional teams"
-        },
-        {
-          "priority": 2,
           "owner": "Analyst",
-          "action": "Monitor for escalation indicators"
+          "action": "Send National Urgent alert from the tool"
         }
       ]
     },
@@ -72,13 +53,8 @@
       "actions": [
         {
           "priority": 1,
-          "owner": "Regional Operations",
-          "action": "Continue local monitoring"
-        },
-        {
-          "priority": 2,
           "owner": "Analyst",
-          "action": "Collect additional intelligence"
+          "action": "Send Local Urgent alert from the tool"
         }
       ]
     },
@@ -89,7 +65,18 @@
         {
           "priority": 1,
           "owner": "Analyst",
-          "action": "Routine monitoring"
+          "action": "Send Signal alert from the tool"
+        }
+      ]
+    },
+
+    {
+      "level": "MONITOR",
+      "actions": [
+        {
+          "priority": 1,
+          "owner": "Analyst",
+          "action": "Continue monitoring for material developments"
         }
       ]
     }

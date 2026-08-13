@@ -124,13 +124,50 @@ const normalizedEvent =
 // =============================================
 
 const riskContext =
-  new DecisionContext(
-    normalizedEvent
-  );
+    new DecisionContext({
+
+        ...normalizedEvent,
+
+        // DecisionContext expects nested casualty data
+        casualties: {
+
+            fatalities:
+                Number(
+                    normalizedEvent.fatalities ??
+                    eventContext.fatalities ??
+                    0
+                ),
+
+            injuries:
+                Number(
+                    normalizedEvent.injuries ??
+                    eventContext.injuries ??
+                    0
+                )
+
+        },
+
+        // Preserve AI-extracted infrastructure assets
+        criticalInfrastructure:
+            Array.isArray(
+                eventContext.criticalInfrastructure
+            )
+                ? eventContext.criticalInfrastructure
+                : [],
+
+        infrastructureImpact:
+            normalizedEvent.infrastructureImpact ??
+            eventContext.infrastructureImpact ??
+            "None"
+
+    });
 
 this.riskFactorEngine.process(
-  riskContext
+    riskContext
 );
+
+normalizedEvent.riskFactors =
+    riskContext.riskFactors;
 
 // Pass validated risk factors into the
 // scoring layer without changing the

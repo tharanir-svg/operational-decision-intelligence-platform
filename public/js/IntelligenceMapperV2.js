@@ -10,40 +10,70 @@ class IntelligenceMapperV2 {
 
         this.DOMAIN_MAP = {
 
-    // Enterprise Security
-    "Security": "Terrorism",
-    "Physical Security": "Terrorism",
-    "Terrorism": "Terrorism",
+            // Enterprise Security
+            "Security": "Terrorism",
+            "Physical Security": "Terrorism",
+            "Terrorism": "Terrorism",
 
-    // Crime
-    "Crime": "Crime",
-    "Organized Crime": "Organized Crime",
+            // Conflict
+            "Conflict": "Armed Conflict",
+            "Armed Conflict": "Armed Conflict",
 
-    // Cyber
-    "Cyber": "Cyber Security",
-    "Cyber Security": "Cyber Security",
+            // Crime
+            "Crime": "Crime",
+            "Organized Crime": "Organized Crime",
 
-    // Public Health
-    "Health": "Public Health",
-    "Public Health": "Public Health",
+            // Cyber
+            "Cyber": "Cyber Security",
+            "Cyber Security": "Cyber Security",
 
-    // Infrastructure
-    "Infrastructure": "Infrastructure",
+            // Public Health
+            "Health": "Public Health",
+            "Public Health": "Public Health",
 
-    // Political
-    "Political": "Political",
+            // Infrastructure
+            "Infrastructure": "Infrastructure",
 
-    // Transport
-    "Transportation": "Transportation",
-    "Transport": "Transportation",
+            // Political
+            "Political": "Political",
+            "Politics": "Political",
 
-    // Environment
-    "Environmental": "Environmental",
+            // Transport
+            "Transportation": "Transportation",
+            "Transport": "Transportation",
 
-    // Intelligence
-    "Intelligence": "Intelligence"
+            // Aviation
+            "Aviation": "Aviation",
 
-};
+            // Maritime
+            "Maritime": "Maritime",
+
+            // Energy
+            "Energy": "Energy",
+
+            // Industrial
+            "Industrial": "Industrial",
+
+            // Weather
+            "Weather": "Weather",
+
+            // Environment
+            "Environmental": "Environmental",
+
+            // Supply Chain
+            "Supply Chain": "Supply Chain",
+
+            // Financial
+            "Financial": "Financial",
+
+            // Border
+            "Border Security": "Border Security",
+
+            // Intelligence
+            "Intelligence": "Intelligence"
+
+        };
+
 
         //==========================================
         // Event Type Mapping
@@ -52,30 +82,28 @@ class IntelligenceMapperV2 {
         this.EVENT_MAP = {
 
             // Terrorism
-            "Terrorist Attack": "Suicide Bombing",
+            "Terrorist Attack": "Facility Attack",
             "Bomb Attack": "Bombing",
             "Explosion": "Bombing",
             "Blast": "Bombing",
             "Suicide Attack": "Suicide Bombing",
             "Suicide Bombing": "Suicide Bombing",
 
-            "IED": "Vehicle-Borne IED",
+            "IED": "Explosive Device Found",
             "VBIED": "Vehicle-Borne IED",
 
             "Hostage": "Hostage Situation",
             "Kidnapping": "Kidnapping",
 
             "Facility Attack": "Facility Attack",
-
             "Assassination": "Assassination",
-
             "Mass Shooting": "Mass Shooting",
 
             // Crime
-            "Robbery": "Robbery",
+            "Robbery": "Armed Robbery",
             "Murder": "Homicide",
 
-            // Disaster
+            // Weather / Disaster
             "Earthquake": "Earthquake",
             "Flood": "Flood",
             "Wildfire": "Wildfire",
@@ -86,6 +114,7 @@ class IntelligenceMapperV2 {
 
         };
 
+
         //==========================================
         // Threshold Mapping
         //==========================================
@@ -93,17 +122,36 @@ class IntelligenceMapperV2 {
         this.THRESHOLD_MAP = {
 
             "Low": "MONITOR",
-            "Medium": "LOCAL",
-            "High": "NATIONAL",
+            "Medium": "LOCAL_URGENT",
+            "High": "NATIONAL_URGENT",
             "Critical": "FLASH",
-            "Severe": "FLASH"
+            "Severe": "FLASH",
+
+            "Signal": "SIGNAL",
+            "SIGNAL": "SIGNAL",
+
+            "Local": "LOCAL_URGENT",
+            "LOCAL": "LOCAL_URGENT",
+            "LOCAL_URGENT": "LOCAL_URGENT",
+
+            "National": "NATIONAL_URGENT",
+            "NATIONAL": "NATIONAL_URGENT",
+            "NATIONAL_URGENT": "NATIONAL_URGENT",
+
+            "Global": "GLOBAL_URGENT",
+            "GLOBAL": "GLOBAL_URGENT",
+            "GLOBAL_URGENT": "GLOBAL_URGENT",
+
+            "FLASH": "FLASH",
+            "MONITOR": "MONITOR"
 
         };
 
     }
 
+
     //==================================================
-    // Store intelligence
+    // Store Intelligence
     //==================================================
 
     set(intelligence) {
@@ -116,41 +164,83 @@ class IntelligenceMapperV2 {
 
         }
 
-        const mapped = JSON.parse(
-    JSON.stringify(intelligence)
-);
+
+        const mapped =
+            JSON.parse(
+                JSON.stringify(
+                    intelligence
+                )
+            );
+
+
+        //==========================================
+        // Core Classification
+        //==========================================
 
         mapped.domain =
-            this.mapDomain(mapped.domain);
+            this.mapDomain(
+                mapped.domain
+            );
 
         mapped.eventType =
-            this.mapEvent(mapped.eventType);
+            this.mapEvent(
+                mapped.eventType
+            );
 
         mapped.suggestedThreshold =
             this.mapThreshold(
                 mapped.suggestedThreshold
             );
 
+
+        //==========================================
+        // Text Fields
+        //==========================================
+
         mapped.summary =
-            this.safeString(mapped.summary);
+            this.safeString(
+                mapped.summary
+            );
 
         mapped.country =
-            this.safeString(mapped.country);
+            this.safeString(
+                mapped.country
+            );
 
         mapped.region =
-            this.safeString(mapped.region);
+            this.safeString(
+                mapped.region
+            );
 
         mapped.city =
-            this.safeString(mapped.city);
+            this.safeString(
+                mapped.city
+            );
 
         mapped.reasoning =
-            this.safeString(mapped.reasoning);
+            this.safeString(
+                mapped.reasoning
+            );
+
+        mapped.suggestedCategory =
+            this.safeString(
+                mapped.suggestedCategory
+            );
+
+
+        //==========================================
+        // Infrastructure Impact
+        //==========================================
 
         mapped.infrastructureImpact =
-            this.safeString(
-                mapped.infrastructureImpact,
-                "None"
+            this.normalizeInfrastructureImpact(
+                mapped.infrastructureImpact
             );
+
+
+        //==========================================
+        // Numeric Fields
+        //==========================================
 
         mapped.confidence =
             this.safeNumber(
@@ -161,6 +251,11 @@ class IntelligenceMapperV2 {
             this.safeNumber(
                 mapped.crowdSize
             );
+
+
+        //==========================================
+        // Arrays
+        //==========================================
 
         mapped.threatIndicators =
             this.safeArray(
@@ -192,28 +287,54 @@ class IntelligenceMapperV2 {
                 mapped.recommendedActions
             );
 
-        if (!mapped.casualties) {
 
-            mapped.casualties = {
+        //==========================================
+        // Casualties
+        //==========================================
 
-                fatalities:
-                    this.safeNumber(
-                        mapped.fatalities
-                    ),
+        const casualties =
+            mapped.casualties || {};
 
-                injuries:
-                    this.safeNumber(
-                        mapped.injuries
-                    )
 
-            };
+        mapped.casualties = {
 
-        }
+            fatalities:
+                this.safeNumber(
+                    casualties.fatalities ??
+                    mapped.fatalities
+                ),
+
+            injuries:
+                this.safeNumber(
+                    casualties.injuries ??
+                    mapped.injuries
+                )
+
+        };
+
+
+        //==========================================
+        // Keep flat casualty fields synchronized
+        //==========================================
+
+        mapped.fatalities =
+            mapped.casualties.fatalities;
+
+        mapped.injuries =
+            mapped.casualties.injuries;
+
+
+        //==========================================
+        // Store
+        //==========================================
 
         this.current = mapped;
 
     }
 
+
+    //==================================================
+    // Get Current Intelligence
     //==================================================
 
     get() {
@@ -222,71 +343,200 @@ class IntelligenceMapperV2 {
 
     }
 
+
     //==================================================
-    // Mapping Helpers
+    // Domain Mapping
     //==================================================
 
     mapDomain(domain) {
 
-    if (!domain)
-        return "";
+        if (!domain) {
+            return "";
+        }
 
-    const cleaned = String(domain).trim();
+        const cleaned =
+            String(domain)
+                .trim();
 
-    return this.DOMAIN_MAP[cleaned] || cleaned;
+        return (
+            this.DOMAIN_MAP[cleaned] ||
+            cleaned
+        );
 
-}
+    }
+
+
+    //==================================================
+    // Event Mapping
+    //==================================================
 
     mapEvent(eventType) {
 
-        if (!eventType)
+        if (!eventType) {
             return "";
+        }
 
-        return this.EVENT_MAP[eventType] || eventType;
+        const cleaned =
+            String(eventType)
+                .trim();
+
+        return (
+            this.EVENT_MAP[cleaned] ||
+            cleaned
+        );
 
     }
+
+
+    //==================================================
+    // Threshold Mapping
+    //==================================================
 
     mapThreshold(level) {
 
-        if (!level)
+        if (!level) {
             return "MONITOR";
+        }
 
-        return this.THRESHOLD_MAP[level] || level;
+        const cleaned =
+            String(level)
+                .trim();
+
+        return (
+            this.THRESHOLD_MAP[cleaned] ||
+            cleaned
+        );
 
     }
 
-    safeString(value, fallback = "") {
 
-        if (value === null || value === undefined)
+    //==================================================
+    // Infrastructure Impact Normalization
+    //==================================================
+
+    normalizeInfrastructureImpact(value) {
+
+        const allowed = [
+            "None",
+            "Minor",
+            "Moderate",
+            "Severe"
+        ];
+
+        const cleaned =
+            this.safeString(
+                value,
+                "None"
+            )
+            .trim();
+
+
+        const matched =
+            allowed.find(
+                item =>
+                    item.toLowerCase() ===
+                    cleaned.toLowerCase()
+            );
+
+
+        return (
+            matched ||
+            "None"
+        );
+
+    }
+
+
+    //==================================================
+    // Safe String
+    //==================================================
+
+    safeString(
+        value,
+        fallback = ""
+    ) {
+
+        if (
+            value === null ||
+            value === undefined
+        ) {
+
             return fallback;
+
+        }
 
         return String(value);
 
     }
 
+
+    //==================================================
+    // Safe Number
+    //==================================================
+
     safeNumber(value) {
 
-        return Number(value) || 0;
+        const number =
+            Number(value);
+
+        return Number.isFinite(number)
+            ? number
+            : 0;
 
     }
+
+
+    //==================================================
+    // Safe Array
+    //==================================================
 
     safeArray(value) {
 
-        return Array.isArray(value)
-            ? value
-            : [];
+        if (Array.isArray(value)) {
+
+            return value
+                .map(item =>
+                    this.safeString(item)
+                        .trim()
+                )
+                .filter(Boolean);
+
+        }
+
+
+        if (
+            typeof value === "string" &&
+            value.trim()
+        ) {
+
+            return value
+                .split(",")
+                .map(item =>
+                    item.trim()
+                )
+                .filter(Boolean);
+
+        }
+
+
+        return [];
 
     }
+
+
     //==================================================
-    // Populate Intelligence Page (Page 2)
+    // Populate Intelligence Page — Page 2
     //==================================================
 
     populatePane2() {
 
-        const i = this.current;
+        const i =
+            this.current;
 
-        if (!i)
+        if (!i) {
             return;
+        }
+
 
         //------------------------------------------
         // Summary
@@ -295,6 +545,7 @@ class IntelligenceMapperV2 {
         $("ip-summary").value =
             i.summary;
 
+
         //------------------------------------------
         // Classification
         //------------------------------------------
@@ -302,21 +553,26 @@ class IntelligenceMapperV2 {
         $("ip-event-type").value =
             i.eventType;
 
+
         setSelectValue(
             "ip-domain",
             i.domain
         );
+
 
         setSelectValue(
             "ip-region",
             i.region
         );
 
+
         $("ip-country").value =
             i.country;
 
+
         $("ip-location").value =
             i.city;
+
 
         //------------------------------------------
         // Confidence
@@ -325,9 +581,11 @@ class IntelligenceMapperV2 {
         $("ip-confidence").value =
             i.confidence;
 
+
         updateConfidenceBar(
             i.confidence
         );
+
 
         //------------------------------------------
         // Casualties
@@ -336,87 +594,60 @@ class IntelligenceMapperV2 {
         $("ip-fatalities").value =
             i.casualties.fatalities;
 
+
         $("ip-injuries").value =
             i.casualties.injuries;
+
 
         $("ip-crowd").value =
             i.crowdSize;
 
+
         //------------------------------------------
-        // Infrastructure
+        // Infrastructure Impact
         //------------------------------------------
 
-        const infrastructureAssets =
-    Array.isArray(i.criticalInfrastructure)
-        ? i.criticalInfrastructure
-        : [];
+        setSelectValue(
+            "ip-infra",
+            i.infrastructureImpact
+        );
 
-const infrastructureText =
-    infrastructureAssets
-        .join(" ")
-        .toLowerCase();
-
-let infrastructureImpact =
-    i.infrastructureImpact || "None";
-
-if (
-    infrastructureText.includes("white house") ||
-    infrastructureText.includes("power grid") ||
-    infrastructureText.includes("airport")
-) {
-
-    infrastructureImpact = "Severe";
-
-}
-else if (
-    infrastructureText.includes("stadium") ||
-    infrastructureText.includes("hospital") ||
-    infrastructureText.includes("port")
-) {
-
-    infrastructureImpact = "Moderate";
-
-}
-else if (
-    infrastructureAssets.length > 0
-) {
-
-    infrastructureImpact = "Minor";
-
-}
-
-setSelectValue(
-    "ip-infra",
-    infrastructureImpact
-);
 
         //------------------------------------------
         // Threat Indicators
         //------------------------------------------
 
         $("ip-threats").value =
-            i.threatIndicators.join(", ");
+            i.threatIndicators
+                .join(", ");
+
 
         //------------------------------------------
         // Weapons
         //------------------------------------------
 
         $("ip-weapons").value =
-            i.weapons.join(", ");
+            i.weapons
+                .join(", ");
+
 
         //------------------------------------------
         // Critical Infrastructure
         //------------------------------------------
 
         $("ip-crit-infra").value =
-            i.criticalInfrastructure.join(", ");
+            i.criticalInfrastructure
+                .join(", ");
+
 
         //------------------------------------------
         // VIPs
         //------------------------------------------
 
         $("ip-vips").value =
-            i.persons.join(", ");
+            i.persons
+                .join(", ");
+
 
         //------------------------------------------
         // Recommendation
@@ -425,10 +656,12 @@ setSelectValue(
         $("ip-category").value =
             i.suggestedCategory || "";
 
+
         setSelectValue(
             "ip-threshold",
             i.suggestedThreshold
         );
+
 
         //------------------------------------------
         // AI Reasoning
@@ -437,8 +670,9 @@ setSelectValue(
         $("ip-reasoning").value =
             i.reasoning;
 
+
         //------------------------------------------
-        // UI Refresh
+        // Threshold UI
         //------------------------------------------
 
         updateThresholdColor(
@@ -447,16 +681,19 @@ setSelectValue(
 
     }
 
-    //==================================================
-    // Populate Decision Page (Page 3)
+        //==================================================
+    // Populate Decision Page — Page 3
     //==================================================
 
     populatePane3() {
 
-        const i = this.current;
+        const i =
+            this.current;
 
-        if (!i)
+        if (!i) {
             return;
+        }
+
 
         //------------------------------------------
         // Domain
@@ -466,6 +703,7 @@ setSelectValue(
             "domain",
             i.domain
         );
+
 
         //------------------------------------------
         // Event Type
@@ -477,6 +715,7 @@ setSelectValue(
             i.eventType
         );
 
+
         //------------------------------------------
         // Region
         //------------------------------------------
@@ -485,6 +724,7 @@ setSelectValue(
             "region",
             i.region
         );
+
 
         //------------------------------------------
         // Casualties
@@ -496,76 +736,32 @@ setSelectValue(
         $("injuries").value =
             i.casualties.injuries;
 
-        //------------------------------------------
-        // Infrastructure
-        //------------------------------------------
 
         //------------------------------------------
-// Infrastructure Impact
-//------------------------------------------
+        // Infrastructure Impact
+        //------------------------------------------
 
-const infrastructureAssets =
-    Array.isArray(i.criticalInfrastructure)
-        ? i.criticalInfrastructure
-        : [];
+        const infrastructureImpact =
+            this.normalizeInfrastructureImpact(
+                i.infrastructureImpact
+            );
 
-const infrastructureText =
-    infrastructureAssets
-        .join(" ")
-        .toLowerCase();
 
-let infrastructureImpact =
-    i.infrastructureImpact || "None";
+        document
+            .querySelectorAll(
+                'input[name="infrastructure"]'
+            )
+            .forEach(radio => {
 
-// High-priority government / critical assets
-if (
-    infrastructureText.includes("white house") ||
-    infrastructureText.includes("power grid") ||
-    infrastructureText.includes("airport")
-) {
+                radio.checked =
+                    radio.value ===
+                    infrastructureImpact;
 
-    infrastructureImpact = "Severe";
+            });
 
-}
-
-// Major public infrastructure
-else if (
-    infrastructureText.includes("stadium") ||
-    infrastructureText.includes("hospital") ||
-    infrastructureText.includes("port")
-) {
-
-    infrastructureImpact = "Moderate";
-
-}
-
-// Any other explicitly identified infrastructure
-else if (
-    infrastructureAssets.length > 0
-) {
-
-    infrastructureImpact = "Minor";
-
-}
-
-//------------------------------------------
-// Apply to Page 3
-//------------------------------------------
-
-document
-    .querySelectorAll(
-        'input[name="infrastructure"]'
-    )
-    .forEach(r => {
-
-        r.checked =
-            r.value ===
-            infrastructureImpact;
-
-    });
 
         //------------------------------------------
-        // Badge
+        // Origin Badge
         //------------------------------------------
 
         const badge =
@@ -574,7 +770,7 @@ document
         if (badge) {
 
             badge.textContent =
-                "Pre-filled from AI Extraction";
+                "Pre-filled from Approved Intelligence";
 
             badge.className =
                 "step-origin-badge from-intel";
@@ -583,19 +779,41 @@ document
 
     }
 
+
     //==================================================
     // Refresh Both Pages
     //==================================================
 
     refresh() {
 
-        this.populatePane2();
+        if (!this.current) {
+            return;
+        }
 
+        this.populatePane2();
         this.populatePane3();
 
     }
+
+
     //==================================================
-    // Clear Current Intelligence
+    // Synchronize Both Pages
+    //==================================================
+
+    sync() {
+
+        if (!this.current) {
+            return;
+        }
+
+        this.populatePane2();
+        this.populatePane3();
+
+    }
+
+
+    //==================================================
+    // Clear Intelligence
     //==================================================
 
     clear() {
@@ -604,8 +822,9 @@ document
 
     }
 
+
     //==================================================
-    // Has Data
+    // Has Intelligence
     //==================================================
 
     hasData() {
@@ -614,8 +833,9 @@ document
 
     }
 
+
     //==================================================
-    // Get Original Intelligence
+    // Get Raw Intelligence
     //==================================================
 
     getRaw() {
@@ -624,113 +844,185 @@ document
 
     }
 
+
     //==================================================
-    // Debug
+    // Debug Intelligence
     //==================================================
 
     debug() {
 
-        console.group("========== Intelligence Mapper ==========");
+        console.group(
+            "========== Intelligence Mapper V2 =========="
+        );
 
-        console.log("Current Intelligence");
+        console.log(
+            "Current Intelligence"
+        );
 
-        console.dir(this.current);
+        console.dir(
+            this.current
+        );
 
         console.groupEnd();
 
     }
 
     //==================================================
-    // Export for Decision Engine
+    // Export Approved Intelligence for Decision Engine
     //==================================================
 
     toDecisionInput() {
 
-        if (!this.current)
+        if (!this.current) {
             return null;
+        }
+
+        const i =
+            this.current;
+
 
         return {
 
+            //--------------------------------------
+            // Classification
+            //--------------------------------------
+
             domain:
-                this.current.domain,
+                i.domain || "",
 
             eventType:
-                this.current.eventType,
+                i.eventType || "",
 
             region:
-                this.current.region,
+                i.region || "",
 
             country:
-                this.current.country,
+                i.country || "",
 
             city:
-                this.current.city,
+                i.city || "",
+
+
+            //--------------------------------------
+            // Casualties
+            //--------------------------------------
 
             fatalities:
-                this.current.casualties?.fatalities || 0,
+                this.safeNumber(
+                    i.casualties?.fatalities
+                ),
 
             injuries:
-                this.current.casualties?.injuries || 0,
+                this.safeNumber(
+                    i.casualties?.injuries
+                ),
+
+
+            //--------------------------------------
+            // Crowd
+            //--------------------------------------
 
             crowdSize:
-                this.current.crowdSize || 0,
+                this.safeNumber(
+                    i.crowdSize
+                ),
+
+
+            //--------------------------------------
+            // Infrastructure
+            //--------------------------------------
 
             infrastructureImpact:
-                this.current.infrastructureImpact,
-
-            confidence:
-                this.current.confidence,
-
-            summary:
-                this.current.summary,
-
-            reasoning:
-                this.current.reasoning,
-
-            threatIndicators:
-                [...this.current.threatIndicators],
-
-            weapons:
-                [...this.current.weapons],
-
-            organizations:
-                [...this.current.organizations],
-
-            persons:
-                [...this.current.persons],
+                this.normalizeInfrastructureImpact(
+                    i.infrastructureImpact
+                ),
 
             criticalInfrastructure:
-                [...this.current.criticalInfrastructure],
+                this.safeArray(
+                    i.criticalInfrastructure
+                ),
 
-            recommendedActions:
-                [...this.current.recommendedActions],
+
+            //--------------------------------------
+            // Confidence
+            //--------------------------------------
+
+            confidence:
+                this.safeNumber(
+                    i.confidence
+                ),
+
+
+            //--------------------------------------
+            // Intelligence Narrative
+            //--------------------------------------
+
+            summary:
+                this.safeString(
+                    i.summary
+                ),
+
+            reasoning:
+                this.safeString(
+                    i.reasoning
+                ),
+
+
+            //--------------------------------------
+            // Intelligence Indicators
+            //--------------------------------------
+
+            threatIndicators:
+                this.safeArray(
+                    i.threatIndicators
+                ),
+
+            weapons:
+                this.safeArray(
+                    i.weapons
+                ),
+
+            organizations:
+                this.safeArray(
+                    i.organizations
+                ),
+
+            persons:
+                this.safeArray(
+                    i.persons
+                ),
+
+
+            //--------------------------------------
+            // AI Recommendation
+            //--------------------------------------
 
             suggestedThreshold:
-                this.current.suggestedThreshold,
+                this.mapThreshold(
+                    i.suggestedThreshold
+                ),
 
             suggestedCategory:
-                this.current.suggestedCategory
+                this.safeString(
+                    i.suggestedCategory
+                ),
+
+
+            //--------------------------------------
+            // Existing AI Recommendations
+            //--------------------------------------
+
+            recommendedActions:
+                this.safeArray(
+                    i.recommendedActions
+                )
 
         };
 
     }
 
-    //==================================================
-    // Sync Everything
-    //==================================================
-
-    sync() {
-
-        if (!this.current)
-            return;
-
-        this.populatePane2();
-
-        this.populatePane3();
-
-    }
-
 }
+
 
 //======================================================
 // Singleton
