@@ -1,43 +1,65 @@
 {
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Operational Decision Intelligence Platform Threshold Matrix",
 
   "rules": [
+
     {
-      "ruleId": "THR-001",
-      "eventType": "Terrorist Attack",
+      "ruleId": "THR-MASS-CASUALTY-FATALITIES",
+      "eventType": "*",
       "conditions": {
         "fatalities": {
           "gte": 3
         }
       },
       "recommendedSeverity": 5,
-      "recommendedAction": "FLASH"
+      "recommendedAction": "FLASH",
+      "description": "Mass casualty fatality threshold reached."
     },
+
     {
-      "ruleId": "THR-002",
-      "eventType": "Cyber Attack",
-      "modifier": "Critical Infrastructure",
-      "recommendedSeverity": 4,
-      "recommendedAction": "ESCALATE"
-    },
-    {
-      "ruleId": "THR-003",
-      "eventType": "Political Assassination",
-      "recommendedSeverity": 5,
-      "recommendedAction": "FLASH"
-    },
-    {
-      "ruleId": "THR-004",
-      "eventType": "Earthquake",
+      "ruleId": "THR-MASS-CASUALTY-INJURIES",
+      "eventType": "*",
       "conditions": {
-        "fatalities": {
-          "gte": 10
+        "injuries": {
+          "gte": 5
         }
       },
       "recommendedSeverity": 5,
-      "recommendedAction": "FLASH"
+      "recommendedAction": "FLASH",
+      "description": "Mass casualty injury threshold reached."
+    },
+
+    {
+      "ruleId": "THR-CONFIRMED-FATALITY",
+      "eventType": "*",
+      "conditions": {
+        "fatalities": {
+          "gte": 1
+        }
+      },
+      "recommendedSeverity": 2,
+      "recommendedAction": "LOCAL_URGENT",
+      "description": "Confirmed fatality establishes a Local Urgent minimum threshold."
+    },
+
+    {
+      "ruleId": "THR-CYBER-CRITICAL-INFRASTRUCTURE",
+      "eventType": "Cyber Attack",
+      "modifier": "Critical Infrastructure",
+      "recommendedSeverity": 4,
+      "recommendedAction": "GLOBAL_URGENT",
+      "description": "Cyber incident involving critical infrastructure."
+    },
+
+    {
+      "ruleId": "THR-POLITICAL-ASSASSINATION",
+      "eventType": "Political Assassination",
+      "recommendedSeverity": 5,
+      "recommendedAction": "FLASH",
+      "description": "Political assassination qualifies for immediate FLASH handling."
     }
+
   ],
 
   "thresholds": [
@@ -46,40 +68,40 @@
       "minimumScore": 90,
       "level": "FLASH",
       "severity": 5,
-      "recommendedAction": "Immediate Executive Notification",
-      "description": "Critical operational situation requiring immediate command activation."
+      "recommendedAction": "Flag client as #HPW — High Priority Workflow",
+      "description": "Highest-priority event requiring immediate analyst handling through the #HPW workflow."
     },
 
     {
       "minimumScore": 75,
       "level": "GLOBAL_URGENT",
       "severity": 4,
-      "recommendedAction": "Activate Crisis Management Team",
-      "description": "Major incident with significant operational impact."
+      "recommendedAction": "Upgrade in tool and flag client as #HPW — High Priority Workflow",
+      "description": "Global Urgent event requiring analyst upgrade in the tool and client flagging through the #HPW workflow."
     },
 
     {
       "minimumScore": 50,
       "level": "NATIONAL_URGENT",
       "severity": 3,
-      "recommendedAction": "Escalate to National Operations Centre",
-      "description": "National-level monitoring and coordination required."
+      "recommendedAction": "Send National Urgent alert from the tool",
+      "description": "National Urgent event requiring alerting and active follow-up when the incident is kinetic."
     },
 
     {
       "minimumScore": 25,
       "level": "LOCAL_URGENT",
       "severity": 2,
-      "recommendedAction": "Notify Regional Operations",
-      "description": "Regional response and monitoring required."
+      "recommendedAction": "Send Local Urgent alert from the tool",
+      "description": "Local Urgent event requiring direct alerting from the platform."
     },
 
     {
       "minimumScore": 0,
       "level": "SIGNAL",
       "severity": 1,
-      "recommendedAction": "Routine Monitoring",
-      "description": "Routine monitoring with no escalation indicators."
+      "recommendedAction": "Send Signal alert from the tool",
+      "description": "Signal-level event requiring alerting and monitoring for material developments."
     }
 
   ]

@@ -265,9 +265,12 @@ const normalizedScore =
 
     return {
 
-      score,
+  score:
+    rawScore,
 
-      factors,
+  normalizedScore,
+
+  factors,
 
       summary: {
 

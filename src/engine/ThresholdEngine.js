@@ -2,136 +2,574 @@ class ThresholdEngine {
 
     constructor(thresholdMatrix) {
 
-        console.log(">>> USING ThresholdEngine from:", __filename);
+        console.log(
+            ">>> USING ThresholdEngine from:",
+            __filename
+        );
 
-        this.rules = thresholdMatrix.rules || [];
-        this.scoreBands = thresholdMatrix.thresholds || [];
+        this.rules =
+            thresholdMatrix.rules || [];
+
+        this.scoreBands =
+            thresholdMatrix.thresholds || [];
 
     }
 
-    evaluate(eventContext, riskScore) {
 
-        console.log("\n========== THRESHOLD ENGINE ==========");
-        console.log("Incoming Event:", eventContext);
-        console.log("Risk Score:", riskScore);
+    //==================================================
+    // Evaluate
+    //==================================================
 
-        const eventRule = this._matchEventRule(eventContext);
+    evaluate(
+        eventContext,
+        riskScore
+    ) {
 
-        if (eventRule) {
+        console.log(
+            "\n========== THRESHOLD ENGINE =========="
+        );
 
-            console.log("Matched Event Rule:", eventRule);
+        console.log(
+            "Incoming Event:",
+            eventContext
+        );
 
-            return {
+        console.log(
+            "Risk Score:",
+            riskScore
+        );
 
-                ruleId: eventRule.ruleId,
 
-                level: eventRule.recommendedAction,
+        //==============================================
+        // Evaluate operational rules
+        //==============================================
 
-                action: eventRule.recommendedAction,
+        const ruleDecision =
+            this._evaluateRules(
+                eventContext
+            );
 
-                severity: eventRule.recommendedSeverity,
 
-                recommendedAction: eventRule.recommendedAction,
+        //==============================================
+        // Evaluate score bands
+        //==============================================
 
-                description: "Matched operational rule",
+        const scoreDecision =
+            this._evaluateByScore(
+                riskScore
+            );
 
-                source: "event-rule"
 
-            };
+        console.log(
+            "Rule Decision:",
+            ruleDecision
+        );
+
+        console.log(
+            "Score Decision:",
+            scoreDecision
+        );
+
+
+        //==============================================
+        // Select the HIGHER operational threshold
+        //
+        // Important:
+        // Event rules establish minimum thresholds.
+        // They must never downgrade a higher score-band
+        // decision.
+        //==============================================
+
+        const finalDecision =
+            this._selectHigherDecision(
+                ruleDecision,
+                scoreDecision
+            );
+
+
+        console.log(
+            "Returning Threshold Decision:",
+            finalDecision
+        );
+
+        console.log(
+            "=====================================\n"
+        );
+
+
+        return finalDecision;
+
+    }
+
+
+    //==================================================
+    // Evaluate Event Rules
+    //==================================================
+
+    _evaluateRules(eventContext) {
+
+        const matchedRules =
+            this.rules.filter(
+                rule =>
+                    this._matchesRule(
+                        rule,
+                        eventContext
+                    )
+            );
+
+
+        if (!matchedRules.length) {
+
+            return null;
 
         }
 
-        console.log("No event rule matched. Evaluating score bands...");
 
-        return this._evaluateByScore(riskScore);
+        //------------------------------------------
+        // Multiple rules may match.
+        // Select the highest-severity rule.
+        //------------------------------------------
+
+        const strongestRule =
+            matchedRules.reduce(
+                (
+                    strongest,
+                    current
+                ) => {
+
+                    if (!strongest) {
+                        return current;
+                    }
+
+
+                    return (
+                        Number(
+                            current.recommendedSeverity
+                        ) >
+                        Number(
+                            strongest.recommendedSeverity
+                        )
+                    )
+                        ? current
+                        : strongest;
+
+                },
+                null
+            );
+
+
+        return {
+
+            ruleId:
+                strongestRule.ruleId,
+
+            level:
+                strongestRule.recommendedAction,
+
+            action:
+                strongestRule.recommendedAction,
+
+            severity:
+                Number(
+                    strongestRule.recommendedSeverity
+                ) || 1,
+
+            recommendedAction:
+                strongestRule.recommendedAction,
+
+            description:
+                strongestRule.description ||
+                "Matched operational threshold rule.",
+
+            source:
+                "event-rule",
+
+            matchedRules:
+                matchedRules.map(
+                    rule => ({
+                        ruleId:
+                            rule.ruleId,
+
+                        action:
+                            rule.recommendedAction,
+
+                        severity:
+                            rule.recommendedSeverity
+                    })
+                )
+
+        };
 
     }
 
-    _matchEventRule(eventContext) {
 
-        return this.rules.find(rule => {
+    //==================================================
+    // Match Single Rule
+    //==================================================
 
-            if (rule.eventType !== eventContext.eventType)
-                return false;
+    _matchesRule(
+        rule,
+        eventContext
+    ) {
 
-            const cond = rule.conditions || {};
+        if (!rule) {
+
+            return false;
+
+        }
+
+
+        //==============================================
+        // Event Type
+        //
+        // "*" means rule applies to every event type.
+        //==============================================
+
+        if (
+            rule.eventType &&
+            rule.eventType !== "*" &&
+            rule.eventType !==
+                eventContext.eventType
+        ) {
+
+            return false;
+
+        }
+
+
+        //==============================================
+        // Modifier
+        //==============================================
+
+        if (
+            rule.modifier &&
+            !this._matchesModifier(
+                rule.modifier,
+                eventContext
+            )
+        ) {
+
+            return false;
+
+        }
+
+
+        //==============================================
+        // Conditions
+        //==============================================
+
+        const conditions =
+            rule.conditions || {};
+
+
+        //------------------------------------------
+        // Fatalities
+        //------------------------------------------
+
+        if (
+            conditions.fatalities?.gte !==
+            undefined
+        ) {
+
+            const fatalities =
+                Number(
+                    eventContext.fatalities ??
+                    eventContext.casualties
+                        ?.fatalities ??
+                    0
+                );
+
 
             if (
-                cond.fatalities?.gte !== undefined &&
-                (eventContext.fatalities || 0) < cond.fatalities.gte
-            )
+                fatalities <
+                Number(
+                    conditions.fatalities.gte
+                )
+            ) {
+
                 return false;
-
-            if (
-                cond.injuries?.gte !== undefined &&
-                (eventContext.injuries || 0) < cond.injuries.gte
-            )
-                return false;
-
-            return true;
-
-        }) || null;
-
-    }
-
-    _evaluateByScore(riskScore) {
-
-        for (const band of this.scoreBands) {
-
-            if (riskScore >= band.minimumScore) {
-
-                console.log("Matched Score Band:", band);
-
-                const result = {
-
-                    minimumScore: band.minimumScore,
-
-                    level: band.level,
-
-                    action: band.level,
-
-                    severity: band.severity,
-
-                    recommendedAction: band.recommendedAction,
-
-                    description: band.description,
-
-                    source: "score-band"
-
-                };
-
-                console.log("Returning Threshold Decision:", result);
-                console.log("=====================================\n");
-
-                return result;
 
             }
 
         }
 
-        const defaultResult = {
 
-            level: "SIGNAL",
+        //------------------------------------------
+        // Injuries
+        //------------------------------------------
 
-            action: "SIGNAL",
+        if (
+            conditions.injuries?.gte !==
+            undefined
+        ) {
 
-            severity: 1,
+            const injuries =
+                Number(
+                    eventContext.injuries ??
+                    eventContext.casualties
+                        ?.injuries ??
+                    0
+                );
 
-            recommendedAction: "Routine Monitoring",
 
-            description: "Default operational threshold",
+            if (
+                injuries <
+                Number(
+                    conditions.injuries.gte
+                )
+            ) {
 
-            source: "default"
+                return false;
+
+            }
+
+        }
+
+
+        return true;
+
+    }
+
+
+    //==================================================
+    // Modifier Matching
+    //==================================================
+
+    _matchesModifier(
+        modifier,
+        eventContext
+    ) {
+
+        if (
+            modifier ===
+            "Critical Infrastructure"
+        ) {
+
+            const infrastructure =
+                eventContext
+                    .criticalInfrastructure;
+
+
+            if (
+                Array.isArray(
+                    infrastructure
+                ) &&
+                infrastructure.length > 0
+            ) {
+
+                return true;
+
+            }
+
+
+            if (
+                typeof infrastructure ===
+                    "string" &&
+                infrastructure.trim()
+            ) {
+
+                return true;
+
+            }
+
+
+            return (
+                eventContext
+                    .infrastructureImpact &&
+                eventContext
+                    .infrastructureImpact !==
+                    "None"
+            );
+
+        }
+
+
+        return false;
+
+    }
+
+
+    //==================================================
+    // Score Band Evaluation
+    //==================================================
+
+    _evaluateByScore(riskScore) {
+
+        const score =
+            Number(
+                riskScore
+            ) || 0;
+
+
+        for (
+            const band of
+            this.scoreBands
+        ) {
+
+            if (
+                score >=
+                Number(
+                    band.minimumScore
+                )
+            ) {
+
+                return {
+
+                    minimumScore:
+                        band.minimumScore,
+
+                    level:
+                        band.level,
+
+                    action:
+                        band.level,
+
+                    severity:
+                        Number(
+                            band.severity
+                        ) || 1,
+
+                    recommendedAction:
+                        band.recommendedAction,
+
+                    description:
+                        band.description,
+
+                    source:
+                        "score-band"
+
+                };
+
+            }
+
+        }
+
+
+        return {
+
+            minimumScore:
+                0,
+
+            level:
+                "SIGNAL",
+
+            action:
+                "SIGNAL",
+
+            severity:
+                1,
+
+            recommendedAction:
+                "Send Signal alert from the tool",
+
+            description:
+                "Default operational threshold.",
+
+            source:
+                "default"
 
         };
 
-        console.log("Returning Default Threshold:", defaultResult);
-        console.log("=====================================\n");
+    }
 
-        return defaultResult;
+
+    //==================================================
+    // Select Higher Decision
+    //==================================================
+
+    _selectHigherDecision(
+        ruleDecision,
+        scoreDecision
+    ) {
+
+        if (!ruleDecision) {
+
+            return scoreDecision;
+
+        }
+
+
+        if (!scoreDecision) {
+
+            return ruleDecision;
+
+        }
+
+
+        const ruleSeverity =
+            Number(
+                ruleDecision.severity
+            ) || 0;
+
+
+        const scoreSeverity =
+            Number(
+                scoreDecision.severity
+            ) || 0;
+
+
+        //------------------------------------------
+        // Rule is stronger
+        //------------------------------------------
+
+        if (
+            ruleSeverity >
+            scoreSeverity
+        ) {
+
+            return {
+
+                ...ruleDecision,
+
+                scoreBandDecision:
+                    scoreDecision.level
+
+            };
+
+        }
+
+
+        //------------------------------------------
+        // Score is stronger
+        //------------------------------------------
+
+        if (
+            scoreSeverity >
+            ruleSeverity
+        ) {
+
+            return {
+
+                ...scoreDecision,
+
+                matchedRule:
+                    ruleDecision.ruleId
+
+            };
+
+        }
+
+
+        //------------------------------------------
+        // Same severity
+        //
+        // Prefer operational rule because it gives
+        // the more specific explanation.
+        //------------------------------------------
+
+        return {
+
+            ...ruleDecision,
+
+            scoreBandDecision:
+                scoreDecision.level
+
+        };
 
     }
 
 }
 
-module.exports = ThresholdEngine;
+
+module.exports =
+    ThresholdEngine;

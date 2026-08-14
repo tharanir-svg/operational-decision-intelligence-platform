@@ -82,7 +82,7 @@ class IntelligenceMapperV2 {
         this.EVENT_MAP = {
 
             // Terrorism
-            "Terrorist Attack": "Facility Attack",
+            "Terrorist Attack": "Terrorist Attack",
             "Bomb Attack": "Bombing",
             "Explosion": "Bombing",
             "Blast": "Bombing",

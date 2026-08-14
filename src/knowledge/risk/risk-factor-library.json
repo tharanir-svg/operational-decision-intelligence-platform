@@ -1,8 +1,9 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Operational Risk Factor Library",
 
   "riskFactors": [
+
     {
       "id": "RF-001",
       "name": "Extreme Fatality Count",
@@ -60,6 +61,20 @@
       },
       "points": 10,
       "reason": "Identification of critical infrastructure increases operational significance."
+    },
+
+    {
+      "id": "RF-006",
+      "name": "Confirmed Injury Burden",
+      "rule": {
+        "field": "intelligence.casualties.injuries",
+        "operator": "greaterThan",
+        "value": 0
+      },
+      "valueField": "intelligence.casualties.injuries",
+      "pointsPerUnit": 3,
+      "reason": "Confirmed injuries contribute operational risk according to the injury weighting model."
     }
+
   ]
 }

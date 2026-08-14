@@ -18,6 +18,7 @@
   ],
 
   "Terrorism": [
+    "Terrorist Attack",
     "Bombing",
     "Suicide Bombing",
     "Vehicle-Borne IED",
@@ -33,7 +34,7 @@
     "Lone Wolf Attack",
     "Facility Attack",
     "Kidnapping"
-  ],
+],
 
   "Crime": [
     "Shooting",

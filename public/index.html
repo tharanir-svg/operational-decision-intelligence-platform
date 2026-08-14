@@ -218,7 +218,7 @@
               <circle cx="6" cy="6" r="5.5" stroke="#6366f1" stroke-width="1"/>
               <path d="M4 6l1.5 1.5L8 4" stroke="#6366f1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            AI Extraction — Mock Data
+            AI-Extracted Intelligence
           </div>
           <button class="back-btn" id="backToEvidence">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M7.5 2L3.5 6l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -346,27 +346,93 @@
         </div>
 
         <!-- Recommendation -->
-        <div class="ip-section">
-          <div class="ip-section-label">Recommendation</div>
-          <div class="ip-grid-2">
-            <div class="field-group">
-              <label class="field-label" for="ip-category">Event Category</label>
-              <input type="text" id="ip-category" class="ip-input" />
-            </div>
-            <div class="field-group">
-              <label class="field-label" for="ip-threshold">Suggested Threshold</label>
-              <div class="select-wrap">
-                <select id="ip-threshold" class="threshold-select">
-                  <option value="MONITOR">MONITOR</option>
-                  <option value="WATCH">WATCH</option>
-                  <option value="ESCALATE">ESCALATE</option>
-                  <option value="FLASH">FLASH</option>
-                </select>
-                <svg class="select-chevron" width="12" height="12" viewBox="0 0 12 12"><path d="M2 4l4 4 4-4" stroke="#64748b" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-              </div>
-            </div>
-          </div>
-        </div>
+        <!-- Recommendation -->
+<div class="ip-section">
+
+  <div class="ip-section-label">
+    Recommendation
+  </div>
+
+  <div class="ip-grid-2">
+
+    <div class="field-group">
+
+      <label
+        class="field-label"
+        for="ip-category"
+      >
+        Event Category
+      </label>
+
+      <input
+        type="text"
+        id="ip-category"
+        class="ip-input"
+      />
+
+    </div>
+
+
+    <div class="field-group">
+
+      <label
+        class="field-label"
+        for="ip-threshold"
+      >
+        Suggested Threshold
+      </label>
+
+      <div class="select-wrap">
+
+        <select
+          id="ip-threshold"
+          class="threshold-select"
+        >
+
+          <option value="SIGNAL">
+            SIGNAL
+          </option>
+
+          <option value="LOCAL_URGENT">
+            LOCAL URGENT
+          </option>
+
+          <option value="NATIONAL_URGENT">
+            NATIONAL URGENT
+          </option>
+
+          <option value="GLOBAL_URGENT">
+            GLOBAL URGENT
+          </option>
+
+          <option value="FLASH">
+            FLASH
+          </option>
+
+        </select>
+
+        <svg
+          class="select-chevron"
+          width="12"
+          height="12"
+          viewBox="0 0 12 12"
+        >
+          <path
+            d="M2 4l4 4 4-4"
+            stroke="#64748b"
+            stroke-width="1.5"
+            fill="none"
+            stroke-linecap="round"
+          />
+        </svg>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
 
         <!-- AI Reasoning -->
         <div class="ip-section">
