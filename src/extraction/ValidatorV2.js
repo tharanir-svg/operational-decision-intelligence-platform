@@ -838,218 +838,255 @@ class ValidatorV2 {
 
     resolveInfrastructureImpact(i) {
 
-        const supplied =
-            this.normalizeInfrastructure(
-                i.infrastructureImpact
-            );
+    //==================================================
+    // Normalize AI-supplied assessment
+    //==================================================
 
+    const supplied =
+        this.normalizeInfrastructure(
+            i.infrastructureImpact
+        );
 
-        //==================================================
-        // Respect explicit meaningful assessment
-        //==================================================
 
-        if (
-            supplied === "Severe" ||
-            supplied === "Moderate" ||
-            supplied === "Minor"
-        ) {
+    //==================================================
+    // Critical Infrastructure
+    //==================================================
 
-            return supplied;
+    const infrastructure =
+        this.array(
+            i.criticalInfrastructure
+        );
 
-        }
 
+    const hasCriticalInfrastructure =
+        infrastructure.length > 0;
 
-        //==================================================
-        // Infrastructure
-        //==================================================
 
-        const infrastructure =
-            this.array(
-                i.criticalInfrastructure
-            );
+    //==================================================
+    // Casualties
+    //==================================================
 
+    const fatalities =
+        this.num(
+            i.casualties
+                ?.fatalities
+        );
 
-        if (
-            infrastructure.length === 0
-        ) {
 
-            return "None";
+    const injuries =
+        this.num(
+            i.casualties
+                ?.injuries
+        );
 
-        }
 
+    //==================================================
+    // Classification
+    //==================================================
 
-        //==================================================
-        // Casualties
-        //==================================================
+    const domain =
+        this.str(
+            i.domain
+        )
+            .trim()
+            .toLowerCase();
 
-        const fatalities =
-            this.num(
-                i.casualties
-                    ?.fatalities
-            );
 
+    const eventType =
+        this.str(
+            i.eventType
+        )
+            .trim()
+            .toLowerCase();
 
-        const injuries =
-            this.num(
-                i.casualties
-                    ?.injuries
-            );
 
+    //==================================================
+    // Evidence-bearing threat indicators
+    //==================================================
 
-        //==================================================
-        // Classification
-        //==================================================
+    const threatText =
+        this.array(
+            i.threatIndicators
+        )
+            .join(" ")
+            .toLowerCase();
 
-        const domain =
-            this.str(
-                i.domain
-            )
-                .toLowerCase();
 
+    const weaponText =
+        this.array(
+            i.weapons
+        )
+            .join(" ")
+            .toLowerCase();
 
-        const eventType =
-            this.str(
-                i.eventType
-            )
-                .toLowerCase();
 
+    const summaryText =
+        this.str(
+            i.summary
+        )
+            .toLowerCase();
 
-        //==================================================
-        // Threat / weapons
-        //==================================================
 
-        const threatText =
-            this.array(
-                i.threatIndicators
-            )
-                .join(" ")
-                .toLowerCase();
+    const combined =
+        [
 
+            eventType,
 
-        const weaponText =
-            this.array(
-                i.weapons
-            )
-                .join(" ")
-                .toLowerCase();
+            threatText,
 
+            weaponText,
 
-        const combined =
-            [
+            summaryText
 
-                eventType,
+        ]
+            .join(" ");
 
-                threatText,
 
-                weaponText
+    //==================================================
+    // Kinetic Indicators
+    //==================================================
 
-            ]
-                .join(" ");
+    const kineticIndicators = [
 
+        "bomb",
 
-        //==================================================
-        // KINETIC INDICATORS
-        //==================================================
+        "bombing",
 
-        const kineticIndicators = [
+        "suicide bombing",
 
-            "bomb",
+        "explosion",
 
-            "bombing",
+        "explosive",
 
-            "explosion",
+        "blast",
 
-            "explosive",
+        "ied",
 
-            "blast",
+        "vbied",
 
-            "ied",
+        "shooting",
 
-            "vbied",
+        "gunfire",
 
-            "shooting",
+        "firearm",
 
-            "gunfire",
+        "armed assault",
 
-            "firearm",
+        "missile",
 
-            "armed assault",
+        "rocket",
 
-            "missile",
+        "drone strike",
 
-            "rocket",
+        "airstrike"
 
-            "drone strike",
+    ];
 
-            "airstrike"
 
-        ];
+    const kinetic =
+        kineticIndicators.some(
+            indicator =>
+                combined.includes(
+                    indicator
+                )
+        );
 
 
-        const kinetic =
-            kineticIndicators.some(
-                indicator =>
-                    combined.includes(
-                        indicator
-                    )
-            );
+    const terrorism =
+        domain ===
+        "terrorism";
 
 
-        const terrorism =
-            domain ===
-            "terrorism";
+    //==================================================
+    // DETERMINISTIC SEVERE OVERRIDE
+    //
+    // This must run BEFORE accepting an AI-supplied
+    // Minor or Moderate classification.
+    //
+    // Critical infrastructure +
+    // kinetic/terrorism event +
+    // major casualties
+    //
+    // = Severe
+    //==================================================
 
-
-        //==================================================
-        // SEVERE
-        //
-        // Critical infrastructure +
-        // major casualty kinetic/terrorism event.
-        //==================================================
-
-        if (
-            (
-                kinetic ||
-                terrorism
-            ) &&
-            (
-                fatalities >= 10 ||
-                injuries >= 20
-            )
-        ) {
-
-            return "Severe";
-
-        }
-
-
-        //==================================================
-        // MODERATE
-        //
-        // Critical infrastructure involved in
-        // kinetic / terrorism incident.
-        //==================================================
-
-        if (
+    if (
+        hasCriticalInfrastructure &&
+        (
             kinetic ||
             terrorism
-        ) {
+        ) &&
+        (
+            fatalities >= 10 ||
+            injuries >= 20
+        )
+    ) {
 
-            return "Moderate";
-
-        }
-
-
-        //==================================================
-        // MINOR
-        //
-        // Critical infrastructure identified,
-        // but no stronger impact condition.
-        //==================================================
-
-        return "Minor";
+        return "Severe";
 
     }
+
+
+    //==================================================
+    // Respect explicit AI assessment when the
+    // deterministic Severe rule was NOT triggered.
+    //
+    // This preserves cases such as Philadelphia,
+    // where AI supplied Minor and the Severe casualty
+    // condition is not met.
+    //==================================================
+
+    if (
+        supplied === "Severe" ||
+        supplied === "Moderate" ||
+        supplied === "Minor"
+    ) {
+
+        return supplied;
+
+    }
+
+
+    //==================================================
+    // No critical infrastructure
+    //==================================================
+
+    if (
+        !hasCriticalInfrastructure
+    ) {
+
+        return "None";
+
+    }
+
+
+    //==================================================
+    // MODERATE
+    //
+    // Critical infrastructure involved in a kinetic
+    // or terrorism incident without Severe conditions.
+    //==================================================
+
+    if (
+        kinetic ||
+        terrorism
+    ) {
+
+        return "Moderate";
+
+    }
+
+
+    //==================================================
+    // MINOR
+    //
+    // Critical infrastructure identified without
+    // stronger operational impact indicators.
+    //==================================================
+
+    return "Minor";
+
+}
 
 
     //==================================================

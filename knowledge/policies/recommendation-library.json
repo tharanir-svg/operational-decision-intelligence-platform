@@ -32,7 +32,7 @@
         {
           "priority": 1,
           "owner": "Analyst",
-          "action": "Send Global Urgent alert from the tool"
+          "action": "Upgrade in tool and flag client as #HPW — High Priority Workflow"
         }
       ]
     },
