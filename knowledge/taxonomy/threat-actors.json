@@ -1,3 +1,117 @@
 {
-  "threatActors": []
+  "threatActors": {
+    "Maritime": {
+      "default": [
+        "Coast Guard",
+        "Organized Crime"
+      ],
+      "Piracy": [
+        "Pirate Group",
+        "Armed Robbery Group"
+      ]
+    },
+    "Cyber Security": {
+      "default": [
+        "Cyber Criminal",
+        "Hacktivist"
+      ],
+      "Ransomware": [
+        "Ransomware Group",
+        "APT Group"
+      ]
+    },
+    "Terrorism": {
+      "default": [
+        "Extremist Organization",
+        "Lone Actor"
+      ]
+    },
+    "Crime": {
+      "default": [
+        "Criminal Gang",
+        "Organized Crime"
+      ]
+    },
+    "Organized Crime": {
+      "default": [
+        "Smuggling Ring"
+      ]
+    },
+    "Civil Unrest": {
+      "default": [
+        "Protest Group"
+      ]
+    },
+    "Political": {
+      "default": [
+        "Political Extremists"
+      ]
+    },
+    "Infrastructure": {
+      "default": [
+        "Saboteur"
+      ]
+    },
+    "Transportation": {
+      "default": [
+        "Vandal"
+      ]
+    },
+    "Aviation": {
+      "default": [
+        "Airport Security Threat"
+      ]
+    },
+    "Energy": {
+      "default": [
+        "Insider Threat"
+      ]
+    },
+    "Public Health": {
+      "default": [
+        "Public Health Agency"
+      ]
+    },
+    "Industrial": {
+      "default": [
+        "Insider Threat"
+      ]
+    },
+    "Weather": {
+      "default": [
+        "Natural Hazard"
+      ]
+    },
+    "Environmental": {
+      "default": [
+        "Illegal Dumping Network"
+      ]
+    },
+    "Supply Chain": {
+      "default": [
+        "Cargo Theft Group"
+      ]
+    },
+    "Financial": {
+      "default": [
+        "Fraud Ring"
+      ]
+    },
+    "Border Security": {
+      "default": [
+        "Human Trafficking Network"
+      ]
+    },
+    "Intelligence": {
+      "default": [
+        "Foreign Intelligence Service"
+      ]
+    },
+    "Armed Conflict": {
+      "default": [
+        "Military Force",
+        "Militia"
+      ]
+    }
+  }
 }

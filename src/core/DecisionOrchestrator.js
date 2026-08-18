@@ -1,88 +1,318 @@
+const path = require("path");
+
 const KnowledgeLoader =
-  require("../knowledge/KnowledgeLoader");
+    require("../knowledge/KnowledgeLoader");
 
-const PolicyEngine =
-  require("../policy/PolicyEngine");
+const KnowledgeManager =
+    require("../orchestration/KnowledgeManager");
 
-const ThresholdEngine =
-  require("../engine/ThresholdEngine");
+const DecisionContext =
+    require("../orchestration/DecisionContext");
+
+const RiskFactorEngine =
+    require("../intelligence/RiskFactorEngine");
+
+const NormalizationEngine =
+    require("../engine/NormalizationEngine");
 
 const RiskScoringEngine =
-  require("../engine/RiskScoringEngine");
+    require("../engine/RiskScoringEngine");
+
+const ThresholdEngine =
+    require("../engine/ThresholdEngine");
+
+const PolicyEngine =
+    require("../policy/PolicyEngine");
+
+const RecommendationEngine =
+    require("../engine/RecommendationEngine");
+
+const DecisionTraceEngine =
+    require("../engine/DecisionTraceEngine");
 
 const ExplanationEngine =
-  require("../explanation/ExplanationEngine");
+    require("../explanation/ExplanationEngine");
+
+// NEW
+const DecisionOverrideEngine = require("./DecisionOverrideEngine");
 
 class DecisionOrchestrator {
 
-  constructor() {
+    constructor() {
 
-    const loader =
-      new KnowledgeLoader();
+        const loader = new KnowledgeLoader(
+            path.join(__dirname, "../../knowledge")
+        );
 
-    this.kb =
-      loader.loadKnowledgeBase();
+        const kb = loader.loadKnowledgeBase();
 
-    this.policyEngine =
-      new PolicyEngine(
-        this.kb.policies
-      );
+        // -----------------------------
+        // Engines
+        // -----------------------------
 
-    this.thresholdEngine =
-      new ThresholdEngine(
-        this.kb.thresholds
-      );
+        this.normalizationEngine =
+            new NormalizationEngine();
 
-    this.scoringEngine =
-      new RiskScoringEngine(
-        this.kb.weights,
-        this.kb.regions
-      );
+        // ---------------------------------------------
+// Risk Factor Knowledge + Engine
+// ---------------------------------------------
 
-    this.explanationEngine =
-      new ExplanationEngine();
+this.riskFactorKnowledge =
+  new KnowledgeManager(
+    path.join(__dirname, "../..")
+  );
 
-  }
+this.riskFactorKnowledge.load(
+  "riskFactors",
+  "src/knowledge/risk/risk-factor-library.json"
+);
 
-  evaluate(eventContext) {
+this.riskFactorEngine =
+  new RiskFactorEngine(
+    this.riskFactorKnowledge
+  );
 
-    // Step 1: Calculate risk score
-    const riskScore =
-      this.scoringEngine.calculate(
-        eventContext
-      );
+        this.riskEngine =
+            new RiskScoringEngine(
+                kb.weights,
+                kb.regions
+            );
 
-    // Step 2: Determine threshold level (event-type rules first, score fallback)
-    const thresholdDecision =
-      this.thresholdEngine.evaluate(
-        eventContext,
-        riskScore
-      );
+        this.thresholdEngine =
+            new ThresholdEngine(
+                kb.thresholds
+            );
 
-    // Step 3: Evaluate applicable policies
-    const policies =
-      this.policyEngine.evaluate(
-        eventContext
-      );
+        this.policyEngine =
+            new PolicyEngine(
+                kb.policies
+            );
 
-    // Step 4: Generate explanation
-    const explanation =
-      this.explanationEngine.generate(
-        eventContext,
-        thresholdDecision,
-        riskScore
-      );
+        // NEW
+        this.overrideEngine =
+            new DecisionOverrideEngine(
+                kb.overrideRules
+            );
 
-    return {
-      riskScore,
-      thresholdDecision,
-      policies,
-      explanation
-    };
+        this.recommendationEngine =
+            new RecommendationEngine(
+                kb.recommendations
+            );
 
-  }
+        this.traceEngine =
+            new DecisionTraceEngine();
+
+        this.explanationEngine =
+            new ExplanationEngine();
+
+    }
+
+    evaluate(eventContext) {
+
+        // ===========================================
+        // STEP 0
+        // Normalize
+        // ===========================================
+
+        // STEP 0 - Normalize incoming event
+const normalizedEvent =
+  this.normalizationEngine.normalize(eventContext);
+
+
+// =============================================
+// STEP 0.5 - Risk Factor Evaluation
+// =============================================
+
+const riskContext =
+    new DecisionContext({
+
+        ...normalizedEvent,
+
+        // DecisionContext expects nested casualty data
+        casualties: {
+
+            fatalities:
+                Number(
+                    normalizedEvent.fatalities ??
+                    eventContext.fatalities ??
+                    0
+                ),
+
+            injuries:
+                Number(
+                    normalizedEvent.injuries ??
+                    eventContext.injuries ??
+                    0
+                )
+
+        },
+
+        // Preserve AI-extracted infrastructure assets
+        criticalInfrastructure:
+            Array.isArray(
+                eventContext.criticalInfrastructure
+            )
+                ? eventContext.criticalInfrastructure
+                : [],
+
+        infrastructureImpact:
+            normalizedEvent.infrastructureImpact ??
+            eventContext.infrastructureImpact ??
+            "None"
+
+    });
+
+this.riskFactorEngine.process(
+    riskContext
+);
+
+normalizedEvent.riskFactors =
+    riskContext.riskFactors;
+
+// Pass validated risk factors into the
+// scoring layer without changing the
+// existing normalized event structure.
+
+normalizedEvent.riskFactors =
+  riskContext.riskFactors;
+
+
+// =============================================
+// STEP 1 - Risk Score
+// =============================================
+
+const riskResult =
+  this.riskEngine.calculate(
+    normalizedEvent
+  );
+
+        // ===========================================
+        // STEP 2
+        // Threshold Decision
+        // ===========================================
+
+        const thresholdDecision =
+            this.thresholdEngine.evaluate(
+                normalizedEvent,
+                riskResult.score
+            );
+
+        // ===========================================
+        // STEP 3
+        // Policy Evaluation
+        // ===========================================
+
+        const policies =
+            this.policyEngine.evaluate(
+                normalizedEvent
+            );
+
+        // ===========================================
+        // STEP 4
+        // Decision Override
+        // ===========================================
+
+        const overrideDecision =
+            this.overrideEngine.evaluate({
+
+                thresholdDecision,
+
+                triggeredPolicies: policies,
+
+                normalizedInput:
+                    normalizedEvent
+
+            });
+
+        // ===========================================
+        // STEP 5
+        // Recommendation
+        // ===========================================
+
+        const recommendations =
+            this.recommendationEngine.generate(
+
+                overrideDecision,
+
+                normalizedEvent,
+
+                policies
+
+            );
+
+        // ===========================================
+        // STEP 6
+        // Decision Trace
+        // ===========================================
+
+        const decisionTrace =
+            this.traceEngine.generate(
+
+                riskResult,
+
+                thresholdDecision,
+
+                overrideDecision,
+
+                policies,
+
+                recommendations
+
+            );
+
+        // ===========================================
+        // STEP 7
+        // Explanation
+        // ===========================================
+
+        const explanation =
+            this.explanationEngine.generate(
+
+                normalizedEvent,
+
+                thresholdDecision,
+
+                overrideDecision,
+
+                riskResult,
+
+                recommendations
+
+            );
+
+        // ===========================================
+        // Final Response
+        // ===========================================
+
+        return {
+
+            originalInput:
+                eventContext,
+
+            normalizedInput:
+                normalizedEvent,
+
+            riskScore:
+                riskResult,
+
+            thresholdDecision,
+
+            overrideDecision,
+
+            policies,
+
+            recommendedActions:
+                recommendations,
+
+            decisionTrace,
+
+            explanation
+
+        };
+
+    }
 
 }
 
 module.exports =
-  DecisionOrchestrator;
+    DecisionOrchestrator;

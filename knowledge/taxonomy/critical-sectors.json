@@ -1,3 +1,115 @@
 {
-  "criticalSectors": []
+  "criticalSectors": {
+    "Maritime": {
+      "default": [
+        "Maritime Transport",
+        "International Trade",
+        "Logistics"
+      ]
+    },
+    "Cyber Security": {
+      "default": [
+        "Information Technology",
+        "Telecommunications"
+      ]
+    },
+    "Transportation": {
+      "default": [
+        "Transport",
+        "Supply Chain"
+      ]
+    },
+    "Aviation": {
+      "default": [
+        "Civil Aviation",
+        "Tourism"
+      ]
+    },
+    "Energy": {
+      "default": [
+        "Energy",
+        "Utilities"
+      ]
+    },
+    "Public Health": {
+      "default": [
+        "Healthcare",
+        "Emergency Services"
+      ]
+    },
+    "Infrastructure": {
+      "default": [
+        "Public Infrastructure"
+      ]
+    },
+    "Industrial": {
+      "default": [
+        "Manufacturing"
+      ]
+    },
+    "Supply Chain": {
+      "default": [
+        "Logistics",
+        "Retail"
+      ]
+    },
+    "Financial": {
+      "default": [
+        "Banking",
+        "Insurance"
+      ]
+    },
+    "Border Security": {
+      "default": [
+        "Immigration",
+        "Customs"
+      ]
+    },
+    "Crime": {
+      "default": [
+        "Public Safety"
+      ]
+    },
+    "Organized Crime": {
+      "default": [
+        "Law Enforcement"
+      ]
+    },
+    "Civil Unrest": {
+      "default": [
+        "Government"
+      ]
+    },
+    "Political": {
+      "default": [
+        "Public Administration"
+      ]
+    },
+    "Weather": {
+      "default": [
+        "Emergency Management"
+      ]
+    },
+    "Environmental": {
+      "default": [
+        "Agriculture"
+      ]
+    },
+    "Intelligence": {
+      "default": [
+        "National Security"
+      ]
+    },
+    "Armed Conflict": {
+      "default": [
+        "Defense"
+      ]
+    },
+    "Terrorism": {
+      "default": [
+        "Emergency Services",
+        "National Security"
+      ]
+    }
+  }
 }

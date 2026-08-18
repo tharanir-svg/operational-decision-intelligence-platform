@@ -1,39 +1,34 @@
 # System Overview
 
 ```mermaid
-flowchart TD
+flowchart LR
 
-UI[Frontend]
+A[Analyst Dashboard]
+B[Evidence Intake]
+C[Express API]
+D[Decision Orchestrator]
+E[Knowledge Loader]
+F[Risk Scoring Engine]
+G[Policy Engine]
+H[Threshold Engine]
+I[Explanation Engine]
+J[Knowledge Base]
+K[Decision Response]
 
-API[Express API]
+A --> B
+B --> C
+C --> D
+D --> E
+D --> F
+D --> G
+D --> H
+D --> I
 
-DO[Decision Orchestrator]
+E --> J
+F --> J
+G --> J
+H --> J
 
-KL[Knowledge Loader]
-
-RS[Risk Scoring]
-
-TH[Threshold Engine]
-
-PE[Policy Engine]
-
-RE[Recommendation Engine]
-
-EX[Explanation Engine]
-
-UI --> API
-
-API --> DO
-
-DO --> KL
-
-DO --> RS
-
-DO --> TH
-
-DO --> PE
-
-DO --> RE
-
-DO --> EX
+I --> K
+K --> A
 ```

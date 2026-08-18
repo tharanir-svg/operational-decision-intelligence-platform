@@ -1,0 +1,85 @@
+{
+  "version": "2.0.0",
+  "description": "Operational Alerting and Analyst Workflow Recommendation Library",
+
+  "recommendations": [
+
+    {
+      "level": "FLASH",
+      "actions": [
+        {
+          "priority": 1,
+          "owner": "Analyst",
+          "action": "Flag client as #HPW — High Priority Workflow"
+        }
+      ]
+    },
+
+    {
+      "level": "GLOBAL",
+      "actions": [
+        {
+          "priority": 1,
+          "owner": "Analyst",
+          "action": "Flag client as #HPW — High Priority Workflow"
+        }
+      ]
+    },
+
+    {
+      "level": "GLOBAL_URGENT",
+      "actions": [
+        {
+          "priority": 1,
+          "owner": "Analyst",
+          "action": "Upgrade in tool and flag client as #HPW — High Priority Workflow"
+        }
+      ]
+    },
+
+    {
+      "level": "NATIONAL_URGENT",
+      "actions": [
+        {
+          "priority": 1,
+          "owner": "Analyst",
+          "action": "Send National Urgent alert from the tool"
+        }
+      ]
+    },
+
+    {
+      "level": "LOCAL_URGENT",
+      "actions": [
+        {
+          "priority": 1,
+          "owner": "Analyst",
+          "action": "Send Local Urgent alert from the tool"
+        }
+      ]
+    },
+
+    {
+      "level": "SIGNAL",
+      "actions": [
+        {
+          "priority": 1,
+          "owner": "Analyst",
+          "action": "Send Signal alert from the tool"
+        }
+      ]
+    },
+
+    {
+      "level": "MONITOR",
+      "actions": [
+        {
+          "priority": 1,
+          "owner": "Analyst",
+          "action": "Continue monitoring for material developments"
+        }
+      ]
+    }
+
+  ]
+}

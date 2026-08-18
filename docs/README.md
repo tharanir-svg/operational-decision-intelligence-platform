@@ -1,12 +1,13 @@
 # ODIP Documentation
 
-This folder contains the architecture and technical documentation for the Operational Decision Intelligence Platform (ODIP).
+This folder contains the engineering documentation for the Operational Decision Intelligence Platform (ODIP).
 
-## Contents
+## Documents
 
+- Project Charter
+- Product Requirements Document (PRD)
+- UX Specification
+- Solution Architecture
 - Architecture Decision Records (ADR)
-- API Documentation
-- Architecture Diagrams
-- Knowledge Model
-- Decision Flow
-- Changelog
+- Technical Design Specification (TDS)
+- Engineering Backlog

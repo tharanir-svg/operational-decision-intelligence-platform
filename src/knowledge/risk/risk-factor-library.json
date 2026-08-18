@@ -1,0 +1,80 @@
+{
+  "version": "1.2.0",
+  "description": "Operational Risk Factor Library",
+
+  "riskFactors": [
+
+    {
+      "id": "RF-001",
+      "name": "Extreme Fatality Count",
+      "rule": {
+        "field": "intelligence.casualties.fatalities",
+        "operator": "greaterThanOrEqual",
+        "value": 20
+      },
+      "points": 40,
+      "reason": "20 or more fatalities indicate an extreme casualty event."
+    },
+
+    {
+      "id": "RF-002",
+      "name": "Mass Casualty Event",
+      "rule": {
+        "field": "intelligence.casualties.fatalities",
+        "operator": "greaterThanOrEqual",
+        "value": 10
+      },
+      "points": 15,
+      "reason": "10 or more fatalities indicate a mass casualty event."
+    },
+
+    {
+      "id": "RF-003",
+      "name": "Severe Infrastructure Impact",
+      "rule": {
+        "field": "intelligence.infrastructureImpact",
+        "operator": "equals",
+        "value": "Severe"
+      },
+      "points": 25,
+      "reason": "Severe infrastructure impact materially increases operational risk."
+    },
+
+    {
+      "id": "RF-004",
+      "name": "Terrorism Baseline",
+      "rule": {
+        "field": "intelligence.domain",
+        "operator": "equals",
+        "value": "Terrorism"
+      },
+      "points": 20,
+      "reason": "Terrorism-domain events receive a baseline operational risk factor."
+    },
+
+    {
+      "id": "RF-005",
+      "name": "Critical Infrastructure Identified",
+      "rule": {
+        "field": "intelligence.infrastructure",
+        "operator": "nonEmpty"
+      },
+      "points": 10,
+      "reason": "Identification of critical infrastructure increases operational significance."
+    },
+
+    {
+      "id": "RF-006",
+      "name": "Confirmed Injury Burden",
+      "rule": {
+        "field": "intelligence.casualties.injuries",
+        "operator": "greaterThan",
+        "value": 0
+      },
+      "valueField": "intelligence.casualties.injuries",
+      "pointsPerUnit": 3,
+      "reason": "Confirmed injuries contribute operational risk according to the injury weighting model."
+    }
+
+  ]
+}

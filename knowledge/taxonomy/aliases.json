@@ -1,0 +1,17 @@
+{
+  "countries": {
+    "USA": "United States",
+    "US": "United States",
+    "U.S.": "United States",
+    "UK": "United Kingdom"
+  },
+  "domains": {
+    "Maritime Security": "Maritime",
+    "Cyber": "Cyber Security"
+  },
+  "eventTypes": {
+    "Sea Piracy": "Piracy",
+    "Plane Crash": "Aircraft Crash",
+    "Cyber Attack": "Cyber Incident"
+  }
+}

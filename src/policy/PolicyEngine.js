@@ -1,56 +1,295 @@
 class PolicyEngine {
 
-  constructor(policyLibrary) {
-    this.policies =
-      policyLibrary.policies || [];
-  }
+    constructor(policyLibrary) {
 
-  evaluate(eventContext) {
+        this.policyLibrary =
+            policyLibrary || { policies: [] };
 
-    return this.policies.filter(policy => {
+    }
 
-      // Baseline policy always applies
-      if (policy.category === "Baseline") {
-        return true;
-      }
+    evaluate(eventContext) {
 
-      // Threshold-based policies
-      if (policy.threshold) {
+        const triggeredPolicies = [];
 
-        if (
-          policy.threshold.fatalities &&
-          eventContext.fatalities >=
-          policy.threshold.fatalities
-        ) {
-          return true;
+        for (const policy of this.policyLibrary.policies) {
+
+            const evaluation =
+                this.evaluatePolicy(
+                    policy,
+                    eventContext
+                );
+
+            if (evaluation.matched) {
+
+                triggeredPolicies.push(evaluation);
+
+            }
+
         }
 
-        if (
-          policy.threshold.injuries &&
-          eventContext.injuries >=
-          policy.threshold.injuries
-        ) {
-          return true;
+        triggeredPolicies.sort(
+
+            (a, b) =>
+                (b.priority || 0) -
+                (a.priority || 0)
+
+        );
+
+        return triggeredPolicies;
+
+    }
+
+    evaluatePolicy(policy, eventContext) {
+
+        const reasons = [];
+
+        //---------------------------------------
+        // Domain
+        //---------------------------------------
+
+        if (policy.appliesTo &&
+            !policy.appliesTo.includes("All")) {
+
+            if (
+                !policy.appliesTo.includes(
+                    eventContext.domain
+                )
+            ) {
+
+                return {
+                    matched: false
+                };
+
+            }
+
+            reasons.push(
+                `Domain: ${eventContext.domain}`
+            );
+
         }
 
-      }
+        //---------------------------------------
+        // Event Type
+        //---------------------------------------
 
-      // Category match
-      if (
-        eventContext.category &&
-        eventContext.category ===
-        policy.category
-      ) {
-        return true;
-      }
+        if (policy.eventTypes) {
 
-      return false;
+            if (
+                !policy.eventTypes.includes(
+                    eventContext.eventType
+                )
+            ) {
 
-    });
+                return {
+                    matched: false
+                };
 
-  }
+            }
+
+            reasons.push(
+                `Event Type: ${eventContext.eventType}`
+            );
+
+        }
+
+        //---------------------------------------
+        // Conditions
+        //---------------------------------------
+
+        const conditions =
+            policy.conditions || {};
+
+        //---------------------------------------
+        // Fatalities
+        //---------------------------------------
+
+        if (
+            conditions.fatalities?.gte !== undefined
+        ) {
+
+            if (
+                (eventContext.fatalities || 0)
+                <
+                conditions.fatalities.gte
+            ) {
+
+                return {
+                    matched: false
+                };
+
+            }
+
+            reasons.push(
+
+                `Fatalities >= ${conditions.fatalities.gte}`
+
+            );
+
+        }
+
+        //---------------------------------------
+        // Injuries
+        //---------------------------------------
+
+        if (
+            conditions.injuries?.gte !== undefined
+        ) {
+
+            if (
+                (eventContext.injuries || 0)
+                <
+                conditions.injuries.gte
+            ) {
+
+                return {
+                    matched: false
+                };
+
+            }
+
+            reasons.push(
+
+                `Injuries >= ${conditions.injuries.gte}`
+
+            );
+
+        }
+
+        //---------------------------------------
+        // Confidence
+        //---------------------------------------
+
+        if (
+            conditions.confidence?.gte !== undefined
+        ) {
+
+            const confidence =
+                eventContext
+                    .confidenceAssessment
+                    ?.score || 0;
+
+            if (
+                confidence
+                <
+                conditions.confidence.gte
+            ) {
+
+                return {
+                    matched: false
+                };
+
+            }
+
+            reasons.push(
+
+                `Confidence >= ${conditions.confidence.gte}`
+
+            );
+
+        }
+
+        //---------------------------------------
+        // Region
+        //---------------------------------------
+
+        if (policy.regions) {
+
+            if (
+                !policy.regions.includes(
+                    eventContext.region
+                )
+            ) {
+
+                return {
+                    matched: false
+                };
+
+            }
+
+            reasons.push(
+
+                `Region: ${eventContext.region}`
+
+            );
+
+        }
+
+        //---------------------------------------
+        // Country
+        //---------------------------------------
+
+        if (policy.countries) {
+
+            if (
+                !policy.countries.includes(
+                    eventContext.country
+                )
+            ) {
+
+                return {
+                    matched: false
+                };
+
+            }
+
+            reasons.push(
+
+                `Country: ${eventContext.country}`
+
+            );
+
+        }
+
+        //---------------------------------------
+        // Infrastructure
+        //---------------------------------------
+
+        if (policy.infrastructure) {
+
+            if (
+                !policy.infrastructure.includes(
+                    eventContext.infrastructure
+                )
+            ) {
+
+                return {
+                    matched: false
+                };
+
+            }
+
+            reasons.push(
+
+                `Infrastructure: ${eventContext.infrastructure}`
+
+            );
+
+        }
+
+        //---------------------------------------
+
+        return {
+
+            matched: true,
+
+            policyId:
+                policy.policyId,
+
+            title:
+                policy.title,
+
+            severity:
+                policy.severity,
+
+            priority:
+                policy.priority || 0,
+
+            reasons
+
+        };
+
+    }
 
 }
 
-module.exports =
-  PolicyEngine;
+module.exports = PolicyEngine;

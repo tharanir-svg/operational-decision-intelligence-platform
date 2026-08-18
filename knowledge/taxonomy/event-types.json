@@ -1,5 +1,45 @@
 {
+  "Armed Conflict": [
+    "Armed Clash",
+    "Border Skirmish",
+    "Air Strike",
+    "Missile Strike",
+    "Drone Attack",
+    "Artillery Attack",
+    "Military Exercise",
+    "Ceasefire Violation",
+    "Ground Offensive",
+    "Naval Engagement",
+    "Ambush",
+    "Military Mobilization",
+    "Occupation",
+    "Peacekeeping Operation",
+    "Demobilization"
+  ],
+
+  "Terrorism": [
+    "Terrorist Attack",
+    "Bombing",
+    "Suicide Bombing",
+    "Vehicle-Borne IED",
+    "Mass Shooting",
+    "Hostage Situation",
+    "Armed Assault",
+    "Chemical Attack",
+    "Biological Attack",
+    "Explosive Device Found",
+    "Assassination",
+    "Terror Threat",
+    "Coordinated Attack",
+    "Lone Wolf Attack",
+    "Facility Attack",
+    "Kidnapping"
+],
+
   "Crime": [
+    "Shooting",
+    "Mass Shooting",
+    "Stabbing",
     "Kidnapping",
     "Armed Robbery",
     "Homicide",
@@ -8,22 +48,279 @@
     "Smuggling",
     "Extortion",
     "Vehicle Theft",
-    "Prison Break"
+    "Burglary",
+    "Prison Break",
+    "Fraud",
+    "Money Laundering"
   ],
+
+  "Organized Crime": [
+    "Gang Violence",
+    "Drug Cartel Activity",
+    "Weapons Trafficking",
+    "Human Smuggling",
+    "Money Laundering",
+    "Illegal Gambling",
+    "Racketeering",
+    "Counterfeit Goods",
+    "Extortion Ring",
+    "Organized Theft",
+    "Criminal Network Expansion",
+    "Cross-border Crime"
+  ],
+
   "Cyber Security": [
     "Ransomware",
     "Data Breach",
     "DDoS",
     "Credential Theft",
     "Malware",
-    "Zero-Day Exploit"
+    "Zero-Day Exploit",
+    "Phishing",
+    "Supply Chain Attack",
+    "Insider Threat",
+    "Account Compromise",
+    "Cloud Security Incident",
+    "Website Defacement",
+    "Data Leak",
+    "Cryptojacking",
+    "Unauthorized Access"
   ],
+
+  "Civil Unrest": [
+    "Protest",
+    "Demonstration",
+    "Riot",
+    "Violent Protest",
+    "Road Blockade",
+    "Strike",
+    "Labour Unrest",
+    "University Protest",
+    "Religious Clash",
+    "Ethnic Violence",
+    "Public Disorder",
+    "Curfew"
+  ],
+
+  "Political": [
+    "Election",
+    "Election Violence",
+    "Government Reshuffle",
+    "Parliament Session",
+    "Political Rally",
+    "Diplomatic Crisis",
+    "Sanctions",
+    "Policy Change",
+    "Government Collapse",
+    "Cabinet Announcement",
+    "Political Assassination",
+    "International Summit"
+  ],
+
+  "Infrastructure": [
+    "Power Outage",
+    "Bridge Collapse",
+    "Dam Failure",
+    "Building Collapse",
+    "Telecommunications Failure",
+    "Water Supply Disruption",
+    "Internet Outage",
+    "Gas Leak",
+    "Pipeline Failure",
+    "Construction Accident",
+    "Critical Infrastructure Damage",
+    "Utility Failure",
+    "Structural Failure",
+    "Facility Closure",
+    "Maintenance Shutdown"
+  ],
+
+  "Transportation": [
+    "Road Accident",
+    "Rail Accident",
+    "Traffic Disruption",
+    "Tunnel Closure",
+    "Bridge Closure",
+    "Public Transport Disruption",
+    "Hazmat Spill",
+    "Vehicle Fire",
+    "Cargo Incident",
+    "Transport Strike",
+    "Highway Closure",
+    "Derailment"
+  ],
+
+  "Aviation": [
+    "Aircraft Accident",
+    "Aircraft Incident",
+    "Emergency Landing",
+    "Runway Excursion",
+    "Airport Closure",
+    "Drone Intrusion",
+    "Bird Strike",
+    "Airspace Restriction",
+    "Flight Diversion",
+    "Airport Security Incident",
+    "Aircraft Fire",
+    "Hijacking",
+    "Bomb Threat",
+    "Technical Failure",
+    "Fuel Emergency"
+  ],
+
+  "Maritime": [
+    "Piracy",
+    "Ship Collision",
+    "Grounding",
+    "Vessel Fire",
+    "Vessel Sinking",
+    "Oil Spill",
+    "Port Closure",
+    "Port Congestion",
+    "Maritime Smuggling",
+    "Illegal Fishing",
+    "Search and Rescue",
+    "Vessel Hijacking"
+  ],
+
+  "Energy": [
+    "Power Plant Failure",
+    "Grid Failure",
+    "Oil Spill",
+    "Pipeline Leak",
+    "Gas Explosion",
+    "Fuel Shortage",
+    "Refinery Fire",
+    "Substation Failure",
+    "Nuclear Incident",
+    "Renewable Energy Failure",
+    "Blackout",
+    "Energy Supply Disruption"
+  ],
+
+  "Public Health": [
+    "Disease Outbreak",
+    "Pandemic",
+    "Food Poisoning",
+    "Hospital Overload",
+    "Water Contamination",
+    "Vaccination Campaign",
+    "Medical Supply Shortage",
+    "Heat Health Emergency",
+    "Air Quality Alert",
+    "Chemical Exposure",
+    "Mass Casualty",
+    "Public Health Advisory",
+    "Vector-borne Disease",
+    "Radiation Exposure",
+    "Health Infrastructure Failure"
+  ],
+
+  "Industrial": [
+    "Factory Fire",
+    "Chemical Leak",
+    "Explosion",
+    "Equipment Failure",
+    "Industrial Accident",
+    "Mining Accident",
+    "Worker Fatality",
+    "Hazardous Material Release",
+    "Manufacturing Disruption",
+    "Plant Shutdown",
+    "Safety Violation",
+    "Process Failure"
+  ],
+
   "Weather": [
     "Flood",
-    "Hurricane",
+    "Flash Flood",
     "Cyclone",
-    "Earthquake",
+    "Hurricane",
+    "Typhoon",
+    "Tornado",
+    "Thunderstorm",
+    "Lightning",
+    "Heatwave",
+    "Cold Wave",
     "Wildfire",
-    "Heatwave"
+    "Snowstorm",
+    "Landslide",
+    "Earthquake",
+    "Volcanic Eruption"
+  ],
+
+  "Environmental": [
+    "Wildlife Incident",
+    "Deforestation",
+    "Air Pollution",
+    "Water Pollution",
+    "Hazardous Waste",
+    "Oil Spill",
+    "Forest Fire",
+    "Drought",
+    "Biodiversity Loss",
+    "Protected Area Incident",
+    "Environmental Protest",
+    "Illegal Dumping"
+  ],
+
+  "Supply Chain": [
+    "Port Delay",
+    "Logistics Disruption",
+    "Warehouse Fire",
+    "Container Shortage",
+    "Customs Delay",
+    "Cargo Theft",
+    "Supplier Failure",
+    "Inventory Shortage",
+    "Border Delay",
+    "Cold Chain Failure",
+    "Distribution Disruption",
+    "Freight Strike"
+  ],
+
+  "Financial": [
+    "Bank Failure",
+    "ATM Outage",
+    "Payment System Failure",
+    "Stock Market Crash",
+    "Fraud",
+    "Money Laundering",
+    "Counterfeit Currency",
+    "Financial Sanctions",
+    "Cryptocurrency Theft",
+    "Insurance Fraud",
+    "Economic Crisis",
+    "Liquidity Crisis"
+  ],
+
+  "Border Security": [
+    "Illegal Border Crossing",
+    "Human Smuggling",
+    "Drug Smuggling",
+    "Weapons Smuggling",
+    "Border Clash",
+    "Refugee Movement",
+    "Migration Surge",
+    "Customs Seizure",
+    "Checkpoint Closure",
+    "Border Protest",
+    "Border Infrastructure Damage",
+    "Border Security Operation"
+  ],
+
+  "Intelligence": [
+    "Threat Report",
+    "Threat Assessment",
+    "Suspicious Activity",
+    "Surveillance Detection",
+    "Counter Intelligence",
+    "Disinformation Campaign",
+    "Influence Operation",
+    "Espionage",
+    "Reconnaissance Activity",
+    "Security Advisory",
+    "Watchlist Match",
+    "Strategic Warning"
   ]
 }
