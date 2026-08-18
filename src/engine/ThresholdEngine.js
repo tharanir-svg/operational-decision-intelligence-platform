@@ -236,6 +236,19 @@ class ThresholdEngine {
 
         }
 
+        //==============================================
+// Domain
+//==============================================
+
+if (
+    rule.domain &&
+    rule.domain !==
+        eventContext.domain
+) {
+
+    return false;
+
+}
 
         //==============================================
         // Modifier

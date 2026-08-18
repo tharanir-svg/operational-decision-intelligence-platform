@@ -44,13 +44,13 @@
     },
 
     {
-      "ruleId": "THR-CYBER-CRITICAL-INFRASTRUCTURE",
-      "eventType": "Cyber Attack",
-      "modifier": "Critical Infrastructure",
-      "recommendedSeverity": 4,
-      "recommendedAction": "GLOBAL_URGENT",
-      "description": "Cyber incident involving critical infrastructure."
-    },
+  "ruleId": "THR-CYBER-CRITICAL-INFRASTRUCTURE",
+  "domain": "Cyber Security",
+  "modifier": "Critical Infrastructure",
+  "recommendedSeverity": 4,
+  "recommendedAction": "GLOBAL_URGENT",
+  "description": "Cyber Security incident involving critical infrastructure."
+},
 
     {
       "ruleId": "THR-POLITICAL-ASSASSINATION",

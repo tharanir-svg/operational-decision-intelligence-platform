@@ -13,6 +13,11 @@ const ThresholdEngine =
 const thresholdMatrix =
     require("../knowledge/policies/threshold-matrix.json");
 
+const RecommendationEngine =
+    require("../src/engine/RecommendationEngine");
+
+const recommendationLibrary =
+    require("../knowledge/policies/recommendation-library.json");
 
 function validate(input) {
 
@@ -793,6 +798,871 @@ test(
         assert.equal(
             decision.ruleId,
             "THR-MASS-CASUALTY-FATALITIES"
+        );
+
+    }
+);
+//==================================================
+// 9. CYBER + CRITICAL INFRASTRUCTURE
+//==================================================
+
+test(
+    "Cyber Security incident involving critical infrastructure -> GLOBAL_URGENT",
+    () => {
+
+        const engine =
+            new ThresholdEngine(
+                thresholdMatrix
+            );
+
+
+        const decision =
+            engine.evaluate(
+                {
+                    eventType:
+                        "Ransomware",
+
+                    domain:
+                        "Cyber Security",
+
+                    fatalities:
+                        0,
+
+                    injuries:
+                        0,
+
+                    infrastructureImpact:
+                        "Moderate",
+
+                    criticalInfrastructure: [
+                        "Regional Power Grid"
+                    ]
+                },
+                10
+            );
+
+
+        assert.equal(
+            decision.action,
+            "GLOBAL_URGENT"
+        );
+
+
+        assert.equal(
+            decision.ruleId,
+            "THR-CYBER-CRITICAL-INFRASTRUCTURE"
+        );
+
+    }
+);
+
+//==================================================
+// 10. NATIONAL URGENT + KINETIC WORKFLOW
+//==================================================
+
+//==================================================
+// 10. NATIONAL URGENT + KINETIC WORKFLOW
+//==================================================
+
+test(
+    "NATIONAL_URGENT kinetic event adds active update workflow",
+    () => {
+
+        const engine =
+            new RecommendationEngine(
+                recommendationLibrary
+            );
+
+
+        const result =
+            engine.generate(
+                "NATIONAL_URGENT",
+                {
+
+                    domain:
+                        "Crime",
+
+                    eventType:
+                        "Shooting",
+
+                    region:
+                        "North America",
+
+                    country:
+                        "United States",
+
+                    city:
+                        "Atlanta",
+
+                    fatalities:
+                        0,
+
+                    injuries:
+                        0,
+
+                    casualties: {
+                        fatalities: 0,
+                        injuries: 0
+                    },
+
+                    infrastructureImpact:
+                        "Moderate",
+
+                    criticalInfrastructure: [
+                        "Transit Hub"
+                    ],
+
+                    threatIndicators: [
+                        "Active shooter"
+                    ],
+
+                    weapons: [
+                        "Firearm"
+                    ],
+
+                    organizations: [],
+                    persons: []
+
+                },
+                []
+            );
+
+
+        assert.equal(
+            result.level,
+            "NATIONAL_URGENT"
+        );
+
+
+        assert.equal(
+            result.kineticEvent,
+            true
+        );
+
+
+        const actions =
+            result.actions.map(
+                item =>
+                    item.action
+            );
+
+
+        assert.ok(
+            actions.includes(
+                "Send National Urgent alert from the tool"
+            )
+        );
+
+
+        assert.ok(
+            actions.includes(
+                "Inform the team that this is a kinetic event requiring active follow-up"
+            )
+        );
+
+
+        assert.ok(
+            actions.includes(
+                "Initiate active update search using approved Boolean or AI-assisted sources"
+            )
+        );
+
+
+        assert.equal(
+            result.totalActions,
+            3
+        );
+
+    }
+);
+
+//==================================================
+// 11. NATIONAL URGENT + NON-KINETIC WORKFLOW
+//==================================================
+
+test(
+    "NATIONAL_URGENT non-kinetic event does not add active update workflow",
+    () => {
+
+        const engine =
+            new RecommendationEngine(
+                recommendationLibrary
+            );
+
+
+        const result =
+            engine.generate(
+                "NATIONAL_URGENT",
+                {
+
+                    domain:
+                        "Political",
+
+                    eventType:
+                        "Government Policy Change",
+
+                    region:
+                        "North America",
+
+                    country:
+                        "United States",
+
+                    city:
+                        "Washington, D.C.",
+
+                    fatalities:
+                        0,
+
+                    injuries:
+                        0,
+
+                    casualties: {
+                        fatalities: 0,
+                        injuries: 0
+                    },
+
+                    infrastructureImpact:
+                        "None",
+
+                    criticalInfrastructure:
+                        [],
+
+                    threatIndicators:
+                        [],
+
+                    weapons:
+                        [],
+
+                    organizations:
+                        [],
+
+                    persons:
+                        []
+
+                },
+                []
+            );
+
+
+        assert.equal(
+            result.level,
+            "NATIONAL_URGENT"
+        );
+
+
+        assert.equal(
+            result.kineticEvent,
+            false
+        );
+
+
+        const actions =
+            result.actions.map(
+                item =>
+                    item.action
+            );
+
+
+        assert.ok(
+            actions.includes(
+                "Send National Urgent alert from the tool"
+            )
+        );
+
+
+        assert.equal(
+            actions.includes(
+                "Inform the team that this is a kinetic event requiring active follow-up"
+            ),
+            false
+        );
+
+
+        assert.equal(
+            actions.includes(
+                "Initiate active update search using approved Boolean or AI-assisted sources"
+            ),
+            false
+        );
+
+
+        assert.equal(
+            result.totalActions,
+            1
+        );
+
+    }
+);
+//==================================================
+// 12. GLOBAL URGENT WORKFLOW
+//==================================================
+
+test(
+    "GLOBAL_URGENT uses upgrade and HPW workflow",
+    () => {
+
+        const engine =
+            new RecommendationEngine(
+                recommendationLibrary
+            );
+
+
+        const result =
+            engine.generate(
+                "GLOBAL_URGENT",
+                {
+
+                    domain:
+                        "Cyber Security",
+
+                    eventType:
+                        "Ransomware",
+
+                    region:
+                        "North America",
+
+                    country:
+                        "United States",
+
+                    city:
+                        "New York",
+
+                    fatalities:
+                        0,
+
+                    injuries:
+                        0,
+
+                    casualties: {
+                        fatalities: 0,
+                        injuries: 0
+                    },
+
+                    infrastructureImpact:
+                        "Moderate",
+
+                    criticalInfrastructure: [
+                        "Power Grid"
+                    ],
+
+                    threatIndicators:
+                        [],
+
+                    weapons:
+                        [],
+
+                    organizations:
+                        [],
+
+                    persons:
+                        []
+
+                },
+                []
+            );
+
+
+        assert.equal(
+            result.level,
+            "GLOBAL_URGENT"
+        );
+
+
+        assert.equal(
+            result.kineticEvent,
+            false
+        );
+
+
+        const actions =
+            result.actions.map(
+                item =>
+                    item.action
+            );
+
+
+        assert.ok(
+            actions.includes(
+                "Upgrade in tool and flag client as #HPW — High Priority Workflow"
+            )
+        );
+
+
+        assert.equal(
+            actions.includes(
+                "Send Global Urgent alert from the tool"
+            ),
+            false
+        );
+
+
+        assert.equal(
+            result.totalActions,
+            1
+        );
+
+    }
+);
+//==================================================
+// 13. WEATHER / NON-SECURITY EVENT
+//==================================================
+
+test(
+    "Severe weather event remains Weather and does not receive terrorism baseline",
+    () => {
+
+        const {
+            validated,
+            result
+        } =
+            evaluate({
+
+                summary:
+                    "A major earthquake damaged a regional hospital. No fatalities or injuries were reported.",
+
+                originalText:
+                    "A major earthquake damaged a regional hospital. No fatalities or injuries were reported.",
+
+                eventType:
+                    "Earthquake",
+
+                domain:
+                    "Weather",
+
+                region:
+                    "",
+
+                country:
+                    "United States",
+
+                city:
+                    "San Francisco",
+
+                casualties: {
+                    fatalities: 0,
+                    injuries: 0
+                },
+
+                crowdSize:
+                    0,
+
+                infrastructureImpact:
+                    "Severe",
+
+                criticalInfrastructure: [
+                    "Regional Hospital"
+                ],
+
+                threatIndicators:
+                    [],
+
+                weapons:
+                    [],
+
+                organizations:
+                    [],
+
+                persons:
+                    [],
+
+                suggestedCategory:
+                    "Natural Hazard",
+
+                suggestedThreshold:
+                    "SIGNAL",
+
+                reasoning:
+                    "",
+
+                recommendedActions:
+                    []
+
+            });
+
+
+        assert.equal(
+            validated.domain,
+            "Weather"
+        );
+
+
+        assert.equal(
+            validated.eventType,
+            "Earthquake"
+        );
+
+
+        assert.equal(
+            validated.region,
+            "North America"
+        );
+
+
+        assert.equal(
+            validated.infrastructureImpact,
+            "Severe"
+        );
+
+
+        assert.equal(
+            result.riskScore.score,
+            35
+        );
+
+
+        const factorNames =
+            result.riskScore.factors.map(
+                factor =>
+                    factor.factor
+            );
+
+
+        assert.ok(
+            factorNames.includes(
+                "Severe Infrastructure Impact"
+            )
+        );
+
+
+        assert.ok(
+            factorNames.includes(
+                "Critical Infrastructure Identified"
+            )
+        );
+
+
+        assert.equal(
+            factorNames.includes(
+                "Terrorism Baseline"
+            ),
+            false
+        );
+
+
+        assert.equal(
+            result.thresholdDecision.action,
+            "LOCAL_URGENT"
+        );
+
+
+        assert.equal(
+            result.recommendedActions.kineticEvent,
+            false
+        );
+
+    }
+);
+//==================================================
+// 14. AMBIGUOUS MASS SHOOTING + TERRORISM EVIDENCE
+//==================================================
+
+test(
+    "Mass Shooting with explicit terrorism evidence resolves to Terrorism",
+    () => {
+
+        const {
+            validated,
+            result
+        } =
+            evaluate({
+
+                summary:
+                    "A mass shooting occurred at a public venue. Authorities described the attack as ideologically motivated and said a terrorist organization claimed responsibility. No fatalities or injuries have been confirmed.",
+
+                originalText:
+                    "A mass shooting occurred at a public venue. Authorities described the attack as ideologically motivated and said a terrorist organization claimed responsibility. No fatalities or injuries have been confirmed.",
+
+                eventType:
+                    "Mass Shooting",
+
+                // Deliberately supplied as Crime.
+                // Explicit terrorism evidence should override this.
+                domain:
+                    "Crime",
+
+                region:
+                    "",
+
+                country:
+                    "United States",
+
+                city:
+                    "Denver",
+
+                casualties: {
+                    fatalities: 0,
+                    injuries: 0
+                },
+
+                crowdSize:
+                    0,
+
+                infrastructureImpact:
+                    "None",
+
+                criticalInfrastructure:
+                    [],
+
+                threatIndicators: [
+                    "Ideologically motivated",
+                    "Terrorist organization claimed responsibility"
+                ],
+
+                weapons: [
+                    "Firearm"
+                ],
+
+                organizations: [
+                    "Terrorist organization"
+                ],
+
+                persons:
+                    [],
+
+                suggestedCategory:
+                    "Violent Crime",
+
+                suggestedThreshold:
+                    "SIGNAL",
+
+                reasoning:
+                    "",
+
+                recommendedActions:
+                    []
+
+            });
+
+
+        assert.equal(
+            validated.domain,
+            "Terrorism"
+        );
+
+
+        assert.equal(
+            validated.eventType,
+            "Mass Shooting"
+        );
+
+
+        assert.equal(
+            validated.suggestedCategory,
+            "Security"
+        );
+
+
+        assert.equal(
+            result.riskScore.score,
+            20
+        );
+
+
+        const factorNames =
+            result.riskScore.factors.map(
+                factor =>
+                    factor.factor
+            );
+
+
+        assert.ok(
+            factorNames.includes(
+                "Terrorism Baseline"
+            )
+        );
+
+
+        assert.equal(
+            result.thresholdDecision.action,
+            "SIGNAL"
+        );
+
+    }
+);
+//==================================================
+// 15. AMBIGUOUS MASS SHOOTING WITHOUT TERRORISM EVIDENCE
+//==================================================
+
+test(
+    "Mass Shooting without terrorism evidence resolves to Crime",
+    () => {
+
+        const {
+            validated,
+            result
+        } =
+            evaluate({
+
+                summary:
+                    "A mass shooting occurred at a shopping mall. Police reported an active shooter incident. No fatalities or injuries have been confirmed.",
+
+                originalText:
+                    "A mass shooting occurred at a shopping mall. Police reported an active shooter incident. No fatalities or injuries have been confirmed.",
+
+                eventType:
+                    "Mass Shooting",
+
+                // Deliberately supplied incorrectly as Terrorism.
+                // Without terrorism evidence, Validator should
+                // resolve the ambiguous event to Crime.
+                domain:
+                    "Terrorism",
+
+                region:
+                    "",
+
+                country:
+                    "United States",
+
+                city:
+                    "Dallas",
+
+                casualties: {
+                    fatalities: 0,
+                    injuries: 0
+                },
+
+                crowdSize:
+                    0,
+
+                infrastructureImpact:
+                    "None",
+
+                criticalInfrastructure:
+                    [],
+
+                threatIndicators: [
+                    "Active Shooter"
+                ],
+
+                weapons: [
+                    "Firearm"
+                ],
+
+                organizations:
+                    [],
+
+                persons:
+                    [],
+
+                suggestedCategory:
+                    "Security",
+
+                suggestedThreshold:
+                    "SIGNAL",
+
+                reasoning:
+                    "",
+
+                recommendedActions:
+                    []
+
+            });
+
+
+        assert.equal(
+            validated.domain,
+            "Crime"
+        );
+
+
+        assert.equal(
+            validated.eventType,
+            "Mass Shooting"
+        );
+
+
+        assert.equal(
+            validated.suggestedCategory,
+            "Violent Crime"
+        );
+
+
+        const factorNames =
+            result.riskScore.factors.map(
+                factor =>
+                    factor.factor
+            );
+
+
+        assert.equal(
+            factorNames.includes(
+                "Terrorism Baseline"
+            ),
+            false
+        );
+
+
+        assert.equal(
+            result.thresholdDecision.action,
+            "SIGNAL"
+        );
+
+
+        assert.equal(
+            result.overrideDecision.overridden,
+            false
+        );
+
+    }
+);
+//==================================================
+// 16. CRITICAL INFRASTRUCTURE — NON-CYBER CONTROL
+//==================================================
+
+test(
+    "Critical infrastructure alone does not trigger cyber GLOBAL_URGENT rule",
+    () => {
+
+        const engine =
+            new ThresholdEngine(
+                thresholdMatrix
+            );
+
+
+        const decision =
+            engine.evaluate(
+                {
+
+                    domain:
+                        "Infrastructure",
+
+                    eventType:
+                        "Power Outage",
+
+                    fatalities:
+                        0,
+
+                    injuries:
+                        0,
+
+                    infrastructureImpact:
+                        "Moderate",
+
+                    criticalInfrastructure: [
+                        "Regional Power Grid"
+                    ]
+
+                },
+                10
+            );
+
+
+        assert.equal(
+            decision.action,
+            "SIGNAL"
+        );
+
+
+        assert.equal(
+            decision.ruleId,
+            undefined
+        );
+
+
+        assert.equal(
+            decision.source,
+            "score-band"
         );
 
     }
