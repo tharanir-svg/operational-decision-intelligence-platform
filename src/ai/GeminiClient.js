@@ -1,79 +1,214 @@
-const { GoogleGenAI } = require("@google/genai");
+const {
+    GoogleGenAI
+} = require("@google/genai");
 
-console.log("✅ GeminiClient loaded");
 
 class GeminiClient {
 
     constructor() {
 
-        const apiKey = process.env.GEMINI_API_KEY;
+        //==================================================
+        // API KEY
+        //==================================================
 
-        if (!apiKey) {
-            throw new Error("GEMINI_API_KEY is missing.");
+        const apiKey =
+            process.env.GEMINI_API_KEY;
+
+
+        if (
+            !apiKey ||
+            !apiKey.trim()
+        ) {
+
+            throw new Error(
+                "GEMINI_API_KEY is missing."
+            );
+
         }
 
-        this.client = new GoogleGenAI({
-            apiKey
-        });
 
-        this.model = "gemini-3.1-flash-lite";
+        //==================================================
+        // CLIENT
+        //==================================================
 
-        console.log(">>> USING MODEL:", this.model);
+        this.client =
+            new GoogleGenAI({
+                apiKey
+            });
+
+
+        //==================================================
+        // MODEL
+        //
+        // Allow deployment environments to override the
+        // model without requiring a code change.
+        //==================================================
+
+        this.model =
+            process.env.GEMINI_MODEL ||
+            "gemini-3.1-flash-lite";
+
     }
+
 
     async generate(prompt) {
 
-        console.log("==========================================");
-        console.log("ENTERED GeminiClient.generate()");
-        console.log("MODEL:", this.model);
-        console.log("Prompt length:", prompt.length);
-        console.log("==========================================");
+        //==================================================
+        // INPUT VALIDATION
+        //==================================================
+
+        if (
+            typeof prompt !== "string" ||
+            !prompt.trim()
+        ) {
+
+            return {
+
+                success: false,
+
+                error:
+                    "Prompt is required.",
+
+                model:
+                    this.model,
+
+                processingTime:
+                    0
+
+            };
+
+        }
+
+
+        const startedAt =
+            Date.now();
+
 
         try {
 
-            const response = await this.client.models.generateContent({
+            //==================================================
+            // GEMINI REQUEST
+            //==================================================
 
-                model: this.model,
+            const response =
+                await this.client.models.generateContent({
 
-                contents: prompt
+                    model:
+                        this.model,
 
-            });
+                    contents:
+                        prompt
 
-            console.log("==========================================");
-            console.log("GEMINI RAW RESPONSE");
-            console.dir(response, { depth: null });
-            console.log("==========================================");
+                });
 
-            if (!response) {
-                throw new Error("Gemini returned no response.");
+
+            const processingTime =
+                Date.now() -
+                startedAt;
+
+
+            //==================================================
+            // RESPONSE VALIDATION
+            //==================================================
+
+            if (
+                !response
+            ) {
+
+                throw new Error(
+                    "Gemini returned no response."
+                );
+
             }
 
-            if (!response.text) {
-                throw new Error("Gemini returned an empty text response.");
+
+            const text =
+                typeof response.text === "string"
+                    ? response.text.trim()
+                    : "";
+
+
+            if (
+                !text
+            ) {
+
+                throw new Error(
+                    "Gemini returned an empty text response."
+                );
+
             }
 
+
+            //==================================================
+            // SAFE OPERATIONAL LOGGING
+            //
+            // Do NOT print prompts, evidence, raw responses,
+            // API keys or incident content.
+            //==================================================
+
+            console.log(
+                `[Gemini] response received | model=${this.model} | latency=${processingTime}ms`
+            );
+
+
+            //==================================================
+            // SUCCESS
+            //==================================================
+
             return {
-                success: true,
-                text: response.text,
-                model: this.model,
-                latency: 0,
-                raw: response
+
+                success:
+                    true,
+
+                text,
+
+                model:
+                    this.model,
+
+                processingTime
+
             };
 
-        } catch (error) {
-
-            console.log("==========================================");
-            console.log("GEMINI ERROR");
-            console.dir(error, { depth: null });
-            console.log("==========================================");
-
-            return {
-                success: false,
-                error: error.message,
-                model: this.model
-            };
         }
+
+        catch (error) {
+
+            const processingTime =
+                Date.now() -
+                startedAt;
+
+
+            //==================================================
+            // SAFE ERROR LOGGING
+            //==================================================
+
+            console.error(
+                `[Gemini] request failed | model=${this.model} | latency=${processingTime}ms | ${error?.message || "Unknown error"}`
+            );
+
+
+            return {
+
+                success:
+                    false,
+
+                error:
+                    error?.message ||
+                    "Gemini request failed.",
+
+                model:
+                    this.model,
+
+                processingTime
+
+            };
+
+        }
+
     }
+
 }
 
-module.exports = GeminiClient;
+
+module.exports =
+    GeminiClient;
