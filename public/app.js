@@ -395,6 +395,647 @@ const GAUGE_CIRC = 565.49;
 let currentStep   = 0;
 let unlockedUntil = 0; // highest step ever reached
 
+//==================================================
+// INTELLIGENCE OPERATING MODE
+//==================================================
+
+let intelligenceMode =
+    "AI_ASSISTED";
+
+let aiAvailable =
+    false;
+
+
+//==================================================
+// APPLY MODE TO UI
+//==================================================
+
+function setIntelligenceMode(mode) {
+
+    //==================================================
+    // SAFETY FALLBACK
+    //==================================================
+
+    if (
+        mode === "AI_ASSISTED" &&
+        !aiAvailable
+    ) {
+        mode = "MANUAL";
+    }
+
+
+    intelligenceMode =
+        mode;
+
+
+    //==================================================
+    // ELEMENT REFERENCES
+    //==================================================
+
+    const aiRadio =
+        document.getElementById(
+            "aiMode"
+        );
+
+    const manualRadio =
+        document.getElementById(
+            "manualMode"
+        );
+
+    const aiOption =
+        document.getElementById(
+            "aiModeOption"
+        );
+
+    const manualOption =
+        document.getElementById(
+            "manualModeOption"
+        );
+
+    const badge =
+        document.getElementById(
+            "intelModeBadgeText"
+        );
+
+    const note =
+        document.getElementById(
+            "modeNote"
+        );
+
+    const description =
+        document.getElementById(
+            "modeDescription"
+        );
+
+    const analyzeBtnText =
+        document.getElementById(
+            "analyzeBtnText"
+        );
+
+
+    //==================================================
+    // PAGE 2 MODE-AWARE ELEMENTS
+    //==================================================
+
+    const thresholdLabel =
+        document.getElementById(
+            "thresholdFieldLabel"
+        );
+
+    const thresholdSelectWrap =
+        document.getElementById(
+            "thresholdSelectWrap"
+        );
+
+    const thresholdDisplay =
+        document.getElementById(
+            "engineThresholdDisplay"
+        );
+
+    const thresholdNote =
+        document.getElementById(
+            "thresholdFieldNote"
+        );
+
+    const reasoningSectionLabel =
+        document.getElementById(
+            "reasoningSectionLabel"
+        );
+
+    const reasoningBadgeText =
+        document.getElementById(
+            "reasoningBadgeText"
+        );
+
+
+    //==================================================
+    // RADIO STATE
+    //==================================================
+
+    if (aiRadio) {
+
+        aiRadio.checked =
+            intelligenceMode ===
+            "AI_ASSISTED";
+
+    }
+
+
+    if (manualRadio) {
+
+        manualRadio.checked =
+            intelligenceMode ===
+            "MANUAL";
+
+    }
+
+
+    //==================================================
+    // CARD SELECTION STATE
+    //==================================================
+
+    aiOption?.classList.toggle(
+        "selected",
+        intelligenceMode ===
+            "AI_ASSISTED"
+    );
+
+
+    manualOption?.classList.toggle(
+        "selected",
+        intelligenceMode ===
+            "MANUAL"
+    );
+
+
+    //==================================================
+    // AI ASSISTED MODE
+    //==================================================
+
+    if (
+        intelligenceMode ===
+        "AI_ASSISTED"
+    ) {
+
+        if (badge) {
+
+            badge.textContent =
+                "AI-Extracted Intelligence";
+
+        }
+
+
+        if (description) {
+
+            description.textContent =
+                "AI structures evidence before analyst review.";
+
+        }
+
+
+        if (note) {
+
+            note.textContent =
+                "AI assists with extraction only. Operational decisions remain policy and rules driven.";
+
+        }
+
+
+        if (analyzeBtnText) {
+
+            analyzeBtnText.textContent =
+                "Analyze Evidence";
+
+        }
+
+
+        //==============================================
+        //==============================================
+// AI THRESHOLD = ADVISORY ONLY
+//==============================================
+
+if (thresholdLabel) {
+
+    thresholdLabel.textContent =
+        "AI Suggested Threshold";
+
+}
+
+
+const aiThresholdSelect =
+    document.getElementById(
+        "ip-threshold"
+    );
+
+if (aiThresholdSelect) {
+
+    aiThresholdSelect.disabled =
+        false;
+
+    aiThresholdSelect.style.removeProperty(
+        "display"
+    );
+
+}
+
+const aiThresholdWrap =
+    aiThresholdSelect
+        ?.closest(".select-wrap");
+
+if (aiThresholdWrap) {
+
+    aiThresholdWrap.style.removeProperty(
+        "display"
+    );
+
+}
+
+const actualThresholdWrap =
+    aiThresholdSelect
+        ?.closest(".select-wrap") ||
+    thresholdSelectWrap;
+
+
+if (actualThresholdWrap) {
+
+    actualThresholdWrap.style.setProperty(
+        "display",
+        "",
+        "important"
+    );
+
+}
+
+
+if (aiThresholdSelect) {
+
+    aiThresholdSelect.disabled =
+        false;
+
+}
+
+
+if (thresholdDisplay) {
+
+    thresholdDisplay.style.setProperty(
+        "display",
+        "none",
+        "important"
+    );
+
+}
+
+
+if (thresholdNote) {
+
+    thresholdNote.textContent =
+        "Advisory only — ODIP independently calculates the operational threshold.";
+
+}
+
+        //==============================================
+        // AI REASONING
+        //==============================================
+
+        if (reasoningSectionLabel) {
+
+            reasoningSectionLabel.textContent =
+                "AI Reasoning";
+
+        }
+
+
+        if (reasoningBadgeText) {
+
+            reasoningBadgeText.textContent =
+                "Model Reasoning";
+
+        }
+
+    }
+
+
+    //==================================================
+    // MANUAL INTELLIGENCE MODE
+    //==================================================
+
+    else {
+
+        if (badge) {
+
+            badge.textContent =
+                "Analyst-Entered Intelligence";
+
+        }
+
+
+        if (description) {
+
+            description.textContent =
+                "Analyst structures intelligence without an AI provider.";
+
+        }
+
+
+        if (note) {
+
+            note.textContent =
+                "Manual Mode makes no AI call. Risk scoring, thresholds, policies and recommendations remain fully operational.";
+
+        }
+
+
+        if (analyzeBtnText) {
+
+            analyzeBtnText.textContent =
+                "Continue to Manual Intelligence";
+
+        }
+
+        //==============================================
+//==============================================
+// MANUAL MODE HAS NO THRESHOLD SELECTION
+//==============================================
+
+if (thresholdLabel) {
+
+    thresholdLabel.textContent =
+        "Operational Threshold";
+
+}
+
+
+// Find the ACTUAL threshold dropdown
+const manualThresholdSelect =
+    document.getElementById(
+        "ip-threshold"
+    );
+
+if (manualThresholdSelect) {
+
+    manualThresholdSelect.disabled =
+        true;
+
+    manualThresholdSelect.style.setProperty(
+        "display",
+        "none",
+        "important"
+    );
+
+}
+
+const manualThresholdWrap =
+    manualThresholdSelect
+        ?.closest(".select-wrap");
+
+if (manualThresholdWrap) {
+
+    manualThresholdWrap.style.setProperty(
+        "display",
+        "none",
+        "important"
+    );
+
+}
+
+// Hide its real parent wrapper regardless
+// of whether thresholdSelectWrap was wired correctly.
+const actualThresholdWrap =
+    manualThresholdSelect
+        ?.closest(".select-wrap") ||
+    thresholdSelectWrap;
+
+
+if (actualThresholdWrap) {
+
+    actualThresholdWrap.style.setProperty(
+        "display",
+        "none",
+        "important"
+    );
+
+}
+
+
+if (manualThresholdSelect) {
+
+    manualThresholdSelect.disabled =
+        true;
+
+}
+
+
+// Force the ODIP-calculated message visible.
+// This also overrides any .hidden { display:none!important }
+if (thresholdDisplay) {
+
+    thresholdDisplay.classList.remove(
+        "hidden"
+    );
+
+    thresholdDisplay.style.setProperty(
+        "display",
+        "block",
+        "important"
+    );
+
+}
+
+
+if (thresholdNote) {
+
+    thresholdNote.textContent =
+        "ODIP calculates this independently from the analyst-approved incident facts.";
+
+}
+
+        //==============================================
+        // ANALYST NOTES
+        //==============================================
+
+        if (reasoningSectionLabel) {
+
+            reasoningSectionLabel.textContent =
+                "Analyst Notes";
+
+        }
+
+
+        if (reasoningBadgeText) {
+
+            reasoningBadgeText.textContent =
+                "Analyst Context";
+
+        }
+
+    }
+
+}
+
+
+//==================================================
+// CHECK SERVER AI CAPABILITY
+//==================================================
+
+async function initIntelligenceMode() {
+
+    const status =
+        document.getElementById(
+            "aiCapabilityStatus"
+        );
+
+    const aiOption =
+        document.getElementById(
+            "aiModeOption"
+        );
+
+    const aiRadio =
+        document.getElementById(
+            "aiMode"
+        );
+
+    const manualRadio =
+        document.getElementById(
+            "manualMode"
+        );
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/ai-capability"
+            );
+
+        if (!response.ok) {
+            throw new Error(
+                "Capability check failed"
+            );
+        }
+
+        const result =
+            await response.json();
+
+
+        aiAvailable =
+            Boolean(
+                result.aiAvailable
+            );
+
+
+        if (aiAvailable) {
+
+            if (status) {
+
+                status.textContent =
+                    "AI Available";
+
+                status.className =
+                    "mode-capability available";
+
+            }
+
+            aiOption?.classList.remove(
+                "disabled"
+            );
+
+            if (aiRadio) {
+                aiRadio.disabled =
+                    false;
+            }
+
+            setIntelligenceMode(
+                "AI_ASSISTED"
+            );
+
+        }
+        else {
+
+            if (status) {
+
+                status.textContent =
+                    "Manual Only";
+
+                status.className =
+                    "mode-capability unavailable";
+
+            }
+
+            aiOption?.classList.add(
+                "disabled"
+            );
+
+            if (aiRadio) {
+                aiRadio.disabled =
+                    true;
+            }
+
+            setIntelligenceMode(
+                "MANUAL"
+            );
+
+        }
+
+    }
+    catch (error) {
+
+        console.warn(
+            "AI capability unavailable:",
+            error.message
+        );
+
+
+        aiAvailable =
+            false;
+
+
+        if (status) {
+
+            status.textContent =
+                "Manual Only";
+
+            status.className =
+                "mode-capability unavailable";
+
+        }
+
+
+        aiOption?.classList.add(
+            "disabled"
+        );
+
+
+        if (aiRadio) {
+            aiRadio.disabled =
+                true;
+        }
+
+
+        setIntelligenceMode(
+            "MANUAL"
+        );
+
+    }
+
+
+    aiRadio?.addEventListener(
+        "change",
+        () => {
+
+            if (
+                aiRadio.checked &&
+                aiAvailable
+            ) {
+
+                setIntelligenceMode(
+                    "AI_ASSISTED"
+                );
+
+            }
+
+        }
+    );
+
+
+    manualRadio?.addEventListener(
+        "change",
+        () => {
+
+            if (
+                manualRadio.checked
+            ) {
+
+                setIntelligenceMode(
+                    "MANUAL"
+                );
+
+            }
+
+        }
+    );
+
+}
+
 function goToStep(step) {
 
     console.log("GO TO STEP:", step);
@@ -760,189 +1401,497 @@ function setSelectValue(id, value) {
 }
 
 /* ── Analyze Evidence → POST /api/extract ──────────────────── */
-function initAnalyzeBtn() {
+/* ==================================================
+   Evidence Intake
+   AI Assisted OR Manual Intelligence
+   ================================================== */
+//==================================================
+// BUILD MANUAL INTELLIGENCE OBJECT
+//
+// Manual Mode makes NO external AI call.
+//==================================================
 
-    const analyzeBtn = document.getElementById("analyzeBtn");
+function buildManualIntelligence() {
 
-    if (!analyzeBtn) {
-        console.error("Analyze button not found.");
-        return;
-    }
+    const text =
+        document.getElementById("ev-text")
+            ?.value?.trim() || "";
 
-    analyzeBtn.addEventListener("click", async () => {
+    const region =
+        document.getElementById("ev-region")
+            ?.value || "";
 
-        console.log("Analyze button clicked");
+    const country =
+        document.getElementById("ev-country")
+            ?.value || "";
 
-        const err = document.getElementById("evidenceError");
+    const domain =
+        document.getElementById("ev-domain")
+            ?.value || "";
 
-        const region =
-            document.getElementById("ev-region")?.value || "";
+    const eventType =
+        document.getElementById("ev-eventType")
+            ?.value || "";
 
-        const country =
-            document.getElementById("ev-country")?.value || "";
+    const url =
+        document.getElementById("ev-url")
+            ?.value?.trim() || "";
 
-        const domain =
-            document.getElementById("ev-domain")?.value || "";
 
-        const eventType =
-            document.getElementById("ev-eventType")?.value || "";
+    return {
 
-        const text =
-            document.getElementById("ev-text")?.value.trim() || "";
+        summary: text,
 
-        const url =
-            document.getElementById("ev-url")?.value.trim() || "";
+        eventType: eventType,
 
-        if (err) {
+        domain: domain,
 
-            err.classList.add("hidden");
-            err.textContent = "";
+        region: region,
 
+        country: country,
+
+        city: "",
+
+        confidence: 0,
+
+        casualties: {
+            fatalities: 0,
+            injuries: 0
+        },
+
+        crowdSize: 0,
+
+        infrastructureImpact: "None",
+
+        threatIndicators: [],
+
+        weapons: [],
+
+        criticalInfrastructure: [],
+
+        organizations: [],
+
+        persons: [],
+
+        reasoning: "",
+
+        suggestedThreshold: "MONITOR",
+
+        suggestedCategory: domain || "",
+
+        recommendedActions: [],
+
+        originalText: text,
+
+        sourceUrl: url,
+
+        timestamp:
+            new Date().toISOString(),
+
+        metadata: {
+            engine: "Manual Intelligence",
+            mode: "MANUAL",
+            provider: null
         }
-
-        if (
-            !text &&
-            !url &&
-            !region &&
-            !domain
-        ) {
-
-            if (err) {
-
-                err.textContent =
-                    "Please enter evidence or choose a context.";
-
-                err.classList.remove("hidden");
-
-            }
-
-            return;
-
-        }
-
-        analyzeBtn.disabled = true;
-
-        analyzeBtn.innerHTML =
-            "Analyzing...";
-
-try {
-
-    const payload = {
-
-        evidence: text,
-
-        region,
-
-        country,
-
-        domain,
-
-        eventType,
-
-        url
 
     };
 
-    console.log("Sending payload to V2");
-    console.dir(payload);
-
-    const response = await fetch("/api/extract-v2", {
-
-        method: "POST",
-
-        headers: {
-
-            "Content-Type": "application/json"
-
-        },
-
-        body: JSON.stringify(payload)
-
-    });
-
-    const result = await response.json();
-
-    console.log("========== V2 RESPONSE ==========");
-    console.dir(result);
-
-    if (!response.ok) {
-
-        throw new Error(
-            result.error || "Extraction failed."
-        );
-
-    }
-
-    if (!result.success) {
-
-        throw new Error(
-            result.error || "Extraction unsuccessful."
-        );
-
-    }
-
-    //------------------------------------------
-    // Store Enterprise Object
-    //------------------------------------------
-
-    window.currentExtraction =
-        result.intelligence;
-
-    console.log("Enterprise Intelligence");
-    console.dir(window.currentExtraction);
-
-    //------------------------------------------
-    // Populate Pane 2
-    //------------------------------------------
-
-    window.IntelligenceMapperV2.set(
-    window.currentExtraction
-);
-
-    console.log("Current Extraction");
-    console.dir(window.currentExtraction);
-
-    console.log("Mapper After Set");
-    console.dir(window.IntelligenceMapperV2.get());
-
-    window.IntelligenceMapperV2.populatePane2();
-
-    //------------------------------------------
-    // Unlock Step 2
-    //------------------------------------------
-
-    unlockStep(1);
-
-    goToStep(1);
-
 }
 
-        catch (e) {
+function initAnalyzeBtn() {
 
-            console.error(e);
+    const analyzeBtn =
+        document.getElementById(
+            "analyzeBtn"
+        );
+
+
+    if (!analyzeBtn) {
+
+        console.error(
+            "Analyze button not found."
+        );
+
+        return;
+
+    }
+
+
+    analyzeBtn.addEventListener(
+        "click",
+        async () => {
+
+
+            const err =
+                document.getElementById(
+                    "evidenceError"
+                );
+
+
+            const region =
+                document.getElementById(
+                    "ev-region"
+                )?.value || "";
+
+            const country =
+                document.getElementById(
+                    "ev-country"
+                )?.value || "";
+
+            const domain =
+                document.getElementById(
+                    "ev-domain"
+                )?.value || "";
+
+            const eventType =
+                document.getElementById(
+                    "ev-eventType"
+                )?.value || "";
+
+            const text =
+                document.getElementById(
+                    "ev-text"
+                )?.value.trim() || "";
+
+            const url =
+                document.getElementById(
+                    "ev-url"
+                )?.value.trim() || "";
+
 
             if (err) {
 
+                err.classList.add(
+                    "hidden"
+                );
+
                 err.textContent =
+                    "";
 
-                    e.message;
+            }
 
-                err.classList.remove("hidden");
+
+            //==========================================
+            // Require at least some useful context
+            //==========================================
+
+            if (
+                !text &&
+                !url &&
+                !region &&
+                !domain &&
+                !eventType
+            ) {
+
+                if (err) {
+
+                    err.textContent =
+                        "Please enter evidence or choose a context.";
+
+                    err.classList.remove(
+                        "hidden"
+                    );
+
+                }
+
+                return;
+
+            }
+
+
+            //==========================================
+            // MANUAL INTELLIGENCE MODE
+            //==========================================
+
+            if (
+                intelligenceMode ===
+                "MANUAL"
+            ) {
+
+                try {
+
+                    const intelligence =
+                        buildManualIntelligence();
+
+
+                    window.currentExtraction =
+                        intelligence;
+
+
+                    window
+                        .IntelligenceMapperV2
+                        .set(
+                            intelligence
+                        );
+
+
+                    window
+    .IntelligenceMapperV2
+    .populatePane2();
+
+
+// Re-apply Manual Mode AFTER Page 2 is populated.
+// This prevents mapper population from restoring
+// AI-only threshold controls.
+setIntelligenceMode(
+    "MANUAL"
+);
+
+                    const badge =
+                        document.getElementById(
+                            "intelModeBadgeText"
+                        );
+
+                    if (badge) {
+
+                        badge.textContent =
+                            "Analyst-Entered Intelligence";
+
+                    }
+
+
+                    unlockStep(
+                        1
+                    );
+
+                    goToStep(
+                        1
+                    );
+
+
+                    console.log(
+                        "Manual Intelligence Mode — no AI call made."
+                    );
+
+                }
+                catch (error) {
+
+                    console.error(
+                        error
+                    );
+
+
+                    if (err) {
+
+                        err.textContent =
+                            error.message ||
+                            "Unable to prepare manual intelligence.";
+
+                        err.classList.remove(
+                            "hidden"
+                        );
+
+                    }
+
+                }
+
+
+                return;
+
+            }
+
+
+            //==========================================
+            // AI ASSISTED MODE
+            //==========================================
+
+            analyzeBtn.disabled =
+                true;
+
+            const analyzeBtnText =
+    document.getElementById(
+        "analyzeBtnText"
+    );
+
+if (analyzeBtnText) {
+
+    analyzeBtnText.textContent =
+        "Analyzing…";
+
+}
+
+            try {
+
+                const payload = {
+
+                    evidence:
+                        text,
+
+                    region,
+
+                    country,
+
+                    domain,
+
+                    eventType,
+
+                    url
+
+                };
+
+
+                const response =
+                    await fetch(
+                        "/api/extract-v2",
+                        {
+
+                            method:
+                                "POST",
+
+                            headers: {
+
+                                "Content-Type":
+                                    "application/json"
+
+                            },
+
+                            body:
+                                JSON.stringify(
+                                    payload
+                                )
+
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (
+                    !response.ok ||
+                    !result.success
+                ) {
+
+                    //==================================
+                    // AI unavailable during operation
+                    // Offer safe manual fallback
+                    //==================================
+
+                    if (
+                        result.code ===
+                            "AI_DISABLED" ||
+                        result.code ===
+                            "AI_UNAVAILABLE"
+                    ) {
+
+                        aiAvailable =
+                            false;
+
+                        setIntelligenceMode(
+                            "MANUAL"
+                        );
+
+
+                        throw new Error(
+                            "AI extraction is unavailable. Manual Intelligence Mode has been activated."
+                        );
+
+                    }
+
+
+                    throw new Error(
+                        result.error ||
+                        "Extraction failed."
+                    );
+
+                }
+
+
+                window.currentExtraction =
+                    result.intelligence;
+
+
+                window
+                    .IntelligenceMapperV2
+                    .set(
+                        window.currentExtraction
+                    );
+
+
+                window.currentExtraction =
+                    window
+                        .IntelligenceMapperV2
+                        .get();
+
+
+                window
+                    .IntelligenceMapperV2
+                    .populatePane2();
+
+                    setIntelligenceMode(
+    "AI_ASSISTED"
+);
+
+                const badge =
+                    document.getElementById(
+                        "intelModeBadgeText"
+                    );
+
+
+                if (badge) {
+
+                    badge.textContent =
+                        "AI-Extracted Intelligence";
+
+                }
+
+
+                unlockStep(
+                    1
+                );
+
+                goToStep(
+                    1
+                );
+
+            }
+            catch (error) {
+
+                console.error(
+                    error
+                );
+
+
+                if (err) {
+
+                    err.textContent =
+                        error.message;
+
+                    err.classList.remove(
+                        "hidden"
+                    );
+
+                }
+
+            }
+            finally {
+
+                analyzeBtn.disabled =
+                    false;
+
+
+                const analyzeBtnText =
+    document.getElementById(
+        "analyzeBtnText"
+    );
+
+if (analyzeBtnText) {
+
+    analyzeBtnText.textContent =
+        intelligenceMode ===
+            "AI_ASSISTED"
+
+            ? "Analyze Evidence"
+
+            : "Continue to Manual Intelligence";
+
+}
 
             }
 
         }
-
-        finally {
-
-            analyzeBtn.disabled = false;
-
-            analyzeBtn.innerHTML =
-                "Analyze Evidence";
-
-        }
-
-    });
+    );
 
 }
 //==================================================
@@ -1381,7 +2330,21 @@ async function handleEvaluate(e) {
                 : []
 
     };
+    //==================================================
+// MANUAL MODE THRESHOLD SAFEGUARD
+//
+// Analysts provide facts.
+// ODIP determines the operational threshold.
+//==================================================
 
+if (
+    intelligenceMode ===
+    "MANUAL"
+) {
+
+    delete payload.suggestedThreshold;
+
+}
 
     console.log(
         "===== DECISION PAYLOAD ====="
@@ -2345,6 +3308,12 @@ async function checkHealth() {
 document.addEventListener("DOMContentLoaded", async () => {
 
     console.log("1. DOM Loaded");
+
+    await initIntelligenceMode();
+
+console.log(
+    "1A. Intelligence Mode Initialized"
+);
 
     await TaxonomyManager.load();
     console.log("2. Taxonomy Loaded");
