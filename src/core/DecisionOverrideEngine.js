@@ -1,14 +1,19 @@
 class DecisionOverrideEngine {
 
-    constructor(overrideRules) {
+    constructor(overrideRules = {}) {
 
         this.priorityOrder =
             overrideRules.priorityOrder || {};
 
         this.rules =
-            overrideRules.rules || [];
+            Array.isArray(
+                overrideRules.rules
+            )
+                ? overrideRules.rules
+                : [];
 
     }
+
 
     evaluate({
         thresholdDecision,
@@ -17,52 +22,83 @@ class DecisionOverrideEngine {
     }) {
 
         const initialDecision =
-            this.getDecisionLevel(thresholdDecision);
+            this.getDecisionLevel(
+                thresholdDecision
+            );
 
-        let finalDecision = initialDecision;
 
-        let overridden = false;
+        let finalDecision =
+            initialDecision;
 
-        let overrideReason = null;
+        let overridden =
+            false;
 
-        const triggeredOverrides = [];
+        let overrideReason =
+            null;
+
+        const triggeredOverrides =
+            [];
+
 
         // Highest priority rule first
         const sortedRules =
             [...this.rules].sort(
-                (a, b) => b.priority - a.priority
+                (a, b) =>
+                    Number(b.priority || 0) -
+                    Number(a.priority || 0)
             );
 
-        for (const rule of sortedRules) {
+
+        for (
+            const rule of
+            sortedRules
+        ) {
 
             if (
-                this.matchesRule(
+                !this.matchesRule(
                     rule,
                     triggeredPolicies,
                     normalizedInput
                 )
             ) {
 
-                triggeredOverrides.push({
-                    id: rule.id,
-                    name: rule.name,
-                    decision: rule.overrideDecision
-                });
-
-                finalDecision =
-                    rule.overrideDecision;
-
-                overrideReason =
-                    rule.name;
-
-                overridden = true;
-
-                // Highest priority wins
-                break;
+                continue;
 
             }
 
+
+            triggeredOverrides.push({
+
+                id:
+                    rule.id,
+
+                name:
+                    rule.name,
+
+                decision:
+                    rule.overrideDecision
+
+            });
+
+
+            finalDecision =
+                rule.overrideDecision;
+
+
+            overrideReason =
+                rule.name;
+
+
+            overridden =
+                true;
+
+
+            // Highest-priority matching
+            // override wins.
+            break;
+
         }
+
 
         return {
 
@@ -80,21 +116,46 @@ class DecisionOverrideEngine {
 
     }
 
+
+    //==================================================
+    // Resolve Decision Level
+    //==================================================
+
     getDecisionLevel(decision) {
 
-        if (!decision)
+        if (!decision) {
+
             return "MONITOR";
 
-        if (typeof decision === "string")
+        }
+
+
+        if (
+            typeof decision ===
+            "string"
+        ) {
+
             return decision;
 
+        }
+
+
         return (
+
             decision.level ||
+
             decision.action ||
+
             "MONITOR"
+
         );
 
     }
+
+
+    //==================================================
+    // Match Override Rule
+    //==================================================
 
     matchesRule(
         rule,
@@ -103,29 +164,35 @@ class DecisionOverrideEngine {
     ) {
 
         const conditions =
-            rule.conditions || {};
+            rule?.conditions || {};
 
-        // -------------------------
-        // Policy Match
-        // -------------------------
+
+        //==================================================
+        // POLICY
+        //==================================================
 
         if (conditions.policyId) {
 
             const matched =
                 triggeredPolicies.some(
                     policy =>
-                        policy.id ===
+                        policy?.id ===
                         conditions.policyId
                 );
 
-            if (!matched)
+
+            if (!matched) {
+
                 return false;
+
+            }
 
         }
 
-        // -------------------------
-        // Domain
-        // -------------------------
+
+        //==================================================
+        // DOMAIN
+        //==================================================
 
         if (conditions.domain) {
 
@@ -140,9 +207,10 @@ class DecisionOverrideEngine {
 
         }
 
-        // -------------------------
-        // Event Type
-        // -------------------------
+
+        //==================================================
+        // EVENT TYPE
+        //==================================================
 
         if (conditions.eventType) {
 
@@ -157,9 +225,10 @@ class DecisionOverrideEngine {
 
         }
 
-        // -------------------------
-        // Infrastructure
-        // -------------------------
+
+        //==================================================
+        // INFRASTRUCTURE IMPACT
+        //==================================================
 
         if (
             conditions.infrastructureImpact
@@ -176,22 +245,101 @@ class DecisionOverrideEngine {
 
         }
 
-        // -------------------------
-        // Fatalities
-        // -------------------------
 
-        if (conditions.fatalities) {
+        //==================================================
+        // CRITICAL INFRASTRUCTURE PRESENCE
+        //
+        // Example rule:
+        //
+        // "criticalInfrastructure": {
+        //     "nonEmpty": true
+        // }
+        //==================================================
+
+        if (
+            conditions
+                .criticalInfrastructure
+        ) {
+
+            const requirement =
+                conditions
+                    .criticalInfrastructure;
+
+
+            if (
+                requirement.nonEmpty ===
+                true
+            ) {
+
+                const infrastructure =
+                    input
+                        .criticalInfrastructure;
+
+
+                const hasInfrastructure =
+
+                    Array.isArray(
+                        infrastructure
+                    )
+
+                        ? infrastructure
+                            .some(
+                                item =>
+                                    String(
+                                        item || ""
+                                    )
+                                        .trim()
+                                        .length > 0
+                            )
+
+                        : String(
+                            infrastructure ||
+                            ""
+                        )
+                            .trim()
+                            .length > 0;
+
+
+                if (
+                    !hasInfrastructure
+                ) {
+
+                    return false;
+
+                }
+
+            }
+
+        }
+
+
+        //==================================================
+        // FATALITIES
+        //==================================================
+
+        if (
+            conditions.fatalities
+        ) {
 
             const fatalities =
                 Number(
-                    input.fatalities || 0
+                    input.fatalities ||
+                    0
                 );
 
+
             if (
-                conditions.fatalities.gte !==
-                undefined &&
+                conditions
+                    .fatalities
+                    .gte !==
+                    undefined &&
+
                 fatalities <
-                    conditions.fatalities.gte
+                    Number(
+                        conditions
+                            .fatalities
+                            .gte
+                    )
             ) {
 
                 return false;
@@ -200,11 +348,13 @@ class DecisionOverrideEngine {
 
         }
 
+
         return true;
 
     }
 
 }
+
 
 module.exports =
     DecisionOverrideEngine;
