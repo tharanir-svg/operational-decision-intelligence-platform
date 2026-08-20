@@ -2,10 +2,6 @@ class ThresholdEngine {
 
     constructor(thresholdMatrix) {
 
-        console.log(
-            ">>> USING ThresholdEngine from:",
-            __filename
-        );
 
         this.rules =
             thresholdMatrix.rules || [];

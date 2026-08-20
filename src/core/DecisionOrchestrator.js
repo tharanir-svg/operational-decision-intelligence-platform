@@ -41,7 +41,10 @@ class DecisionOrchestrator {
     constructor() {
 
         const loader = new KnowledgeLoader(
-            path.join(__dirname, "../../knowledge")
+            path.join(
+    process.cwd(),
+    "knowledge"
+)
         );
 
         const kb = loader.loadKnowledgeBase();
@@ -59,7 +62,7 @@ class DecisionOrchestrator {
 
 this.riskFactorKnowledge =
   new KnowledgeManager(
-    path.join(__dirname, "../..")
+    process.cwd()
   );
 
 this.riskFactorKnowledge.load(

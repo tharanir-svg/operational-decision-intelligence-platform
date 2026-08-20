@@ -4,7 +4,11 @@ const path = require("path");
 class TaxonomyRepository {
 
     constructor() {
-        this.basePath = path.join(__dirname, "../../knowledge/taxonomy");
+        this.basePath = path.join(
+    process.cwd(),
+    "knowledge",
+    "taxonomy"
+);
     }
 
     loadJSON(fileName) {

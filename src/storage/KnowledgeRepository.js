@@ -3,7 +3,10 @@ const path = require("path");
 
 class KnowledgeRepository {
   constructor() {
-    this.basePath = path.join(__dirname, "../../knowledge");
+    this.basePath = path.join(
+    process.cwd(),
+    "knowledge"
+);
   }
 
   loadJSON(relativePath) {
