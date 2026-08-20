@@ -55,7 +55,105 @@
       <!-- ── Step 0: Evidence Intake ──────────── -->
       <div class="step-pane active" id="pane-0">
 
-        <div class="pane-section-label">Context</div>
+  <!-- ── Intelligence Operating Mode ─────────── -->
+  <div class="mode-panel" id="intelligenceModePanel">
+
+    <div class="mode-panel-header">
+
+      <div>
+        <div class="pane-section-label mode-section-label">
+          Intelligence Mode
+        </div>
+
+        <div class="mode-description" id="modeDescription">
+          Choose how evidence is structured before operational decisioning.
+        </div>
+      </div>
+
+      <div class="mode-capability checking" id="aiCapabilityStatus">
+        Checking AI…
+      </div>
+
+    </div>
+
+
+    <div
+      class="mode-options"
+      role="radiogroup"
+      aria-label="Intelligence operating mode"
+    >
+
+      <label
+        class="mode-option selected"
+        id="aiModeOption"
+      >
+
+        <input
+          type="radio"
+          name="intelligenceMode"
+          id="aiMode"
+          value="AI_ASSISTED"
+          checked
+        />
+
+        <span class="mode-option-indicator"></span>
+
+        <span class="mode-option-content">
+
+          <span class="mode-option-title">
+            AI Assisted
+          </span>
+
+          <span class="mode-option-copy">
+            AI structures the evidence for analyst review.
+          </span>
+
+        </span>
+
+      </label>
+
+
+      <label
+        class="mode-option"
+        id="manualModeOption"
+      >
+
+        <input
+          type="radio"
+          name="intelligenceMode"
+          id="manualMode"
+          value="MANUAL"
+        />
+
+        <span class="mode-option-indicator"></span>
+
+        <span class="mode-option-content">
+
+          <span class="mode-option-title">
+            Manual Intelligence
+          </span>
+
+          <span class="mode-option-copy">
+            Analyst structures the intelligence without an AI call.
+          </span>
+
+        </span>
+
+      </label>
+
+    </div>
+
+
+    <div class="mode-note" id="modeNote">
+      AI assists with extraction only. Operational decisions remain policy and rules driven.
+    </div>
+
+  </div>
+
+
+  <div class="divider"></div>
+
+  <div class="pane-section-label">Context</div>
 
         <div class="field-group">
 
@@ -218,7 +316,7 @@
               <circle cx="6" cy="6" r="5.5" stroke="#6366f1" stroke-width="1"/>
               <path d="M4 6l1.5 1.5L8 4" stroke="#6366f1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            AI-Extracted Intelligence
+            <span id="intelModeBadgeText">AI-Extracted Intelligence</span>
           </div>
           <button class="back-btn" id="backToEvidence">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M7.5 2L3.5 6l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -375,58 +473,82 @@
 
     <div class="field-group">
 
-      <label
-        class="field-label"
-        for="ip-threshold"
-      >
-        Suggested Threshold
-      </label>
+      <div class="field-group">
 
-      <div class="select-wrap">
+  <label
+    class="field-label"
+    id="thresholdFieldLabel"
+    for="ip-threshold"
+  >
+    AI Suggested Threshold
+  </label>
 
-        <select
-          id="ip-threshold"
-          class="threshold-select"
-        >
+  <!-- AI mode: advisory only -->
+  <div
+    class="select-wrap"
+    id="thresholdSelectWrap"
+  >
 
-          <option value="SIGNAL">
-            SIGNAL
-          </option>
+    <select
+      id="ip-threshold"
+      class="threshold-select"
+    >
 
-          <option value="LOCAL_URGENT">
-            LOCAL URGENT
-          </option>
+      <option value="SIGNAL">
+        SIGNAL
+      </option>
 
-          <option value="NATIONAL_URGENT">
-            NATIONAL URGENT
-          </option>
+      <option value="LOCAL_URGENT">
+        LOCAL URGENT
+      </option>
 
-          <option value="GLOBAL_URGENT">
-            GLOBAL URGENT
-          </option>
+      <option value="NATIONAL_URGENT">
+        NATIONAL URGENT
+      </option>
 
-          <option value="FLASH">
-            FLASH
-          </option>
+      <option value="GLOBAL_URGENT">
+        GLOBAL URGENT
+      </option>
 
-        </select>
+      <option value="FLASH">
+        FLASH
+      </option>
 
-        <svg
-          class="select-chevron"
-          width="12"
-          height="12"
-          viewBox="0 0 12 12"
-        >
-          <path
-            d="M2 4l4 4 4-4"
-            stroke="#64748b"
-            stroke-width="1.5"
-            fill="none"
-            stroke-linecap="round"
-          />
-        </svg>
+    </select>
 
-      </div>
+    <svg
+      class="select-chevron"
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+    >
+      <path
+        d="M2 4l4 4 4-4"
+        stroke="#64748b"
+        stroke-width="1.5"
+        fill="none"
+        stroke-linecap="round"
+      />
+    </svg>
+
+  </div>
+
+  <!-- Manual mode: engine owns threshold -->
+  <div
+    id="engineThresholdDisplay"
+    class="engine-threshold-display hidden"
+  >
+    Calculated by ODIP
+  </div>
+
+  <div
+    id="thresholdFieldNote"
+    class="threshold-field-note"
+  >
+    Advisory only — ODIP independently calculates the operational threshold.
+  </div>
+
+</div>
 
     </div>
 
@@ -434,16 +556,24 @@
 
 </div>
 
-        <!-- AI Reasoning -->
-        <div class="ip-section">
-          <div class="ip-section-label">AI Reasoning</div>
+        <!-- Reasoning / Analyst Notes -->
+<div class="ip-section">
+
+  <div
+    class="ip-section-label"
+    id="reasoningSectionLabel"
+  >
+    AI Reasoning
+  </div>
           <div class="ai-reasoning-wrap">
             <div class="ai-reasoning-badge">
               <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
                 <circle cx="5.5" cy="5.5" r="4.5" stroke="#6366f1" stroke-width="1"/>
                 <path d="M5.5 3.5v2.5l1.5 1" stroke="#6366f1" stroke-width="1" stroke-linecap="round"/>
               </svg>
-              Model Reasoning
+              <span id="reasoningBadgeText">
+  Model Reasoning
+</span>
             </div>
             <textarea id="ip-reasoning" class="ip-textarea ip-reasoning-textarea" rows="5" spellcheck="false"></textarea>
           </div>

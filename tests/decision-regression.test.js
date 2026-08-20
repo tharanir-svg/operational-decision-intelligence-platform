@@ -1667,3 +1667,168 @@ test(
 
     }
 );
+//==================================================
+// 17. SEVERE TERRORISM WITHOUT CRITICAL INFRASTRUCTURE
+//==================================================
+
+test(
+    "Severe terrorism without critical infrastructure does not trigger Critical Infrastructure Terrorism override",
+    () => {
+
+        const {
+            validated,
+            result
+        } =
+            evaluate({
+
+                summary:
+                    "A bombing caused severe damage to a commercial warehouse. No fatalities or injuries have been confirmed.",
+
+                originalText:
+                    "A bombing caused severe damage to a commercial warehouse. No fatalities or injuries have been confirmed.",
+
+                eventType:
+                    "Bombing",
+
+                domain:
+                    "Terrorism",
+
+                region:
+                    "",
+
+                country:
+                    "United States",
+
+                city:
+                    "Chicago",
+
+                casualties: {
+                    fatalities: 0,
+                    injuries: 0
+                },
+
+                crowdSize:
+                    0,
+
+                infrastructureImpact:
+                    "Severe",
+
+                // Deliberately empty.
+                // Severe impact alone must NOT qualify
+                // as Critical Infrastructure Terrorism.
+                criticalInfrastructure:
+                    [],
+
+                threatIndicators: [
+                    "Bombing"
+                ],
+
+                weapons: [
+                    "Explosive device"
+                ],
+
+                organizations:
+                    [],
+
+                persons:
+                    [],
+
+                suggestedCategory:
+                    "Security",
+
+                suggestedThreshold:
+                    "SIGNAL",
+
+                reasoning:
+                    "",
+
+                recommendedActions:
+                    []
+
+            });
+
+
+        //==============================================
+        // INPUT VALIDATION
+        //==============================================
+
+        assert.equal(
+            validated.domain,
+            "Terrorism"
+        );
+
+
+        assert.equal(
+            validated.infrastructureImpact,
+            "Severe"
+        );
+
+
+        assert.deepEqual(
+            validated.criticalInfrastructure,
+            []
+        );
+
+
+        //==============================================
+        // RISK FACTORS
+        //==============================================
+
+        const factorNames =
+            result.riskScore.factors.map(
+                factor =>
+                    factor.factor
+            );
+
+
+        assert.ok(
+            factorNames.includes(
+                "Severe Infrastructure Impact"
+            )
+        );
+
+
+        assert.ok(
+            factorNames.includes(
+                "Terrorism Baseline"
+            )
+        );
+
+
+        assert.equal(
+            factorNames.includes(
+                "Critical Infrastructure Identified"
+            ),
+            false
+        );
+
+
+        //==============================================
+        // OVERRIDE SAFEGUARD
+        //==============================================
+
+        assert.equal(
+            result.overrideDecision.overridden,
+            false
+        );
+
+
+        assert.equal(
+            result.overrideDecision.overrideReason,
+            null
+        );
+
+
+        assert.equal(
+            result.overrideDecision.triggeredOverrides.length,
+            0
+        );
+
+
+        assert.equal(
+            result.overrideDecision.finalDecision,
+            result.overrideDecision.initialDecision
+        );
+
+    }
+);

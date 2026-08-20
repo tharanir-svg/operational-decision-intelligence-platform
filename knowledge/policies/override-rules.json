@@ -24,17 +24,20 @@
     },
 
     {
-      "id": "OVR-002",
-      "name": "Critical Infrastructure Terrorism",
-      "priority": 90,
+  "id": "OVR-002",
+  "name": "Critical Infrastructure Terrorism",
+  "priority": 90,
 
-      "conditions": {
-        "domain": "Terrorism",
-        "infrastructureImpact": "Severe"
-      },
+  "conditions": {
+    "domain": "Terrorism",
+    "infrastructureImpact": "Severe",
+    "criticalInfrastructure": {
+      "nonEmpty": true
+    }
+  },
 
-      "overrideDecision": "GLOBAL"
-    },
+  "overrideDecision": "GLOBAL"
+},
 
     {
       "id": "OVR-003",
