@@ -1,8 +1,3 @@
-const {
-    GoogleGenAI
-} = require("@google/genai");
-
-
 class GeminiClient {
 
     constructor() {
@@ -27,26 +22,31 @@ class GeminiClient {
         }
 
 
-        //==================================================
-        // CLIENT
-        //==================================================
-
-        this.client =
-            new GoogleGenAI({
-                apiKey
-            });
+        this.apiKey =
+            apiKey.trim();
 
 
         //==================================================
         // MODEL
         //
-        // Allow deployment environments to override the
-        // model without requiring a code change.
+        // Vertex AI Express Mode.
         //==================================================
 
         this.model =
             process.env.GEMINI_MODEL ||
-            "gemini-3.1-flash-lite";
+            "gemini-2.5-flash";
+
+
+        //==================================================
+        // VERTEX EXPRESS ENDPOINT
+        //
+        // Native REST is used instead of @google/genai.
+        // This avoids SDK authentication incompatibility
+        // inside the Cloudflare Workers runtime.
+        //==================================================
+
+        this.baseUrl =
+            "https://aiplatform.googleapis.com/v1/publishers/google/models";
 
     }
 
@@ -87,19 +87,72 @@ class GeminiClient {
         try {
 
             //==================================================
-            // GEMINI REQUEST
+            // BUILD REQUEST URL
+            //
+            // Do not log this URL because it contains the API
+            // key as a query parameter.
+            //==================================================
+
+            const url =
+                new URL(
+                    `${this.baseUrl}/${encodeURIComponent(this.model)}:generateContent`
+                );
+
+
+            url.searchParams.set(
+                "key",
+                this.apiKey
+            );
+
+
+            //==================================================
+            // VERTEX EXPRESS REST REQUEST
             //==================================================
 
             const response =
-                await this.client.models.generateContent({
+                await fetch(
+                    url.toString(),
+                    {
 
-                    model:
-                        this.model,
+                        method:
+                            "POST",
 
-                    contents:
-                        prompt
+                        headers: {
 
-                });
+                            "Content-Type":
+                                "application/json"
+
+                        },
+
+                        body:
+                            JSON.stringify({
+
+                                contents: [
+
+                                    {
+
+                                        role:
+                                            "user",
+
+                                        parts: [
+
+                                            {
+
+                                                text:
+                                                    prompt
+
+                                            }
+
+                                        ]
+
+                                    }
+
+                                ]
+
+                            })
+
+                    }
+                );
 
 
             const processingTime =
@@ -108,24 +161,87 @@ class GeminiClient {
 
 
             //==================================================
-            // RESPONSE VALIDATION
+            // PARSE RESPONSE
             //==================================================
 
-            if (
-                !response
-            ) {
+            let data;
+
+
+            try {
+
+                data =
+                    await response.json();
+
+            }
+
+            catch {
 
                 throw new Error(
-                    "Gemini returned no response."
+                    `Vertex AI returned an invalid response. HTTP ${response.status}.`
                 );
 
             }
 
 
+            //==================================================
+            // HTTP / API ERROR
+            //==================================================
+
+            if (
+                !response.ok
+            ) {
+
+                const apiMessage =
+                    data?.error?.message ||
+                    `Vertex AI request failed with HTTP ${response.status}.`;
+
+
+                throw new Error(
+                    apiMessage
+                );
+
+            }
+
+
+            //==================================================
+            // EXTRACT GENERATED TEXT
+            //==================================================
+
+            const candidates =
+                Array.isArray(data?.candidates)
+                    ? data.candidates
+                    : [];
+
+
+            if (
+                candidates.length === 0
+            ) {
+
+                throw new Error(
+                    "Vertex AI returned no candidates."
+                );
+
+            }
+
+
+            const parts =
+                Array.isArray(
+                    candidates[0]?.content?.parts
+                )
+                    ? candidates[0].content.parts
+                    : [];
+
+
             const text =
-                typeof response.text === "string"
-                    ? response.text.trim()
-                    : "";
+                parts
+                    .map(
+                        part =>
+                            typeof part?.text === "string"
+                                ? part.text
+                                : ""
+                    )
+                    .join("")
+                    .trim();
 
 
             if (
@@ -133,7 +249,7 @@ class GeminiClient {
             ) {
 
                 throw new Error(
-                    "Gemini returned an empty text response."
+                    "Vertex AI returned an empty text response."
                 );
 
             }
@@ -142,17 +258,22 @@ class GeminiClient {
             //==================================================
             // SAFE OPERATIONAL LOGGING
             //
-            // Do NOT print prompts, evidence, raw responses,
-            // API keys or incident content.
+            // Never log:
+            // - API key
+            // - request URL
+            // - prompt/evidence
+            // - raw model response
             //==================================================
 
             console.log(
-                `[Gemini] response received | model=${this.model} | latency=${processingTime}ms`
+                `[Gemini/VertexREST] response received | model=${this.model} | latency=${processingTime}ms`
             );
 
 
             //==================================================
             // SUCCESS
+            //
+            // Keep the same interface expected by ServiceV2.
             //==================================================
 
             return {
@@ -183,7 +304,7 @@ class GeminiClient {
             //==================================================
 
             console.error(
-                `[Gemini] request failed | model=${this.model} | latency=${processingTime}ms | ${error?.message || "Unknown error"}`
+                `[Gemini/VertexREST] request failed | model=${this.model} | latency=${processingTime}ms | ${error?.message || "Unknown error"}`
             );
 
 
@@ -194,7 +315,7 @@ class GeminiClient {
 
                 error:
                     error?.message ||
-                    "Gemini request failed.",
+                    "Vertex AI request failed.",
 
                 model:
                     this.model,

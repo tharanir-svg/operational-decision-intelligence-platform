@@ -145,3 +145,6 @@ vite.config.ts.timestamp-*
 # Cloudflare local/build artifacts
 .wrangler/
 dist-cloudflare/
+
+# Local Cloudflare secrets
+.dev.vars*
