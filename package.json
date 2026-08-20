@@ -20,5 +20,8 @@
   "dependencies": {
     "@google/genai": "^2.10.0",
     "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.124.0"
   }
 }
