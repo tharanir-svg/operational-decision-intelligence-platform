@@ -9,7 +9,9 @@
       "category": "Baseline",
       "severity": 1,
       "description": "Routine monitoring event with no escalation indicators.",
-      "appliesTo": ["All"],
+      "appliesTo": [
+        "All"
+      ],
       "decisionAction": "MONITOR",
       "recommendation": {
         "priority": "Low",
@@ -23,7 +25,12 @@
       "category": "Casualty",
       "severity": 2,
       "description": "Single confirmed fatality establishes Local Urgent baseline.",
-      "appliesTo": ["Conflict", "Crime", "Terrorism", "Infrastructure"],
+      "appliesTo": [
+        "Armed Conflict",
+        "Crime",
+        "Terrorism",
+        "Infrastructure"
+      ],
       "conditions": {
         "fatalities": {
           "gte": 1
@@ -42,7 +49,13 @@
       "category": "Casualty",
       "severity": 5,
       "description": "Mass casualty automatically upgrades to Flash severity.",
-      "appliesTo": ["Conflict", "Crime", "Terrorism", "Infrastructure"],
+      "appliesTo": [
+        "Armed Conflict",
+        "Crime",
+        "Terrorism",
+        "Infrastructure"
+      ],
+      "conditionLogic": "ANY",
       "conditions": {
         "fatalities": {
           "gte": 3
@@ -64,7 +77,10 @@
       "category": "Infrastructure",
       "severity": 4,
       "description": "Major disruption affecting national critical infrastructure.",
-      "appliesTo": ["Infrastructure", "Cyber"],
+      "appliesTo": [
+        "Infrastructure",
+        "Cyber Security"
+      ],
       "decisionAction": "ESCALATE",
       "recommendation": {
         "priority": "High",
@@ -78,7 +94,9 @@
       "category": "Cyber",
       "severity": 4,
       "description": "Confirmed cyber incident affecting critical operational systems.",
-      "appliesTo": ["Cyber"],
+      "appliesTo": [
+        "Cyber Security"
+      ],
       "decisionAction": "ESCALATE",
       "recommendation": {
         "priority": "High",
@@ -92,7 +110,9 @@
       "category": "Politics",
       "severity": 5,
       "description": "Events involving heads of state or constitutional continuity.",
-      "appliesTo": ["Politics"],
+      "appliesTo": [
+        "Political"
+      ],
       "decisionAction": "FLASH",
       "recommendation": {
         "priority": "Critical",
@@ -106,7 +126,9 @@
       "category": "Conflict",
       "severity": 4,
       "description": "Military escalation crossing predefined operational thresholds.",
-      "appliesTo": ["Conflict"],
+      "appliesTo": [
+        "Armed Conflict"
+      ],
       "decisionAction": "ESCALATE",
       "recommendation": {
         "priority": "High",
@@ -120,7 +142,9 @@
       "category": "Weather",
       "severity": 4,
       "description": "Major natural disaster requiring enterprise-wide monitoring.",
-      "appliesTo": ["Weather"],
+      "appliesTo": [
+        "Weather"
+      ],
       "decisionAction": "ESCALATE",
       "recommendation": {
         "priority": "High",
@@ -134,7 +158,9 @@
       "category": "Corporate",
       "severity": 3,
       "description": "Corporate event causing significant operational disruption.",
-      "appliesTo": ["Corporate"],
+      "appliesTo": [
+        "Corporate"
+      ],
       "decisionAction": "WATCH",
       "recommendation": {
         "priority": "Medium",
@@ -148,7 +174,10 @@
       "category": "Security",
       "severity": 3,
       "description": "Large-scale protests or civil disorder requiring operational awareness.",
-      "appliesTo": ["Politics", "Security"],
+      "appliesTo": [
+        "Civil Unrest",
+        "Political"
+      ],
       "decisionAction": "WATCH",
       "recommendation": {
         "priority": "Medium",

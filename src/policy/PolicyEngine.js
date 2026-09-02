@@ -3,15 +3,22 @@ class PolicyEngine {
     constructor(policyLibrary) {
 
         this.policyLibrary =
-            policyLibrary || { policies: [] };
+            policyLibrary || {
+                policies: []
+            };
 
     }
+
 
     evaluate(eventContext) {
 
         const triggeredPolicies = [];
 
-        for (const policy of this.policyLibrary.policies) {
+
+        for (
+            const policy of
+            this.policyLibrary.policies
+        ) {
 
             const evaluation =
                 this.evaluatePolicy(
@@ -19,36 +26,105 @@ class PolicyEngine {
                     eventContext
                 );
 
-            if (evaluation.matched) {
 
-                triggeredPolicies.push(evaluation);
+            if (
+                evaluation.matched
+            ) {
+
+                triggeredPolicies.push(
+                    evaluation
+                );
 
             }
 
         }
 
-        triggeredPolicies.sort(
 
-            (a, b) =>
-                (b.priority || 0) -
-                (a.priority || 0)
+        //==================================================
+        // BASELINE SUPPRESSION
+        //
+        // POL-001 is the fallback monitoring policy.
+        //
+        // If a substantive policy is triggered,
+        // Signal Baseline should not be presented as
+        // the event's triggered operational policy.
+        //==================================================
+
+        const substantivePolicies =
+            triggeredPolicies.filter(
+                policy =>
+                    policy.id !==
+                    "POL-001"
+            );
+
+
+        const finalPolicies =
+            substantivePolicies.length > 0
+
+                ? substantivePolicies
+
+                : triggeredPolicies;
+
+
+        finalPolicies.sort(
+
+            (a, b) => {
+
+                const severityDifference =
+                    Number(
+                        b.severity || 0
+                    ) -
+                    Number(
+                        a.severity || 0
+                    );
+
+
+                if (
+                    severityDifference !== 0
+                ) {
+
+                    return severityDifference;
+
+                }
+
+
+                return (
+                    Number(
+                        b.priority || 0
+                    ) -
+                    Number(
+                        a.priority || 0
+                    )
+                );
+
+            }
 
         );
 
-        return triggeredPolicies;
+
+        return finalPolicies;
 
     }
 
-    evaluatePolicy(policy, eventContext) {
+
+    evaluatePolicy(
+        policy,
+        eventContext
+    ) {
 
         const reasons = [];
 
-        //---------------------------------------
-        // Domain
-        //---------------------------------------
 
-        if (policy.appliesTo &&
-            !policy.appliesTo.includes("All")) {
+        //==================================================
+        // DOMAIN
+        //==================================================
+
+        if (
+            policy.appliesTo &&
+            !policy.appliesTo.includes(
+                "All"
+            )
+        ) {
 
             if (
                 !policy.appliesTo.includes(
@@ -62,17 +138,21 @@ class PolicyEngine {
 
             }
 
+
             reasons.push(
                 `Domain: ${eventContext.domain}`
             );
 
         }
 
-        //---------------------------------------
-        // Event Type
-        //---------------------------------------
 
-        if (policy.eventTypes) {
+        //==================================================
+        // EVENT TYPE
+        //==================================================
+
+        if (
+            policy.eventTypes
+        ) {
 
             if (
                 !policy.eventTypes.includes(
@@ -86,31 +166,145 @@ class PolicyEngine {
 
             }
 
+
             reasons.push(
                 `Event Type: ${eventContext.eventType}`
             );
 
         }
 
-        //---------------------------------------
-        // Conditions
-        //---------------------------------------
+
+        //==================================================
+        // CONDITIONS
+        //==================================================
 
         const conditions =
             policy.conditions || {};
 
-        //---------------------------------------
-        // Fatalities
-        //---------------------------------------
+
+        const conditionLogic =
+            String(
+                policy.conditionLogic ||
+                "ALL"
+            )
+                .trim()
+                .toUpperCase();
+
+
+        //==================================================
+        // CASUALTY CONDITIONS
+        //
+        // Default = ALL
+        //
+        // POL-003 Mass Casualty uses:
+        //
+        // conditionLogic: "ANY"
+        //
+        // fatalities >= 3 OR injuries >= 5
+        //==================================================
+
+        const casualtyChecks = [];
+
 
         if (
-            conditions.fatalities?.gte !== undefined
+            conditions
+                .fatalities
+                ?.gte !==
+            undefined
         ) {
 
+            const threshold =
+                Number(
+                    conditions
+                        .fatalities
+                        .gte
+                );
+
+
+            const actual =
+                Number(
+                    eventContext
+                        .fatalities ||
+                    0
+                );
+
+
+            casualtyChecks.push({
+
+                field:
+                    "Fatalities",
+
+                matched:
+                    actual >= threshold,
+
+                reason:
+                    `Fatalities >= ${threshold}`
+
+            });
+
+        }
+
+
+        if (
+            conditions
+                .injuries
+                ?.gte !==
+            undefined
+        ) {
+
+            const threshold =
+                Number(
+                    conditions
+                        .injuries
+                        .gte
+                );
+
+
+            const actual =
+                Number(
+                    eventContext
+                        .injuries ||
+                    0
+                );
+
+
+            casualtyChecks.push({
+
+                field:
+                    "Injuries",
+
+                matched:
+                    actual >= threshold,
+
+                reason:
+                    `Injuries >= ${threshold}`
+
+            });
+
+        }
+
+
+        if (
+            casualtyChecks.length > 0
+        ) {
+
+            const casualtyMatched =
+
+                conditionLogic === "ANY"
+
+                    ? casualtyChecks.some(
+                        check =>
+                            check.matched
+                    )
+
+                    : casualtyChecks.every(
+                        check =>
+                            check.matched
+                    );
+
+
             if (
-                (eventContext.fatalities || 0)
-                <
-                conditions.fatalities.gte
+                !casualtyMatched
             ) {
 
                 return {
@@ -119,59 +313,60 @@ class PolicyEngine {
 
             }
 
-            reasons.push(
 
-                `Fatalities >= ${conditions.fatalities.gte}`
+            // For ANY logic, show only conditions
+            // that actually triggered the policy.
+            //
+            // For ALL logic, every condition has
+            // already matched.
 
-            );
+            casualtyChecks
+                .filter(
+                    check =>
+                        check.matched
+                )
+                .forEach(
+                    check => {
 
-        }
+                        reasons.push(
+                            check.reason
+                        );
 
-        //---------------------------------------
-        // Injuries
-        //---------------------------------------
-
-        if (
-            conditions.injuries?.gte !== undefined
-        ) {
-
-            if (
-                (eventContext.injuries || 0)
-                <
-                conditions.injuries.gte
-            ) {
-
-                return {
-                    matched: false
-                };
-
-            }
-
-            reasons.push(
-
-                `Injuries >= ${conditions.injuries.gte}`
-
-            );
+                    }
+                );
 
         }
 
-        //---------------------------------------
-        // Confidence
-        //---------------------------------------
+
+        //==================================================
+        // CONFIDENCE
+        //==================================================
 
         if (
-            conditions.confidence?.gte !== undefined
+            conditions
+                .confidence
+                ?.gte !==
+            undefined
         ) {
 
             const confidence =
-                eventContext
-                    .confidenceAssessment
-                    ?.score || 0;
+                Number(
+                    eventContext
+                        .confidenceAssessment
+                        ?.score ||
+                    eventContext
+                        .confidence ||
+                    0
+                );
+
 
             if (
-                confidence
-                <
-                conditions.confidence.gte
+                confidence <
+                Number(
+                    conditions
+                        .confidence
+                        .gte
+                )
             ) {
 
                 return {
@@ -179,6 +374,7 @@ class PolicyEngine {
                 };
 
             }
+
 
             reasons.push(
 
@@ -188,11 +384,14 @@ class PolicyEngine {
 
         }
 
-        //---------------------------------------
-        // Region
-        //---------------------------------------
 
-        if (policy.regions) {
+        //==================================================
+        // REGION
+        //==================================================
+
+        if (
+            policy.regions
+        ) {
 
             if (
                 !policy.regions.includes(
@@ -206,19 +405,21 @@ class PolicyEngine {
 
             }
 
+
             reasons.push(
-
                 `Region: ${eventContext.region}`
-
             );
 
         }
 
-        //---------------------------------------
-        // Country
-        //---------------------------------------
 
-        if (policy.countries) {
+        //==================================================
+        // COUNTRY
+        //==================================================
+
+        if (
+            policy.countries
+        ) {
 
             if (
                 !policy.countries.includes(
@@ -232,19 +433,21 @@ class PolicyEngine {
 
             }
 
+
             reasons.push(
-
                 `Country: ${eventContext.country}`
-
             );
 
         }
 
-        //---------------------------------------
-        // Infrastructure
-        //---------------------------------------
 
-        if (policy.infrastructure) {
+        //==================================================
+        // INFRASTRUCTURE
+        //==================================================
+
+        if (
+            policy.infrastructure
+        ) {
 
             if (
                 !policy.infrastructure.includes(
@@ -258,56 +461,62 @@ class PolicyEngine {
 
             }
 
+
             reasons.push(
-
                 `Infrastructure: ${eventContext.infrastructure}`
-
             );
 
         }
 
-        //---------------------------------------
+
+        //==================================================
+        // MATCHED POLICY
+        //==================================================
 
         return {
 
-    matched: true,
+            matched:
+                true,
 
-    id:
-        policy.id ||
-        policy.policyId ||
-        "",
+            id:
+                policy.id ||
+                policy.policyId ||
+                "",
 
-    policyId:
-        policy.id ||
-        policy.policyId ||
-        "",
+            policyId:
+                policy.id ||
+                policy.policyId ||
+                "",
 
-    name:
-        policy.name ||
-        policy.title ||
-        "",
+            name:
+                policy.name ||
+                policy.title ||
+                "",
 
-    title:
-        policy.name ||
-        policy.title ||
-        "",
+            title:
+                policy.name ||
+                policy.title ||
+                "",
 
-    severity:
-        policy.severity,
+            severity:
+                policy.severity,
 
-    priority:
-        policy.priority || 0,
+            priority:
+                policy.priority ||
+                0,
 
-    decisionAction:
-        policy.decisionAction ||
-        null,
+            decisionAction:
+                policy.decisionAction ||
+                null,
 
-    reasons
+            reasons
 
-};
+        };
 
     }
 
 }
 
-module.exports = PolicyEngine;
+
+module.exports =
+    PolicyEngine;

@@ -539,6 +539,121 @@ test(
             true
         );
 
+                //==================================================
+        // TRIGGERED POLICY
+        //
+        // 15 injuries independently satisfies
+        // the Mass Casualty policy.
+        //
+        // Signal Baseline must be suppressed once
+        // a substantive operational policy matches.
+        //==================================================
+
+        const policyIds =
+            result.policies.map(
+                policy =>
+                    policy.id
+            );
+
+
+        assert.ok(
+            policyIds.includes(
+                "POL-003"
+            )
+        );
+
+
+        assert.equal(
+            policyIds.includes(
+                "POL-001"
+            ),
+            false
+        );
+
+
+        const massCasualtyPolicy =
+            result.policies.find(
+                policy =>
+                    policy.id ===
+                    "POL-003"
+            );
+
+
+        assert.ok(
+            massCasualtyPolicy
+        );
+
+
+        assert.equal(
+            massCasualtyPolicy.name,
+            "Mass Casualty"
+        );
+
+
+        assert.equal(
+            massCasualtyPolicy.severity,
+            5
+        );
+
+
+        assert.equal(
+            massCasualtyPolicy.decisionAction,
+            "FLASH"
+        );
+
+
+        //==================================================
+        // MASS CASUALTY OVERRIDE SAFEGUARD
+        //
+        // OVR-001 should recognise POL-003,
+        // but because ThresholdEngine already returned
+        // FLASH, the override must not change the decision.
+        //==================================================
+
+        const massCasualtyOverride =
+            result.overrideDecision
+                .triggeredOverrides
+                .find(
+                    item =>
+                        item.id ===
+                        "OVR-001"
+                );
+
+
+        assert.ok(
+            massCasualtyOverride
+        );
+
+
+        assert.equal(
+            massCasualtyOverride.name,
+            "Mass Casualty Override"
+        );
+
+
+        assert.equal(
+            massCasualtyOverride.decision,
+            "FLASH"
+        );
+
+
+        assert.equal(
+            massCasualtyOverride.applied,
+            false
+        );
+
+
+        assert.equal(
+            result.overrideDecision.finalDecision,
+            "FLASH"
+        );
+
+
+        assert.equal(
+            result.overrideDecision.overridden,
+            false
+        );
+
     }
 );
 
