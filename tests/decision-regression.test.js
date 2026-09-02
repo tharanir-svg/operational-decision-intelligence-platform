@@ -260,13 +260,12 @@ test(
     }
 );
 
-
 //==================================================
 // 2. PHILADELPHIA — MASS SHOOTING / CRIME
 //==================================================
 
 test(
-    "Philadelphia mass shooting -> Crime, 55, FLASH",
+    "Philadelphia City Hall mass shooting -> Crime, Severe, 80, FLASH",
     () => {
 
         const {
@@ -276,23 +275,27 @@ test(
             evaluate({
 
                 summary:
-                    "A mass shooting incident occurred at Philadelphia City Hall resulting in 15 injuries.",
+                    "A mass shooting incident occurred at Philadelphia City Hall resulting in 15 injuries. Police said no terrorist motive has been established.",
 
                 originalText:
-                    "A mass shooting incident occurred at Philadelphia City Hall resulting in 15 injuries.",
+                    "A mass shooting incident occurred at Philadelphia City Hall resulting in 15 injuries. Police said no terrorist motive has been established.",
 
                 eventType:
                     "Mass Shooting",
 
                 // Deliberately wrong AI classification.
+                // Validator must correct this to Crime
+                // because terrorism is explicitly negated.
                 domain:
                     "Terrorism",
 
                 region:
                     "",
 
+                // Deliberately use alias.
+                // Validator must normalize this.
                 country:
-                    "United States",
+                    "USA",
 
                 city:
                     "Philadelphia",
@@ -305,6 +308,9 @@ test(
                 crowdSize:
                     0,
 
+                // Deliberately lower than expected.
+                // City Hall + kinetic event must
+                // deterministically upgrade this to Severe.
                 infrastructureImpact:
                     "Minor",
 
@@ -325,9 +331,10 @@ test(
                 persons: [],
 
                 suggestedCategory:
-                    "Violent Crime / Terrorism",
+                    "Security",
 
                 // Deliberately wrong.
+                // Casualty policy must force FLASH.
                 suggestedThreshold:
                     "MONITOR",
 
@@ -340,11 +347,19 @@ test(
             });
 
 
+        //==================================================
+        // DOMAIN
+        //==================================================
+
         assert.equal(
             validated.domain,
             "Crime"
         );
 
+
+        //==================================================
+        // EVENT TYPE
+        //==================================================
 
         assert.equal(
             validated.eventType,
@@ -352,17 +367,45 @@ test(
         );
 
 
+        //==================================================
+        // COUNTRY NORMALIZATION
+        //
+        // USA -> United States
+        //==================================================
+
+        assert.equal(
+            validated.country,
+            "United States"
+        );
+
+
+        //==================================================
+        // REGION RESOLUTION
+        //
+        // United States -> North America
+        //==================================================
+
         assert.equal(
             validated.region,
             "North America"
         );
 
 
+        //==================================================
+        // INFRASTRUCTURE IMPACT
+        //
+        // City Hall + kinetic shooting = Severe
+        //==================================================
+
         assert.equal(
             validated.infrastructureImpact,
-            "Minor"
+            "Severe"
         );
 
+
+        //==================================================
+        // CATEGORY
+        //==================================================
 
         assert.equal(
             validated.suggestedCategory,
@@ -370,17 +413,43 @@ test(
         );
 
 
+        //==================================================
+        // THRESHOLD
+        //
+        // 15 injuries exceeds the mass-casualty
+        // injury threshold and must produce FLASH.
+        //==================================================
+
         assert.equal(
             validated.suggestedThreshold,
             "FLASH"
         );
 
 
+        //==================================================
+        // RISK SCORE
+        //
+        // Confirmed Injury Burden:
+        // 15 × 3 = 45
+        //
+        // Critical Infrastructure:
+        // +10
+        //
+        // Severe Infrastructure:
+        // +25
+        //
+        // Total = 80
+        //==================================================
+
         assert.equal(
             result.riskScore.score,
-            55
+            80
         );
 
+
+        //==================================================
+        // RISK FACTORS
+        //==================================================
 
         const factorNames =
             result.riskScore.factors.map(
@@ -403,6 +472,16 @@ test(
         );
 
 
+        assert.ok(
+            factorNames.includes(
+                "Severe Infrastructure Impact"
+            )
+        );
+
+
+        // Explicitly verify that the corrected
+        // Crime classification does NOT accidentally
+        // receive terrorism risk points.
         assert.equal(
             factorNames.includes(
                 "Terrorism Baseline"
@@ -410,6 +489,10 @@ test(
             false
         );
 
+
+        //==================================================
+        // DETERMINISTIC THRESHOLD DECISION
+        //==================================================
 
         assert.equal(
             result.thresholdDecision.action,
@@ -420,6 +503,18 @@ test(
         assert.equal(
             result.thresholdDecision.ruleId,
             "THR-MASS-CASUALTY-INJURIES"
+        );
+
+
+        //==================================================
+        // OVERRIDE SAFETY
+        //
+        // FLASH must remain FLASH.
+        //==================================================
+
+        assert.equal(
+            result.overrideDecision.initialDecision,
+            "FLASH"
         );
 
 
@@ -435,6 +530,10 @@ test(
         );
 
 
+        //==================================================
+        // RECOMMENDATION / KINETIC EVENT
+        //==================================================
+
         assert.equal(
             result.recommendedActions.kineticEvent,
             true
@@ -442,7 +541,6 @@ test(
 
     }
 );
-
 
 //==================================================
 // 3. CONFIRMED FATALITY BASELINE

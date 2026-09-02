@@ -99,9 +99,11 @@ class ValidatorV2 {
 
 
         intel.country =
-            this.str(
-                intel.country
-            ).trim();
+    this.normalizeCountryAlias(
+        this.str(
+            intel.country
+        ).trim()
+    );
 
 
         intel.city =
@@ -663,7 +665,57 @@ class ValidatorV2 {
     );
 
 }
+//==================================================
+// COUNTRY ALIASES
+//==================================================
 
+normalizeCountryAlias(value) {
+
+    const cleaned =
+        this.str(value)
+            .trim();
+
+    const key =
+        cleaned
+            .toLowerCase();
+
+    const aliases = {
+
+        "usa":
+            "United States",
+
+        "us":
+            "United States",
+
+        "u.s.":
+            "United States",
+
+        "u.s.a.":
+            "United States",
+
+        "united states of america":
+            "United States",
+
+        "uk":
+            "United Kingdom",
+
+        "u.k.":
+            "United Kingdom",
+
+        "uae":
+            "United Arab Emirates",
+
+        "u.a.e.":
+            "United Arab Emirates"
+
+    };
+
+    return (
+        aliases[key] ||
+        cleaned
+    );
+
+}
 
     //==================================================
     // REGION RESOLUTION
@@ -891,6 +943,38 @@ class ValidatorV2 {
     const hasCriticalInfrastructure =
         infrastructure.length > 0;
 
+    const infrastructureText =
+        infrastructure
+        .join(" ")
+        .toLowerCase();
+
+
+    const highValueGovernmentIndicators = [
+
+    "city hall",
+
+    "government building",
+
+    "capitol",
+
+    "parliament",
+
+    "white house",
+
+    "presidential palace",
+
+    "municipal building"
+
+];
+
+
+    const highValueGovernmentFacility =
+        highValueGovernmentIndicators.some(
+            indicator =>
+                infrastructureText.includes(
+                    indicator
+            )
+    );
 
     //==================================================
     // Casualties
@@ -1026,7 +1110,41 @@ class ValidatorV2 {
         domain ===
         "terrorism";
 
+    //==================================================
+// HIGH-VALUE GOVERNMENT FACILITY
+//
+// A kinetic incident directly involving a
+// high-value civic/government facility is treated
+// as Severe infrastructure impact.
+//==================================================
 
+if (
+    hasCriticalInfrastructure &&
+    highValueGovernmentFacility &&
+    kinetic
+) {
+
+    return "Severe";
+
+}
+
+//==================================================
+// HIGH-VALUE GOVERNMENT FACILITY
+//
+// A kinetic incident directly involving a
+// high-value civic/government facility is treated
+// as Severe infrastructure impact.
+//==================================================
+
+if (
+    hasCriticalInfrastructure &&
+    highValueGovernmentFacility &&
+    kinetic
+) {
+
+    return "Severe";
+
+}
     //==================================================
     // DETERMINISTIC SEVERE OVERRIDE
     //
