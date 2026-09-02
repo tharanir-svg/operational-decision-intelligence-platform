@@ -68,9 +68,20 @@ class DecisionTraceEngine {
             engine: "DecisionOverrideEngine",
 
             decision:
-                overrideDecision.overridden
-                    ? `Decision overridden to ${overrideDecision.finalDecision}`
-                    : "No override required"
+    overrideDecision.overridden
+
+        ? `Decision escalated to ${overrideDecision.finalDecision}`
+
+        : (
+            Array.isArray(
+                overrideDecision.triggeredOverrides
+            ) &&
+            overrideDecision.triggeredOverrides.length > 0
+        )
+
+            ? `Override safeguard matched; existing ${overrideDecision.finalDecision} decision was equal or higher`
+
+            : "No override rule triggered"
 
         });
 

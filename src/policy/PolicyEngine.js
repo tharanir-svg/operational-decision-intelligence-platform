@@ -270,23 +270,41 @@ class PolicyEngine {
 
         return {
 
-            matched: true,
+    matched: true,
 
-            policyId:
-                policy.policyId,
+    id:
+        policy.id ||
+        policy.policyId ||
+        "",
 
-            title:
-                policy.title,
+    policyId:
+        policy.id ||
+        policy.policyId ||
+        "",
 
-            severity:
-                policy.severity,
+    name:
+        policy.name ||
+        policy.title ||
+        "",
 
-            priority:
-                policy.priority || 0,
+    title:
+        policy.name ||
+        policy.title ||
+        "",
 
-            reasons
+    severity:
+        policy.severity,
 
-        };
+    priority:
+        policy.priority || 0,
+
+    decisionAction:
+        policy.decisionAction ||
+        null,
+
+    reasons
+
+};
 
     }
 

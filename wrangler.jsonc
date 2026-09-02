@@ -25,18 +25,32 @@
 
   "find_additional_modules": true,
 
-  "base_dir": ".",
+"base_dir": ".",
 
-  "preserve_file_names": true,
+"preserve_file_names": true,
 
-  "rules": [
-    {
-      "type": "Data",
-      "globs": [
-        "knowledge/**/*.json",
-        "src/knowledge/**/*.json"
-      ],
-      "fallthrough": true
-    }
-  ]
+"rules": [
+  {
+    "type": "Data",
+    "globs": [
+      "knowledge/**/*.json",
+      "src/knowledge/**/*.json"
+    ],
+    "fallthrough": false
+  },
+  {
+    "type": "Text",
+    "globs": [
+      "__odip_no_text_modules__/**/*.txt"
+    ],
+    "fallthrough": false
+  },
+  {
+    "type": "CompiledWasm",
+    "globs": [
+      "__odip_no_wasm_modules__/**/*.wasm"
+    ],
+    "fallthrough": false
+  }
+]
 }

@@ -54,28 +54,52 @@ class ExplanationEngine {
         summary +=
             `The Threshold Engine initially classified the event as ${initialThreshold}. `;
 
-        if (overridden) {
+        const triggeredOverrides =
+    Array.isArray(
+        overrideDecision?.triggeredOverrides
+    )
+        ? overrideDecision.triggeredOverrides
+        : [];
 
-            summary +=
-                `The Decision Override Engine upgraded the operational decision to ${finalDecision}`;
 
-            if (overrideReason) {
+if (overridden) {
 
-                summary +=
-                    ` based on the "${overrideReason}" rule.`;
+    summary +=
+        `The Decision Override Engine escalated the operational decision to ${finalDecision}`;
 
-            } else {
+    if (overrideReason) {
 
-                summary += ".";
+        summary +=
+            ` based on the "${overrideReason}" rule.`;
 
-            }
+    } else {
 
-        } else {
+        summary += ".";
 
-            summary +=
-                `No override rules were triggered. The final operational decision remains ${finalDecision}.`;
+    }
 
-        }
+} else if (
+    triggeredOverrides.length > 0
+) {
+
+    const names =
+        triggeredOverrides
+            .map(
+                item =>
+                    item.name
+            )
+            .filter(Boolean)
+            .join(", ");
+
+    summary +=
+        `Override safeguard${triggeredOverrides.length > 1 ? "s" : ""} ${names ? `"${names}" ` : ""}matched, but no escalation was required because the existing ${initialThreshold} decision was equal or higher. The final operational decision remains ${finalDecision}.`;
+
+} else {
+
+    summary +=
+        `No override rules were triggered. The final operational decision remains ${finalDecision}.`;
+
+}
 
         // ------------------------------------
         // Return

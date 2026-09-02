@@ -26,7 +26,6 @@ class DecisionOverrideEngine {
                 thresholdDecision
             );
 
-
         let finalDecision =
             initialDecision;
 
@@ -40,7 +39,6 @@ class DecisionOverrideEngine {
             [];
 
 
-        // Highest priority rule first
         const sortedRules =
             [...this.rules].sort(
                 (a, b) =>
@@ -49,10 +47,7 @@ class DecisionOverrideEngine {
             );
 
 
-        for (
-            const rule of
-            sortedRules
-        ) {
+        for (const rule of sortedRules) {
 
             if (
                 !this.matchesRule(
@@ -61,10 +56,30 @@ class DecisionOverrideEngine {
                     normalizedInput
                 )
             ) {
-
                 continue;
-
             }
+
+
+            const candidateDecision =
+                this.getDecisionLevel(
+                    rule.overrideDecision
+                );
+
+
+            const currentPriority =
+                this.getDecisionPriority(
+                    finalDecision
+                );
+
+            const candidatePriority =
+                this.getDecisionPriority(
+                    candidateDecision
+                );
+
+
+            const applied =
+                candidatePriority >
+                currentPriority;
 
 
             triggeredOverrides.push({
@@ -76,25 +91,31 @@ class DecisionOverrideEngine {
                     rule.name,
 
                 decision:
-                    rule.overrideDecision
+                    candidateDecision,
+
+                applied
 
             });
 
 
-            finalDecision =
-                rule.overrideDecision;
+            // Override rules may ESCALATE a decision,
+            // but must never downgrade or falsely
+            // "override" an equal decision.
+            if (!applied) {
+                continue;
+            }
 
+
+            finalDecision =
+                candidateDecision;
 
             overrideReason =
                 rule.name;
 
-
             overridden =
                 true;
 
-
-            // Highest-priority matching
-            // override wins.
+            // Highest-priority valid escalation wins.
             break;
 
         }
@@ -117,45 +138,96 @@ class DecisionOverrideEngine {
     }
 
 
-    //==================================================
-    // Resolve Decision Level
-    //==================================================
-
     getDecisionLevel(decision) {
 
         if (!decision) {
-
             return "MONITOR";
-
         }
-
 
         if (
             typeof decision ===
             "string"
         ) {
-
             return decision;
-
         }
 
-
         return (
-
             decision.level ||
-
             decision.action ||
-
             "MONITOR"
-
         );
 
     }
 
 
-    //==================================================
-    // Match Override Rule
-    //==================================================
+    getDecisionPriority(decision) {
+
+        const level =
+            this.getDecisionLevel(
+                decision
+            );
+
+
+        if (
+            this.priorityOrder[level] !==
+            undefined
+        ) {
+
+            return Number(
+                this.priorityOrder[level]
+            ) || 0;
+
+        }
+
+
+        // GLOBAL and GLOBAL_URGENT are equivalent
+        // operational severity labels.
+        if (
+            level === "GLOBAL_URGENT" &&
+            this.priorityOrder.GLOBAL !==
+            undefined
+        ) {
+
+            return Number(
+                this.priorityOrder.GLOBAL
+            ) || 0;
+
+        }
+
+
+        if (
+            level === "GLOBAL" &&
+            this.priorityOrder.GLOBAL_URGENT !==
+            undefined
+        ) {
+
+            return Number(
+                this.priorityOrder.GLOBAL_URGENT
+            ) || 0;
+
+        }
+
+
+        const fallbackOrder = {
+
+            MONITOR: 0,
+            SIGNAL: 1,
+            LOCAL_URGENT: 2,
+            NATIONAL_URGENT: 3,
+            GLOBAL: 4,
+            GLOBAL_URGENT: 4,
+            FLASH: 5
+
+        };
+
+
+        return (
+            fallbackOrder[level] ??
+            0
+        );
+
+    }
+
 
     matchesRule(
         rule,
@@ -167,32 +239,25 @@ class DecisionOverrideEngine {
             rule?.conditions || {};
 
 
-        //==================================================
-        // POLICY
-        //==================================================
-
         if (conditions.policyId) {
 
             const matched =
                 triggeredPolicies.some(
                     policy =>
-                        policy?.id ===
+                        (
+                            policy?.id ||
+                            policy?.policyId
+                        ) ===
                         conditions.policyId
                 );
 
 
             if (!matched) {
-
                 return false;
-
             }
 
         }
 
-
-        //==================================================
-        // DOMAIN
-        //==================================================
 
         if (conditions.domain) {
 
@@ -200,17 +265,11 @@ class DecisionOverrideEngine {
                 input.domain !==
                 conditions.domain
             ) {
-
                 return false;
-
             }
 
         }
 
-
-        //==================================================
-        // EVENT TYPE
-        //==================================================
 
         if (conditions.eventType) {
 
@@ -218,17 +277,11 @@ class DecisionOverrideEngine {
                 input.eventType !==
                 conditions.eventType
             ) {
-
                 return false;
-
             }
 
         }
 
-
-        //==================================================
-        // INFRASTRUCTURE IMPACT
-        //==================================================
 
         if (
             conditions.infrastructureImpact
@@ -238,23 +291,11 @@ class DecisionOverrideEngine {
                 input.infrastructureImpact !==
                 conditions.infrastructureImpact
             ) {
-
                 return false;
-
             }
 
         }
 
-
-        //==================================================
-        // CRITICAL INFRASTRUCTURE PRESENCE
-        //
-        // Example rule:
-        //
-        // "criticalInfrastructure": {
-        //     "nonEmpty": true
-        // }
-        //==================================================
 
         if (
             conditions
@@ -300,22 +341,14 @@ class DecisionOverrideEngine {
                             .length > 0;
 
 
-                if (
-                    !hasInfrastructure
-                ) {
-
+                if (!hasInfrastructure) {
                     return false;
-
                 }
 
             }
 
         }
 
-
-        //==================================================
-        // FATALITIES
-        //==================================================
 
         if (
             conditions.fatalities
@@ -324,6 +357,8 @@ class DecisionOverrideEngine {
             const fatalities =
                 Number(
                     input.fatalities ||
+                    input.casualties
+                        ?.fatalities ||
                     0
                 );
 

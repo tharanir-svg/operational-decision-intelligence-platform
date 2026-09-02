@@ -71,7 +71,7 @@ function evaluate(input) {
 //==================================================
 
 test(
-    "White House suicide bombing -> Severe, 110, FLASH -> GLOBAL",
+    "White House suicide bombing -> Severe, 110, FLASH remains FLASH",
     () => {
 
         const {
@@ -235,21 +235,21 @@ test(
 
 
         assert.equal(
-            result.overrideDecision.finalDecision,
-            "GLOBAL"
-        );
+    result.overrideDecision.finalDecision,
+    "FLASH"
+);
 
 
-        assert.equal(
-            result.overrideDecision.overridden,
-            true
-        );
+    assert.equal(
+    result.overrideDecision.overridden,
+    false
+);
 
 
-        assert.equal(
-            result.overrideDecision.overrideReason,
-            "Critical Infrastructure Terrorism"
-        );
+    assert.equal(
+    result.overrideDecision.overrideReason,
+    null
+);
 
 
         assert.equal(
@@ -1828,6 +1828,101 @@ test(
         assert.equal(
             result.overrideDecision.finalDecision,
             result.overrideDecision.initialDecision
+        );
+
+    }
+);
+//==================================================
+// 18. NEGATED TERRORISM EVIDENCE
+//==================================================
+
+test(
+    "Mass Shooting with explicit no-terrorism statement resolves to Crime",
+    () => {
+
+        const validated =
+            validate({
+
+                summary:
+                    "A mass shooting occurred in Philadelphia, resulting in 15 reported injuries. Police said no terrorist motive has been established.",
+
+                originalText:
+                    "A mass shooting occurred in Philadelphia, resulting in 15 reported injuries. Police said no terrorist motive has been established.",
+
+                eventType:
+                    "Mass Shooting",
+
+                // Deliberately incorrect AI classification.
+                domain:
+                    "Terrorism",
+
+                region:
+                    "",
+
+                country:
+                    "United States",
+
+                city:
+                    "Philadelphia",
+
+                casualties: {
+                    fatalities: 0,
+                    injuries: 15
+                },
+
+                crowdSize:
+                    0,
+
+                infrastructureImpact:
+                    "None",
+
+                criticalInfrastructure:
+                    [],
+
+                threatIndicators:
+                    [],
+
+                weapons: [
+                    "Firearm"
+                ],
+
+                organizations:
+                    [],
+
+                persons:
+                    [],
+
+                suggestedCategory:
+                    "Security",
+
+                suggestedThreshold:
+                    "FLASH",
+
+                reasoning:
+                    "",
+
+                recommendedActions:
+                    []
+
+            });
+
+
+        assert.equal(
+            validated.domain,
+            "Crime"
+        );
+
+
+        assert.equal(
+            validated.suggestedCategory,
+            "Violent Crime"
+        );
+
+
+        // Casualty threshold remains authoritative.
+        assert.equal(
+            validated.suggestedThreshold,
+            "FLASH"
         );
 
     }

@@ -1,41 +1,30 @@
-const fs = require("fs");
-const path = require("path");
+const ThresholdEngine =
+    require("../engine/ThresholdEngine");
 
-const ThresholdEngine = require("../engine/ThresholdEngine");
-const thresholdMatrix = require("../../knowledge/policies/threshold-matrix.json");
+const thresholdMatrix =
+    require("../../knowledge/policies/threshold-matrix.json");
 
+const countriesTaxonomy =
+    require("../../knowledge/taxonomy/countries.json");
+
+const domainsTaxonomy =
+    require("../../knowledge/taxonomy/domains.json");
+
+const eventTypesTaxonomy =
+    require("../../knowledge/taxonomy/event-types.json");
 
 class ValidatorV2 {
 
     constructor() {
 
-        this.taxonomyPath =
-            path.join(
-                process.cwd(),
-                "knowledge",
-                "taxonomy"
-            );
-
-
         this.countries =
-            this.loadJson(
-                "countries.json",
-                {}
-            );
-
+    countriesTaxonomy;
 
         this.domains =
-            this.loadJson(
-                "domains.json",
-                { domains: [] }
-            );
-
+    domainsTaxonomy;
 
         this.eventTypes =
-            this.loadJson(
-                "event-types.json",
-                {}
-            );
+    eventTypesTaxonomy;
 
 
         this.validDomains =
@@ -561,78 +550,119 @@ class ValidatorV2 {
 
     hasTerrorismIndicators(i) {
 
-        /*
-         * IMPORTANT
-         *
-         * Do NOT use:
-         *
-         * i.domain
-         * i.suggestedCategory
-         *
-         * Those are AI classifications.
-         *
-         * They must not be allowed to prove their
-         * own classification.
-         */
+    /*
+     * IMPORTANT
+     *
+     * Terrorism classification must be supported
+     * by affirmative evidence.
+     *
+     * Negated statements such as:
+     *
+     * "no terrorist motive"
+     * "no evidence of terrorism"
+     * "terrorism has been ruled out"
+     *
+     * must NOT be treated as terrorism indicators.
+     */
+
+    let text = [
+
+        i.summary,
+
+        i.originalText,
+
+        ...this.array(
+            i.threatIndicators
+        ),
+
+        ...this.array(
+            i.organizations
+        )
+
+    ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
 
 
-        const text = [
+    //==================================================
+    // REMOVE NEGATED TERRORISM REFERENCES
+    //==================================================
 
-            i.summary,
+    const negatedPatterns = [
 
-            i.originalText,
+        /\bno\s+(?:known\s+|confirmed\s+)?terrorist\s+(?:motive|link|connection|involvement|nexus)\b/g,
 
-            ...this.array(
-                i.threatIndicators
-            ),
+        /\bno\s+(?:evidence|indication|sign)\s+of\s+terror(?:ism|ist)\b/g,
 
-            ...this.array(
-                i.organizations
-            )
+        /\bterrorist\s+motive\s+(?:has\s+)?not\s+been\s+(?:established|confirmed|identified)\b/g,
 
-        ]
-            .filter(Boolean)
-            .join(" ")
-            .toLowerCase();
+        /\bterror(?:ism|ist)\s+(?:link|connection|nexus)\s+(?:has\s+)?not\s+been\s+(?:established|confirmed|identified)\b/g,
 
+        /\bterror(?:ism|ist)\s+(?:has\s+been\s+)?ruled\s+out\b/g,
 
-        const indicators = [
+        /\bnot\s+(?:being\s+)?treated\s+as\s+terrorism\b/g,
 
-            "terrorist",
+        /\bnot\s+believed\s+to\s+be\s+terrorism\b/g
 
-            "terrorism",
-
-            "terror group",
-
-            "terror organization",
-
-            "extremist",
-
-            "extremism",
-
-            "ideologically motivated",
-
-            "jihadist",
-
-            "jihad",
-
-            "militant group",
-
-            "claimed responsibility",
-
-            "terror cell"
-
-        ];
+    ];
 
 
-        return indicators.some(
-            indicator =>
-                text.includes(
-                    indicator
-                )
-        );
+    for (
+        const pattern of
+        negatedPatterns
+    ) {
+
+        text =
+            text.replace(
+                pattern,
+                " "
+            );
 
     }
+
+
+    //==================================================
+    // AFFIRMATIVE TERRORISM INDICATORS
+    //==================================================
+
+    const indicators = [
+
+        "terrorist",
+
+        "terrorism",
+
+        "terror group",
+
+        "terror organization",
+
+        "extremist",
+
+        "extremism",
+
+        "ideologically motivated",
+
+        "jihadist",
+
+        "jihad",
+
+        "militant group",
+
+        "claimed responsibility",
+
+        "terror cell"
+
+    ];
+
+
+    return indicators.some(
+        indicator =>
+            text.includes(
+                indicator
+            )
+    );
+
+}
 
 
     //==================================================
@@ -1304,51 +1334,6 @@ class ValidatorV2 {
         );
 
     }
-
-
-    //==================================================
-    // LOAD JSON
-    //==================================================
-
-    loadJson(
-        filename,
-        fallback
-    ) {
-
-        try {
-
-            const file =
-                path.join(
-                    this.taxonomyPath,
-                    filename
-                );
-
-
-            return JSON.parse(
-                fs.readFileSync(
-                    file,
-                    "utf8"
-                )
-            );
-
-        }
-        catch (error) {
-
-            console.error(
-
-                `Unable to load taxonomy ${filename}:`,
-
-                error.message
-
-            );
-
-
-            return fallback;
-
-        }
-
-    }
-
 
     //==================================================
     // STRING UTILITY
