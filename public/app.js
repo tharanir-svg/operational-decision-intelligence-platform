@@ -396,6 +396,109 @@ let currentStep   = 0;
 let unlockedUntil = 0; // highest step ever reached
 
 //==================================================
+// AI ANALYSIS PROGRESS
+//==================================================
+
+let analysisElapsedTimer =
+    null;
+
+
+function startAnalysisProgress() {
+
+    const progress =
+        document.getElementById(
+            "analysisProgress"
+        );
+
+    const elapsed =
+        document.getElementById(
+            "analysisElapsed"
+        );
+
+
+    if (!progress) {
+        return;
+    }
+
+
+    progress.classList.remove(
+        "hidden"
+    );
+
+
+    let seconds =
+        0;
+
+
+    if (elapsed) {
+
+        elapsed.textContent =
+            "0s";
+
+    }
+
+
+    if (analysisElapsedTimer) {
+
+        clearInterval(
+            analysisElapsedTimer
+        );
+
+    }
+
+
+    analysisElapsedTimer =
+        setInterval(
+            () => {
+
+                seconds += 1;
+
+
+                if (elapsed) {
+
+                    elapsed.textContent =
+                        `${seconds}s`;
+
+                }
+
+            },
+            1000
+        );
+
+}
+
+
+function stopAnalysisProgress() {
+
+    const progress =
+        document.getElementById(
+            "analysisProgress"
+        );
+
+
+    if (analysisElapsedTimer) {
+
+        clearInterval(
+            analysisElapsedTimer
+        );
+
+        analysisElapsedTimer =
+            null;
+
+    }
+
+
+    if (progress) {
+
+        progress.classList.add(
+            "hidden"
+        );
+
+    }
+
+}
+
+//==================================================
 // INTELLIGENCE OPERATING MODE
 //==================================================
 
@@ -1695,20 +1798,42 @@ setIntelligenceMode(
             // AI ASSISTED MODE
             //==========================================
 
-            analyzeBtn.disabled =
+                        analyzeBtn.disabled =
                 true;
 
             const analyzeBtnText =
-    document.getElementById(
-        "analyzeBtnText"
-    );
+                document.getElementById(
+                    "analyzeBtnText"
+                );
 
-if (analyzeBtnText) {
+            if (analyzeBtnText) {
 
-    analyzeBtnText.textContent =
-        "Analyzing…";
+                analyzeBtnText.textContent =
+                    "Analyzing…";
 
-}
+            }
+
+
+            //==========================================
+            // SHOW AI ANALYSIS PROGRESS
+            //==========================================
+
+            startAnalysisProgress();
+
+
+            const analyzeSpinner =
+                document.getElementById(
+                    "analyzeSpinner"
+                );
+
+            if (analyzeSpinner) {
+
+                analyzeSpinner.classList.remove(
+                    "hidden"
+                );
+
+            }
+
 
             try {
 
@@ -1865,34 +1990,59 @@ if (analyzeBtnText) {
                 }
 
             }
-            finally {
+                        finally {
+
+                //==========================================
+                // STOP AI ANALYSIS PROGRESS
+                //==========================================
+
+                stopAnalysisProgress();
+
+
+                const analyzeSpinner =
+                    document.getElementById(
+                        "analyzeSpinner"
+                    );
+
+                if (analyzeSpinner) {
+
+                    analyzeSpinner.classList.add(
+                        "hidden"
+                    );
+
+                }
+
+
+                //==========================================
+                // RESTORE ANALYZE BUTTON
+                //==========================================
 
                 analyzeBtn.disabled =
                     false;
 
 
                 const analyzeBtnText =
-    document.getElementById(
-        "analyzeBtnText"
-    );
+                    document.getElementById(
+                        "analyzeBtnText"
+                    );
 
-if (analyzeBtnText) {
 
-    analyzeBtnText.textContent =
-        intelligenceMode ===
-            "AI_ASSISTED"
+                if (analyzeBtnText) {
 
-            ? "Analyze Evidence"
+                    analyzeBtnText.textContent =
+                        intelligenceMode ===
+                            "AI_ASSISTED"
 
-            : "Continue to Manual Intelligence";
+                            ? "Analyze Evidence"
 
-}
+                            : "Continue to Manual Intelligence";
+
+                }
 
             }
 
-        }
-    );
-
+            }
+             );
 }
 //==================================================
 // Convert editable comma-separated intelligence

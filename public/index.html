@@ -305,6 +305,36 @@
           <span id="analyzeSpinner" class="spinner hidden"></span>
         </button>
 
+        <div
+  id="analysisProgress"
+  class="analysis-progress hidden"
+  role="status"
+  aria-live="polite"
+>
+  <div class="analysis-progress-header">
+
+    <span class="analysis-progress-title">
+      AI extraction in progress
+    </span>
+
+    <span
+      id="analysisElapsed"
+      class="analysis-progress-time"
+    >
+      0s
+    </span>
+
+  </div>
+
+  <div class="analysis-progress-track">
+    <div class="analysis-progress-indicator"></div>
+  </div>
+
+  <div class="analysis-progress-message">
+    Structuring evidence for analyst review. This can take a few seconds.
+  </div>
+</div>
+
       </div><!-- /pane-0 -->
 
       <!-- ── Step 1: Extracted Intelligence ────── -->

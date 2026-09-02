@@ -774,3 +774,131 @@ appearance: textfield;
 
   color: var(--text-muted);
 }
+/* ==================================================
+   AI ANALYSIS PROGRESS
+   ================================================== */
+
+.analysis-progress {
+    margin-top: 12px;
+    padding: 12px 14px;
+
+    border: 1px solid #1e3a5f;
+    border-radius: 8px;
+
+    background:
+        rgba(15, 23, 42, 0.72);
+}
+
+
+.analysis-progress.hidden {
+    display: none;
+}
+
+
+.analysis-progress-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 9px;
+}
+
+
+.analysis-progress-title {
+    font-size: 12px;
+    font-weight: 600;
+
+    color: #bfdbfe;
+}
+
+
+.analysis-progress-time {
+    min-width: 28px;
+
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+
+    text-align: right;
+
+    color: #64748b;
+}
+
+
+.analysis-progress-track {
+    position: relative;
+
+    height: 3px;
+
+    overflow: hidden;
+
+    border-radius: 999px;
+
+    background:
+        rgba(59, 130, 246, 0.12);
+}
+
+
+.analysis-progress-indicator {
+    position: absolute;
+
+    top: 0;
+    bottom: 0;
+
+    width: 38%;
+
+    border-radius: 999px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            #3b82f6,
+            #60a5fa,
+            transparent
+        );
+
+    animation:
+        odip-analysis-progress
+        1.35s
+        ease-in-out
+        infinite;
+}
+
+
+.analysis-progress-message {
+    margin-top: 9px;
+
+    font-size: 11px;
+    line-height: 1.45;
+
+    color: #64748b;
+}
+
+
+@keyframes odip-analysis-progress {
+
+    0% {
+        left: -40%;
+    }
+
+    100% {
+        left: 105%;
+    }
+
+}
+
+
+@media (
+    prefers-reduced-motion:
+    reduce
+) {
+
+    .analysis-progress-indicator {
+        animation: none;
+
+        left: 31%;
+    }
+
+}
