@@ -815,7 +815,7 @@ if (thresholdNote) {
         if (description) {
 
             description.textContent =
-                "Analyst structures intelligence without an AI provider.";
+                "Enter and verify the incident facts manually before continuing.";
 
         }
 
@@ -823,7 +823,7 @@ if (thresholdNote) {
         if (note) {
 
             note.textContent =
-                "Manual Mode makes no AI call. Risk scoring, thresholds, policies and recommendations remain fully operational.";
+                "Manual Mode does not extract facts from the evidence. Enter the location, casualties, infrastructure impact and other relevant incident details on the Intelligence screen. ODIP will calculate the operational decision.";
 
         }
 
@@ -831,7 +831,7 @@ if (thresholdNote) {
         if (analyzeBtnText) {
 
             analyzeBtnText.textContent =
-                "Continue to Manual Intelligence";
+                "Enter Intelligence Manually";
 
         }
 
@@ -2292,13 +2292,47 @@ function initApproveBtn() {
             ) {
 
                 alert(
-                    "No AI extraction available."
+                    "No intelligence available."
                 );
 
                 return;
 
             }
+                        //==========================================
+            // MANUAL MODE VALIDATION
+            //
+            // Manual Mode performs no AI extraction.
+            // Require the analyst to explicitly provide
+            // the incident location before approval.
+            //==========================================
 
+            if (
+                intelligenceMode ===
+                "MANUAL"
+            ) {
+
+                const location =
+                    $("ip-location")
+                        ?.value
+                        ?.trim() || "";
+
+
+                if (!location) {
+
+                    alert(
+                        "Enter the incident location or city before continuing in Manual Intelligence Mode."
+                    );
+
+
+                    $("ip-location")
+                        ?.focus();
+
+
+                    return;
+
+                }
+
+            }
 
             //--------------------------------------
             // Capture analyst-approved Page 2
