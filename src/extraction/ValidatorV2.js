@@ -599,6 +599,8 @@ class ValidatorV2 {
 
         /\bterrorist\s+motive\s+(?:has\s+)?not\s+been\s+(?:established|confirmed|identified)\b/g,
 
+        /\b(?:have|has)\s+not\s+(?:yet\s+)?(?:established|confirmed|identified|found)\s+(?:any\s+)?(?:a\s+)?terrorist\s+(?:motive|link|connection|involvement|nexus)\b/g,
+
         /\bterror(?:ism|ist)\s+(?:link|connection|nexus)\s+(?:has\s+)?not\s+been\s+(?:established|confirmed|identified)\b/g,
 
         /\bterror(?:ism|ist)\s+(?:has\s+been\s+)?ruled\s+out\b/g,

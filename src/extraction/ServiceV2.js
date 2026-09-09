@@ -52,16 +52,30 @@ class ServiceV2 {
         //----------------------------------------------------
 
         let intel =
-            this.parser.parse(ai.text);
+    this.parser.parse(ai.text);
 
-        console.log("Parser Complete");
+console.log("Parser Complete");
 
-        //----------------------------------------------------
-        // Validate / Enrich
-        //----------------------------------------------------
 
-        intel =
-            this.validator.validate(intel);
+//----------------------------------------------------
+// Preserve authoritative source evidence
+//
+// Never rely on the AI model to reproduce the
+// analyst's original evidence verbatim.
+//----------------------------------------------------
+
+intel.originalText =
+    String(
+        evidence || ""
+    );
+
+
+//----------------------------------------------------
+// Validate / Enrich
+//----------------------------------------------------
+
+intel =
+    this.validator.validate(intel);
 
         console.log("Validation Complete");
 
